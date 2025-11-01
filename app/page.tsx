@@ -76,64 +76,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-dark-500">
-      {/* Hero Section with animated gradient */}
-      <section className="relative overflow-hidden">
-        {/* Animated background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-dark-500 via-dark-400 to-dark-500 opacity-50"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-accent-green/20 via-transparent to-transparent"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-accent-blue/20 via-transparent to-transparent"></div>
-
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-          <div className="text-center">
-            {/* Animated badge */}
-            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white/5 border border-accent-green/30 backdrop-blur-sm mb-8 animate-pulse-slow">
-              <div className="w-2 h-2 bg-accent-green rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-300 font-medium">Employee Tools Hub</span>
-            </div>
-
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              <span className="text-white">Welcome to</span>
-              <br />
-              <span className="gradient-text">CMG Tools Hub</span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Your central portal for accessing CMG Financial&apos;s suite of productivity tools,
-              AI-powered chatbots, change management systems, and marketing platforms.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#tools"
-                className="group inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-xl text-dark-500 bg-gradient-to-r from-accent-green to-accent-blue hover:shadow-neon-green transition-all duration-300 transform hover:scale-105"
-              >
-                Explore Tools
-                <svg className="ml-2 w-5 h-5 transform group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </a>
-              <a
-                href="https://www.cmgfi.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center justify-center px-8 py-4 border-2 border-white/20 text-base font-bold rounded-xl text-white hover:bg-white/5 hover:border-accent-green transition-all duration-300 backdrop-blur-sm"
-              >
-                Visit CMG Financial
-                <svg className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-dark-500 to-transparent"></div>
-      </section>
-
       {/* Tools Dashboard Section */}
       <section id="tools" className="py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
