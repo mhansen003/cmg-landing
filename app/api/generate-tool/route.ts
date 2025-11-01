@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 
 export async function POST(request: NextRequest) {
   try {
-    const { url } = await request.json();
+    const { url, description } = await request.json();
 
     if (!url) {
       return NextResponse.json(
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
         },
         {
           role: 'user',
-          content: `Analyze this tool and generate compelling content: ${url}`,
+          content: `Analyze this tool and generate compelling content: ${url}${description ? `\n\nAdditional context: ${description}` : ''}`,
         },
       ],
       response_format: { type: 'json_object' },

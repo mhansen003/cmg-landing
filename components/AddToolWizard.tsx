@@ -11,6 +11,7 @@ interface AddToolWizardProps {
 
 interface ToolFormData {
   url: string;
+  description: string;
   video: File | null;
   videoPreview: string | null;
 }
@@ -19,6 +20,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<ToolFormData>({
     url: '',
+    description: '',
     video: null,
     videoPreview: null,
   });
@@ -57,7 +59,10 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
       const response = await fetch('/api/generate-tool', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: formData.url }),
+        body: JSON.stringify({
+          url: formData.url,
+          description: formData.description
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to generate tool data');
@@ -84,7 +89,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
 
   const handleClose = () => {
     setStep(1);
-    setFormData({ url: '', video: null, videoPreview: null });
+    setFormData({ url: '', description: '', video: null, videoPreview: null });
     setGeneratedData(null);
     setError(null);
     onClose();
@@ -153,6 +158,20 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
                     className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors"
                   />
                   <p className="text-xs text-gray-500 mt-2">AI will analyze this URL to generate tool details</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-white mb-2">
+                    Brief Description (Optional)
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Describe what this tool does and its key features..."
+                    rows={3}
+                    className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors resize-none"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">Help AI understand your tool better (optional)</p>
                 </div>
 
                 <div>

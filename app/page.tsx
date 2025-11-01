@@ -1,12 +1,55 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ToolCard from '@/components/ToolCard';
 import AddToolWizard from '@/components/AddToolWizard';
 
+// Helper function to get icon for a tool based on category
+const getToolIcon = (category?: string) => {
+  const icons: Record<string, React.ReactNode> = {
+    Operations: (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+    Marketing: (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      </svg>
+    ),
+    default: (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+  };
+  return icons[category || 'default'] || icons.default;
+};
+
 export default function Home() {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
-  const [tools, setTools] = useState([
+  const [tools, setTools] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch tools from API on mount
+  useEffect(() => {
+    const fetchTools = async () => {
+      try {
+        const response = await fetch('/api/tools');
+        const data = await response.json();
+        setTools(data.tools || []);
+      } catch (error) {
+        console.error('Error fetching tools:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTools();
+  }, []);
+
+  // Fallback tools if loading or empty (icons added dynamically in render)
+  const fallbackTools = [
     {
       title: 'Change Management Intake',
       description: 'Streamline your application intake process with our AI-powered change management system. Submit requests, track progress, and automatically route to the right teams.',
@@ -14,7 +57,7 @@ export default function Home() {
       url: 'https://intake.cmgfinancial.ai/',
       category: 'Operations',
       thumbnailUrl: 'https://intake.cmgfinancial.ai/api/og',
-      accentColor: 'green' as const,
+      accentColor: 'green',
       features: [
         'AI-powered request analysis and categorization',
         'Automatic routing to appropriate teams',
@@ -23,11 +66,6 @@ export default function Home() {
         'Integration with Azure DevOps',
         'Document and screenshot attachment support',
       ],
-      icon: (
-        <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
     },
     {
       title: 'Communications Builder',
@@ -37,7 +75,7 @@ export default function Home() {
       category: 'Marketing',
       thumbnailUrl: 'https://trainbuilder.cmgfinancial.ai/api/og',
       videoUrl: '/videos/communications-builder-demo.mp4',
-      accentColor: 'blue' as const,
+      accentColor: 'blue',
       features: [
         'Multi-format output generation (Release Notes, Training Guides, FAQs)',
         'AI-powered content creation and formatting',
@@ -46,32 +84,38 @@ export default function Home() {
         'Quick reference card generation',
         'Consistent branding across all materials',
       ],
-      icon: (
-        <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-      ),
     },
-  ]);
+  ];
 
-  const handleAddTool = (toolData: any) => {
-    // Add the new tool to the tools array
-    const newTool = {
-      title: toolData.title,
-      description: toolData.description,
-      fullDescription: toolData.fullDescription,
-      url: toolData.url,
-      category: toolData.category,
-      thumbnailUrl: toolData.thumbnailUrl,
-      accentColor: toolData.accentColor || 'green',
-      features: toolData.features,
-      icon: (
-        <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
-    };
-    setTools(prev => [...prev, newTool]);
+  const handleAddTool = async (toolData: any) => {
+    try {
+      // Save tool to API
+      const response = await fetch('/api/tools', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: toolData.title,
+          description: toolData.description,
+          fullDescription: toolData.fullDescription,
+          url: toolData.url,
+          category: toolData.category,
+          thumbnailUrl: toolData.thumbnailUrl,
+          videoUrl: toolData.videoUrl,
+          accentColor: toolData.accentColor || 'green',
+          features: toolData.features,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to add tool');
+
+      const data = await response.json();
+
+      // Add new tool to local state
+      setTools(prev => [...prev, data.tool]);
+    } catch (error) {
+      console.error('Error adding tool:', error);
+      alert('Failed to add tool. Please try again.');
+    }
   };
 
   return (
@@ -89,23 +133,30 @@ export default function Home() {
           </div>
 
           {/* Tool Cards Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {tools.map((tool, index) => (
-              <ToolCard
-                key={index}
-                title={tool.title}
-                description={tool.description}
-                url={tool.url}
-                category={tool.category}
-                thumbnailUrl={tool.thumbnailUrl}
-                videoUrl={tool.videoUrl}
-                icon={tool.icon}
-                accentColor={tool.accentColor}
-                fullDescription={tool.fullDescription}
-                features={tool.features}
-              />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-green"></div>
+              <p className="text-gray-400 mt-4">Loading tools...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {(tools.length > 0 ? tools : fallbackTools).map((tool, index) => (
+                <ToolCard
+                  key={tool.id || index}
+                  title={tool.title}
+                  description={tool.description}
+                  url={tool.url}
+                  category={tool.category}
+                  thumbnailUrl={tool.thumbnailUrl}
+                  videoUrl={tool.videoUrl}
+                  icon={getToolIcon(tool.category)}
+                  accentColor={tool.accentColor}
+                  fullDescription={tool.fullDescription}
+                  features={tool.features}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Coming Soon Section */}
           <div className="mt-20 text-center">
