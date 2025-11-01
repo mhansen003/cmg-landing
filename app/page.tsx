@@ -72,7 +72,6 @@ export default function Home() {
       fullDescription: 'The Change Management Intake system revolutionizes how CMG handles internal requests, feature changes, and support tickets. Using advanced AI technology, it automatically categorizes submissions, routes them to the appropriate teams, and pre-fills change management forms. This dramatically reduces processing time and ensures every request gets the attention it deserves.',
       url: 'https://intake.cmgfinancial.ai/',
       category: 'CMG Product',
-      thumbnailUrl: 'https://intake.cmgfinancial.ai/api/og',
       accentColor: 'green',
       features: [
         'AI-powered request analysis and categorization',
@@ -89,7 +88,6 @@ export default function Home() {
       fullDescription: 'The Communications Builder empowers teams to create comprehensive, professional documentation with minimal effort. Simply describe your feature or change, upload screenshots, and let AI generate perfectly formatted release notes, training guides, email announcements, FAQ documents, and quick reference cards - all from a single input.',
       url: 'https://trainbuilder.cmgfinancial.ai/',
       category: 'CMG Product',
-      thumbnailUrl: 'https://trainbuilder.cmgfinancial.ai/api/og',
       videoUrl: '/videos/communications-builder-demo.mp4',
       accentColor: 'blue',
       features: [
@@ -107,7 +105,6 @@ export default function Home() {
       fullDescription: 'The AI Chatbots platform provides access to multiple state-of-the-art language models in one unified interface. Perfect for research, content creation, code generation, data analysis, and complex problem-solving. Switch between different AI models to find the best fit for your task.',
       url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new',
       category: 'Sales',
-      thumbnailUrl: 'https://app-librechat-u2uf7w.azurewebsites.net/api/og',
       accentColor: 'purple',
       features: [
         'Multiple AI models (GPT-4, Claude, Gemini)',
