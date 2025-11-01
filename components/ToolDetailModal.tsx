@@ -63,7 +63,7 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="relative w-full max-w-5xl max-h-[75vh] overflow-y-auto bg-gradient-to-br from-dark-300 to-dark-400 rounded-2xl border border-white/20 shadow-2xl pointer-events-auto animate-in zoom-in-95 duration-300"
+          className="relative w-full max-w-5xl max-h-[75vh] flex flex-col bg-gradient-to-br from-dark-300 to-dark-400 rounded-2xl border border-white/20 shadow-2xl pointer-events-auto animate-in zoom-in-95 duration-300"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
@@ -77,7 +77,7 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
           </button>
 
           {/* Header */}
-          <div className="p-6 border-b border-white/10">
+          <div className="p-6 border-b border-white/10 flex-shrink-0">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 {category && (
@@ -91,8 +91,10 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
             </div>
           </div>
 
-          {/* Video and Screenshot Preview - Side by Side */}
-          {(videoUrl || thumbnailUrl) && (
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Video and Screenshot Preview - Side by Side */}
+            {(videoUrl || thumbnailUrl) && (
             <div className={`relative w-full bg-dark-500 border-y border-white/10 ${videoUrl && thumbnailUrl ? 'grid grid-cols-2' : ''}`}>
               {/* Video */}
               {videoUrl && (
@@ -164,9 +166,10 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
               </div>
             )}
           </div>
+          </div>
 
-          {/* Footer with CTA */}
-          <div className="p-6 border-t border-white/10 bg-dark-500/50">
+          {/* Footer with CTA - Sticky at Bottom */}
+          <div className="p-6 border-t border-white/10 bg-dark-500/50 flex-shrink-0">
             <div className="flex items-center justify-between">
               <div className="text-xs text-gray-400">
                 Ready to get started?
