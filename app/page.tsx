@@ -147,7 +147,7 @@ export default function Home() {
           </div>
 
           {/* Tool Cards Grid */}
-          <div className="space-y-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {tools.map((tool, index) => (
               <ToolCard
                 key={index}

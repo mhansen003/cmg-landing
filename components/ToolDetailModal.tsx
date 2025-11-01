@@ -61,7 +61,7 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-dark-300 to-dark-400 rounded-2xl border border-white/20 shadow-2xl pointer-events-auto animate-in zoom-in-95 duration-300"
+          className="relative w-full max-w-5xl max-h-[75vh] overflow-y-auto bg-gradient-to-br from-dark-300 to-dark-400 rounded-2xl border border-white/20 shadow-2xl pointer-events-auto animate-in zoom-in-95 duration-300"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
@@ -75,23 +75,23 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
           </button>
 
           {/* Header */}
-          <div className="p-8 border-b border-white/10">
+          <div className="p-6 border-b border-white/10">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 {category && (
-                  <span className={`inline-block px-3 py-1 text-xs font-bold ${colors.text} bg-white/5 rounded-full border ${colors.border} mb-4`}>
+                  <span className={`inline-block px-3 py-1 text-xs font-bold ${colors.text} bg-white/5 rounded-full border ${colors.border} mb-3`}>
                     {category}
                   </span>
                 )}
-                <h2 className="text-4xl font-bold text-white mb-3">{title}</h2>
-                <p className="text-lg text-gray-400">{description}</p>
+                <h2 className="text-3xl font-bold text-white mb-2">{title}</h2>
+                <p className="text-base text-gray-400">{description}</p>
               </div>
             </div>
           </div>
 
           {/* Screenshot Preview */}
           {thumbnailUrl && (
-            <div className="relative w-full h-96 bg-dark-500 border-y border-white/10">
+            <div className="relative w-full h-64 bg-dark-500 border-y border-white/10">
               <Image
                 src={thumbnailUrl}
                 alt={`${title} screenshot`}
@@ -104,26 +104,26 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
           )}
 
           {/* Content */}
-          <div className="p-8 space-y-6">
+          <div className="p-6 space-y-4">
             {/* Full Description */}
             {fullDescription && (
               <div>
-                <h3 className="text-xl font-bold text-white mb-3">About this tool</h3>
-                <p className="text-gray-400 leading-relaxed">{fullDescription}</p>
+                <h3 className="text-lg font-bold text-white mb-2">About this tool</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{fullDescription}</p>
               </div>
             )}
 
             {/* Features */}
             {features && features.length > 0 && (
               <div>
-                <h3 className="text-xl font-bold text-white mb-4">Key Features</h3>
-                <div className="grid md:grid-cols-2 gap-3">
+                <h3 className="text-lg font-bold text-white mb-3">Key Features</h3>
+                <div className="grid md:grid-cols-2 gap-2">
                   {features.map((feature, index) => (
-                    <div key={index} className="flex items-start space-x-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                      <svg className={`w-5 h-5 ${colors.text} flex-shrink-0 mt-0.5`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div key={index} className="flex items-start space-x-2 p-2.5 rounded-lg bg-white/5 border border-white/10">
+                      <svg className={`w-4 h-4 ${colors.text} flex-shrink-0 mt-0.5`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-gray-300 text-sm">{feature}</span>
+                      <span className="text-gray-300 text-xs">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -132,19 +132,19 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
           </div>
 
           {/* Footer with CTA */}
-          <div className="p-8 border-t border-white/10 bg-dark-500/50">
+          <div className="p-6 border-t border-white/10 bg-dark-500/50">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-400">
+              <div className="text-xs text-gray-400">
                 Ready to get started?
               </div>
               <a
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`inline-flex items-center px-6 py-3 text-sm font-bold rounded-xl text-dark-500 ${colors.bg} hover:shadow-neon-green transition-all duration-300 transform hover:scale-105`}
+                className={`inline-flex items-center px-5 py-2.5 text-xs font-bold rounded-xl text-dark-500 ${colors.bg} hover:shadow-neon-green transition-all duration-300 transform hover:scale-105`}
               >
                 Launch {title}
-                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </a>

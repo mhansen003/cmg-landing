@@ -103,10 +103,65 @@ const ToolCard: React.FC<ToolCardProps> = ({
         {/* Glow effect on hover */}
         <div className={`absolute -inset-0.5 ${colors.glow} rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition duration-500`}></div>
 
-        <div className={`relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-2xl overflow-hidden border ${colors.hover} border-white/10 transition-all duration-500 group-hover:scale-[1.01]`}>
-          <div className="grid lg:grid-cols-2 gap-0">
-            {/* Left side - Content */}
-            <div className="p-8 flex flex-col justify-between relative z-10">
+        <div className={`relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-xl overflow-hidden border ${colors.hover} border-white/10 transition-all duration-500 group-hover:scale-[1.01]`}>
+          <div className="flex flex-col">
+            {/* Top - Video/Screenshot */}
+            <div className="relative bg-dark-500 flex items-center justify-center p-3 h-48 cursor-pointer" onClick={() => setIsModalOpen(true)}>
+              {videoUrl ? (
+                <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500">
+                  <video
+                    src={videoUrl}
+                    className="w-full h-full object-cover rounded-lg"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                  />
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <svg className="w-8 h-8 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span className="text-xs font-bold">View details</span>
+                    </div>
+                  </div>
+                </div>
+              ) : thumbnailUrl ? (
+                <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent to-dark-500/50 z-10"></div>
+                  <Image
+                    src={thumbnailUrl}
+                    alt={`${title} screenshot`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <svg className="w-8 h-8 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span className="text-xs font-bold">View details</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className={`w-full h-full rounded-lg bg-gradient-to-br from-dark-400 to-dark-500 flex items-center justify-center border ${colors.border}`}>
+                  <svg className={`w-12 h-12 ${colors.text} opacity-30`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              )}
+              {/* Corner accent */}
+              <div className={`absolute top-0 right-0 w-16 h-16 ${colors.bg} opacity-10 blur-2xl`}></div>
+              <div className={`absolute bottom-0 left-0 w-16 h-16 ${colors.bg} opacity-10 blur-2xl`}></div>
+            </div>
+
+            {/* Bottom - Content */}
+            <div className="p-5 flex flex-col justify-between relative z-10">
               <div>
                 {/* Category Badge */}
                 {category && (
@@ -118,29 +173,29 @@ const ToolCard: React.FC<ToolCardProps> = ({
                 )}
 
                 {/* Icon and Title */}
-                <div className="flex items-start space-x-4 mb-6">
+                <div className="flex items-start space-x-3 mb-3">
                   {icon && (
                     <div className="relative flex-shrink-0">
                       <div className={`absolute inset-0 ${colors.bg} blur-md opacity-50`}></div>
-                      <div className={`relative w-14 h-14 ${colors.bg} rounded-xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
-                        {icon}
+                      <div className={`relative w-10 h-10 ${colors.bg} rounded-lg flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                        <div className="scale-75">{icon}</div>
                       </div>
                     </div>
                   )}
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-white mb-2">
+                    <h3 className="text-lg font-bold text-white">
                       {title}
                     </h3>
                   </div>
                 </div>
 
                 {/* Description */}
-                <p className="text-gray-400 text-sm leading-relaxed mb-6">
+                <p className="text-gray-400 text-xs leading-relaxed mb-4">
                   {description}
                 </p>
 
                 {/* Action Buttons Row */}
-                <div className="flex items-center space-x-3 mb-6">
+                <div className="flex items-center space-x-2 mb-4">
                   {/* Vote Up */}
                   <button
                     onClick={() => handleVote('up')}
@@ -226,7 +281,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`inline-flex items-center justify-center w-full px-6 py-3.5 text-sm font-bold rounded-xl text-dark-500 ${colors.bg} hover:${colors.shadow} transition-all duration-300 transform hover:scale-105 hover:translate-y-[-2px] relative overflow-hidden group/button`}
+                  className={`inline-flex items-center justify-center w-full px-4 py-2.5 text-xs font-bold rounded-lg text-dark-500 ${colors.bg} hover:${colors.shadow} transition-all duration-300 transform hover:scale-105 relative overflow-hidden group/button`}
                 >
                   <span className="relative z-10 flex items-center">
                     Launch Tool
@@ -247,76 +302,6 @@ const ToolCard: React.FC<ToolCardProps> = ({
                   <div className="absolute inset-0 bg-white/20 transform translate-x-[-100%] group-hover/button:translate-x-[100%] transition-transform duration-700"></div>
                 </a>
               </div>
-            </div>
-
-            {/* Right side - Video/Screenshot/Thumbnail */}
-            <div className="relative bg-dark-500 flex items-center justify-center p-6 min-h-[300px] lg:min-h-[400px] cursor-pointer" onClick={() => setIsModalOpen(true)}>
-              {videoUrl ? (
-                <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500 transform group-hover:scale-105">
-                  <video
-                    src={videoUrl}
-                    className="w-full h-full object-cover rounded-lg"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                  />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      <span className="text-sm font-bold">Click to view details</span>
-                    </div>
-                  </div>
-                </div>
-              ) : thumbnailUrl ? (
-                <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500 transform group-hover:scale-105">
-                  <div className="absolute inset-0 bg-gradient-to-br from-transparent to-dark-500/50 z-10"></div>
-                  <Image
-                    src={thumbnailUrl}
-                    alt={`${title} screenshot`}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                  {/* Scan line effect */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent transform translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-3000 z-20"></div>
-
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      <span className="text-sm font-bold">Click to view details</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className={`w-full h-full rounded-lg bg-gradient-to-br from-dark-400 to-dark-500 flex items-center justify-center border ${colors.border}`}>
-                  <svg
-                    className={`w-24 h-24 ${colors.text} opacity-30`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-              )}
-
-              {/* Corner accent */}
-              <div className={`absolute top-0 right-0 w-20 h-20 ${colors.bg} opacity-10 blur-3xl`}></div>
-              <div className={`absolute bottom-0 left-0 w-20 h-20 ${colors.bg} opacity-10 blur-3xl`}></div>
             </div>
           </div>
         </div>
