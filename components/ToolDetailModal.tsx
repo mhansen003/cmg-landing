@@ -10,6 +10,7 @@ interface ToolDetailModalProps {
   description: string;
   url: string;
   thumbnailUrl?: string;
+  videoUrl?: string;
   category?: string;
   accentColor?: 'green' | 'blue' | 'purple';
   fullDescription?: string;
@@ -23,6 +24,7 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
   description,
   url,
   thumbnailUrl,
+  videoUrl,
   category,
   accentColor = 'green',
   fullDescription,
@@ -89,17 +91,49 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
             </div>
           </div>
 
-          {/* Screenshot Preview */}
-          {thumbnailUrl && (
-            <div className="relative w-full h-64 bg-dark-500 border-y border-white/10">
-              <Image
-                src={thumbnailUrl}
-                alt={`${title} screenshot`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 80vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-dark-400 to-transparent"></div>
+          {/* Video and Screenshot Preview */}
+          {(videoUrl || thumbnailUrl) && (
+            <div className={`relative w-full bg-dark-500 border-y border-white/10 ${videoUrl && thumbnailUrl ? 'grid grid-cols-2' : ''}`}>
+              {/* Video */}
+              {videoUrl && (
+                <div className="relative h-80 bg-dark-500 flex items-center justify-center p-4">
+                  <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10">
+                    <video
+                      src={videoUrl}
+                      className="w-full h-full object-contain rounded-lg"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      controls
+                    />
+                  </div>
+                  {videoUrl && thumbnailUrl && (
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-dark-500/90 border border-white/10 rounded text-xs text-gray-300 font-bold backdrop-blur-sm">
+                      Video Demo
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Screenshot */}
+              {thumbnailUrl && (
+                <div className="relative h-80 bg-dark-500">
+                  <Image
+                    src={thumbnailUrl}
+                    alt={`${title} screenshot`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-dark-400 to-transparent"></div>
+                  {videoUrl && thumbnailUrl && (
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-dark-500/90 border border-white/10 rounded text-xs text-gray-300 font-bold backdrop-blur-sm">
+                      Screenshot
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

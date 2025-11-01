@@ -315,6 +315,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
         description={description}
         url={url}
         thumbnailUrl={thumbnailUrl}
+        videoUrl={videoUrl}
         category={category}
         accentColor={accentColor}
         fullDescription={fullDescription}
