@@ -91,16 +91,17 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
             </div>
           </div>
 
-          {/* Video and Screenshot Preview */}
+          {/* Video and Screenshot Preview - Side by Side */}
           {(videoUrl || thumbnailUrl) && (
-            <div className="relative w-full bg-dark-500 border-y border-white/10">
-              {/* Video - Full Width at Top */}
+            <div className={`relative w-full bg-dark-500 border-y border-white/10 ${videoUrl && thumbnailUrl ? 'grid grid-cols-2' : ''}`}>
+              {/* Video */}
               {videoUrl && (
                 <div className="relative bg-dark-500 flex items-center justify-center p-6">
-                  <div className="relative w-full rounded-lg overflow-hidden border border-white/10 shadow-2xl" style={{ aspectRatio: '16/9' }}>
+                  <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl">
                     <video
                       src={videoUrl}
                       className="w-full h-full object-contain rounded-lg bg-black"
+                      style={{ minHeight: '400px' }}
                       loop
                       playsInline
                       controls
@@ -115,15 +116,15 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
                 </div>
               )}
 
-              {/* Screenshot - Below Video */}
+              {/* Screenshot */}
               {thumbnailUrl && (
-                <div className="relative h-64 bg-dark-500 border-t border-white/10">
+                <div className="relative bg-dark-500" style={{ minHeight: '400px' }}>
                   <Image
                     src={thumbnailUrl}
                     alt={`${title} screenshot`}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 80vw"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-dark-400 to-transparent"></div>
                   {videoUrl && thumbnailUrl && (
