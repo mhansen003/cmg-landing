@@ -18,7 +18,7 @@ export async function GET() {
           description: 'Streamline your application intake process with our AI-powered change management system. Submit requests, track progress, and automatically route to the right teams.',
           fullDescription: 'The Change Management Intake system revolutionizes how CMG handles internal requests, feature changes, and support tickets. Using advanced AI technology, it automatically categorizes submissions, routes them to the appropriate teams, and pre-fills change management forms. This dramatically reduces processing time and ensures every request gets the attention it deserves.',
           url: 'https://intake.cmgfinancial.ai/',
-          category: 'Operations',
+          category: 'CMG Product',
           thumbnailUrl: 'https://intake.cmgfinancial.ai/api/og',
           accentColor: 'green',
           features: [
@@ -35,7 +35,7 @@ export async function GET() {
           description: 'Create professional communications, training materials, and release notes with AI assistance. Generate multiple output formats from a single input.',
           fullDescription: 'The Communications Builder empowers teams to create comprehensive, professional documentation with minimal effort. Simply describe your feature or change, upload screenshots, and let AI generate perfectly formatted release notes, training guides, email announcements, FAQ documents, and quick reference cards - all from a single input.',
           url: 'https://trainbuilder.cmgfinancial.ai/',
-          category: 'Marketing',
+          category: 'CMG Product',
           thumbnailUrl: 'https://trainbuilder.cmgfinancial.ai/api/og',
           videoUrl: '/videos/communications-builder-demo.mp4',
           accentColor: 'blue',

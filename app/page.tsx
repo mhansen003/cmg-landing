@@ -7,6 +7,11 @@ import AddToolWizard from '@/components/AddToolWizard';
 // Helper function to get icon for a tool based on category
 const getToolIcon = (category?: string) => {
   const icons: Record<string, React.ReactNode> = {
+    'CMG Product': (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    ),
     Operations: (
       <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -38,6 +43,7 @@ const getToolIcon = (category?: string) => {
 
 export default function Home() {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [prefilledCategory, setPrefilledCategory] = useState<string | null>(null);
   const [tools, setTools] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -65,7 +71,7 @@ export default function Home() {
       description: 'Streamline your application intake process with our AI-powered change management system. Submit requests, track progress, and automatically route to the right teams.',
       fullDescription: 'The Change Management Intake system revolutionizes how CMG handles internal requests, feature changes, and support tickets. Using advanced AI technology, it automatically categorizes submissions, routes them to the appropriate teams, and pre-fills change management forms. This dramatically reduces processing time and ensures every request gets the attention it deserves.',
       url: 'https://intake.cmgfinancial.ai/',
-      category: 'Operations',
+      category: 'CMG Product',
       thumbnailUrl: 'https://intake.cmgfinancial.ai/api/og',
       accentColor: 'green',
       features: [
@@ -82,7 +88,7 @@ export default function Home() {
       description: 'Create professional communications, training materials, and release notes with AI assistance. Generate multiple output formats from a single input.',
       fullDescription: 'The Communications Builder empowers teams to create comprehensive, professional documentation with minimal effort. Simply describe your feature or change, upload screenshots, and let AI generate perfectly formatted release notes, training guides, email announcements, FAQ documents, and quick reference cards - all from a single input.',
       url: 'https://trainbuilder.cmgfinancial.ai/',
-      category: 'Marketing',
+      category: 'CMG Product',
       thumbnailUrl: 'https://trainbuilder.cmgfinancial.ai/api/og',
       videoUrl: '/videos/communications-builder-demo.mp4',
       accentColor: 'blue',
@@ -114,6 +120,16 @@ export default function Home() {
     },
   ];
 
+  const handleOpenWizard = (category?: string) => {
+    setPrefilledCategory(category || null);
+    setIsWizardOpen(true);
+  };
+
+  const handleCloseWizard = () => {
+    setIsWizardOpen(false);
+    setPrefilledCategory(null);
+  };
+
   const handleAddTool = async (toolData: any) => {
     try {
       // Save tool to API
@@ -125,7 +141,7 @@ export default function Home() {
           description: toolData.description,
           fullDescription: toolData.fullDescription,
           url: toolData.url,
-          category: toolData.category,
+          category: toolData.category || prefilledCategory,
           thumbnailUrl: toolData.thumbnailUrl,
           videoUrl: toolData.videoUrl,
           accentColor: toolData.accentColor || 'green',
@@ -186,8 +202,8 @@ export default function Home() {
                     <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
                   </div>
 
-                  {/* Horizontal Scrolling Tool Cards */}
-                  <div className="relative group/scroll">
+                  {/* Horizontal Scrolling Tool Cards with Border */}
+                  <div className="relative group/scroll border border-white/10 rounded-xl p-4 bg-gradient-to-br from-dark-400/30 to-dark-500/30">
                     <div className="overflow-x-auto overflow-y-hidden scrollbar-hide pb-4">
                       <div className="flex space-x-6 min-w-max px-1">
                         {categoryTools.map((tool, index) => (
@@ -206,6 +222,27 @@ export default function Home() {
                             />
                           </div>
                         ))}
+
+                        {/* Ghost Tile - Add New Tool */}
+                        <div className="w-[450px] flex-shrink-0">
+                          <button
+                            onClick={() => handleOpenWizard(category)}
+                            className="h-full min-h-[400px] w-full group relative bg-gradient-to-br from-dark-300/50 to-dark-400/50 rounded-xl border-2 border-dashed border-white/20 hover:border-accent-green/50 transition-all duration-300 flex flex-col items-center justify-center space-y-4 hover:scale-[1.02]"
+                          >
+                            <div className="relative">
+                              <div className="absolute inset-0 bg-accent-green/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                              <div className="relative w-16 h-16 rounded-2xl bg-white/5 border border-white/20 group-hover:border-accent-green flex items-center justify-center transition-all duration-300">
+                                <svg className="w-8 h-8 text-gray-500 group-hover:text-accent-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                              </div>
+                            </div>
+                            <div className="text-center">
+                              <h3 className="text-lg font-bold text-gray-400 group-hover:text-white transition-colors">Add New Tool</h3>
+                              <p className="text-sm text-gray-500 group-hover:text-gray-400 transition-colors mt-1">Contribute to {category}</p>
+                            </div>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -213,30 +250,12 @@ export default function Home() {
               ))}
             </div>
           )}
-
-          {/* Coming Soon Section */}
-          <div className="mt-20 text-center">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-accent-purple/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition duration-500"></div>
-              <div className="relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-2xl p-12 border border-white/10 group-hover:border-accent-purple transition-all duration-500">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-accent-purple/10 border border-accent-purple/30 mb-6">
-                  <svg className="w-10 h-10 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </div>
-                <h3 className="text-3xl font-bold text-white mb-3">More Tools Coming Soon</h3>
-                <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                  We&apos;re constantly expanding our suite of tools. Check back regularly for new additions and exciting features!
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* Floating Add Tool Button */}
       <button
-        onClick={() => setIsWizardOpen(true)}
+        onClick={() => handleOpenWizard()}
         className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-accent-green to-accent-blue rounded-full shadow-neon-green hover:scale-110 transition-all duration-300 z-40 flex items-center justify-center group"
         title="Add New Tool"
       >
