@@ -1,8 +1,12 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import ToolCard from '@/components/ToolCard';
+import AddToolWizard from '@/components/AddToolWizard';
 
 export default function Home() {
-  const tools = [
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [tools, setTools] = useState([
     {
       title: 'Change Management Intake',
       description: 'Streamline your application intake process with our AI-powered change management system. Submit requests, track progress, and automatically route to the right teams.',
@@ -47,7 +51,27 @@ export default function Home() {
         </svg>
       ),
     },
-  ];
+  ]);
+
+  const handleAddTool = (toolData: any) => {
+    // Add the new tool to the tools array
+    const newTool = {
+      title: toolData.title,
+      description: toolData.description,
+      fullDescription: toolData.fullDescription,
+      url: toolData.url,
+      category: toolData.category,
+      thumbnailUrl: toolData.thumbnailUrl,
+      accentColor: toolData.accentColor || 'green',
+      features: toolData.features,
+      icon: (
+        <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      ),
+    };
+    setTools(prev => [...prev, newTool]);
+  };
 
   return (
     <div className="min-h-screen bg-dark-500">
@@ -107,43 +131,6 @@ export default function Home() {
 
         {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-dark-500 to-transparent"></div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="relative py-16 border-y border-white/10 bg-dark-400/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center group">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-accent-green/10 border border-accent-green/30 mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-              </div>
-              <div className="text-4xl font-bold text-white mb-2 gradient-text">{tools.length}+</div>
-              <div className="text-gray-400 font-medium">Active Tools</div>
-            </div>
-
-            <div className="text-center group">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-accent-blue/10 border border-accent-blue/30 mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div className="text-4xl font-bold text-white mb-2 text-accent-blue">24/7</div>
-              <div className="text-gray-400 font-medium">Availability</div>
-            </div>
-
-            <div className="text-center group">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-accent-purple/10 border border-accent-purple/30 mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <div className="text-4xl font-bold text-white mb-2 text-accent-purple">CMG</div>
-              <div className="text-gray-400 font-medium">Employees Only</div>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Tools Dashboard Section */}
@@ -222,6 +209,24 @@ export default function Home() {
           </a>
         </div>
       </section>
+
+      {/* Floating Add Tool Button */}
+      <button
+        onClick={() => setIsWizardOpen(true)}
+        className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-accent-green to-accent-blue rounded-full shadow-neon-green hover:scale-110 transition-all duration-300 z-40 flex items-center justify-center group"
+        title="Add New Tool"
+      >
+        <svg className="w-8 h-8 text-dark-500 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      </button>
+
+      {/* Add Tool Wizard */}
+      <AddToolWizard
+        isOpen={isWizardOpen}
+        onClose={() => setIsWizardOpen(false)}
+        onSubmit={handleAddTool}
+      />
     </div>
   );
 }
