@@ -3,11 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --cmg-blue: #0066CC;
-  --cmg-darkblue: #003d7a;
-  --cmg-gray: #6B7280;
-  --cmg-lightgray: #F3F4F6;
-  --cmg-dark: #1F2937;
+  --accent-green: #00FF88;
+  --accent-blue: #00D4FF;
+  --cmg-green: #A4D65E;
+  --dark-bg: #0D0D0D;
 }
 
 body {
@@ -16,6 +15,55 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #0D0D0D;
+  color: #FFFFFF;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #121212;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A2A2A;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A3A3A;
+}
+
+/* Glassmorphism effect */
+.glass {
+  background: rgba(42, 42, 42, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(135deg, #00FF88, #00D4FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Neon glow animation */
+@keyframes neon-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(0, 255, 136, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.8));
+  }
+}
+
+.neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite;
 }
 
 @layer utilities {

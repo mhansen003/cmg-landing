@@ -4,11 +4,12 @@ import ToolCard from '@/components/ToolCard';
 export default function Home() {
   const tools = [
     {
-      title: 'Intake Portal',
-      description: 'Streamline your application intake process with our comprehensive intake management system. Process new applications, track progress, and manage submissions efficiently.',
+      title: 'Change Management Intake',
+      description: 'Streamline your application intake process with our AI-powered change management system. Submit requests, track progress, and automatically route to the right teams. Features AI analysis for smart categorization and faster processing.',
       url: 'https://intake.cmgfinancial.ai/',
       category: 'Operations',
-      videoUrl: '', // User will provide video
+      thumbnailUrl: 'https://intake.cmgfinancial.ai/api/og',
+      accentColor: 'green' as const,
       icon: (
         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -16,11 +17,12 @@ export default function Home() {
       ),
     },
     {
-      title: 'Train Builder',
-      description: 'Create compelling marketing campaigns and training materials with our intuitive Train Builder platform. Design, customize, and deploy professional marketing content.',
+      title: 'Communications Builder',
+      description: 'Create professional communications, training materials, and release notes with AI assistance. Generate multiple output formats from a single input including training guides, email announcements, FAQ documents, and quick reference cards.',
       url: 'https://trainbuilder.cmgfinancial.ai/',
       category: 'Marketing',
-      videoUrl: '', // User will provide video
+      thumbnailUrl: 'https://trainbuilder.cmgfinancial.ai/api/og',
+      accentColor: 'blue' as const,
       icon: (
         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -30,25 +32,43 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-cmg-darkblue to-cmg-blue text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-dark-500">
+      {/* Hero Section with animated gradient */}
+      <section className="relative overflow-hidden">
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-dark-500 via-dark-400 to-dark-500 opacity-50"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-accent-green/20 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-accent-blue/20 via-transparent to-transparent"></div>
+
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Welcome to CMG Tools Hub
+            {/* Animated badge */}
+            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white/5 border border-accent-green/30 backdrop-blur-sm mb-8 animate-pulse-slow">
+              <div className="w-2 h-2 bg-accent-green rounded-full animate-pulse"></div>
+              <span className="text-sm text-gray-300 font-medium">Employee Tools Hub</span>
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              <span className="text-white">Welcome to</span>
+              <br />
+              <span className="gradient-text">CMG Tools Hub</span>
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+
+            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
               Your central portal for accessing CMG Financial&apos;s suite of productivity tools,
-              chat bots, change management systems, and marketing platforms.
+              AI-powered chatbots, change management systems, and marketing platforms.
             </p>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="#tools"
-                className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-cmg-blue bg-white hover:bg-gray-50 transition-colors duration-200"
+                className="group inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-xl text-dark-500 bg-gradient-to-r from-accent-green to-accent-blue hover:shadow-neon-green transition-all duration-300 transform hover:scale-105"
               >
                 Explore Tools
-                <svg className="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="ml-2 w-5 h-5 transform group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </a>
@@ -56,51 +76,72 @@ export default function Home() {
                 href="https://www.cmgfi.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-white hover:bg-white hover:text-cmg-blue transition-colors duration-200"
+                className="group inline-flex items-center justify-center px-8 py-4 border-2 border-white/20 text-base font-bold rounded-xl text-white hover:bg-white/5 hover:border-accent-green transition-all duration-300 backdrop-blur-sm"
               >
                 Visit CMG Financial
+                <svg className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
               </a>
             </div>
           </div>
         </div>
+
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-dark-500 to-transparent"></div>
       </section>
 
-      {/* Stats/Features Section */}
-      <section className="py-12 bg-white">
+      {/* Stats Section */}
+      <section className="relative py-16 border-y border-white/10 bg-dark-400/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="p-6">
-              <div className="text-4xl font-bold text-cmg-blue mb-2">
-                {tools.length}+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center group">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-accent-green/10 border border-accent-green/30 mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
               </div>
-              <div className="text-cmg-gray font-medium">Active Tools</div>
+              <div className="text-4xl font-bold text-white mb-2 gradient-text">{tools.length}+</div>
+              <div className="text-gray-400 font-medium">Active Tools</div>
             </div>
-            <div className="p-6">
-              <div className="text-4xl font-bold text-cmg-blue mb-2">24/7</div>
-              <div className="text-cmg-gray font-medium">Availability</div>
+
+            <div className="text-center group">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-accent-blue/10 border border-accent-blue/30 mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div className="text-4xl font-bold text-white mb-2 text-accent-blue">24/7</div>
+              <div className="text-gray-400 font-medium">Availability</div>
             </div>
-            <div className="p-6">
-              <div className="text-4xl font-bold text-cmg-blue mb-2">100%</div>
-              <div className="text-cmg-gray font-medium">CMG Employees</div>
+
+            <div className="text-center group">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-accent-purple/10 border border-accent-purple/30 mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div className="text-4xl font-bold text-white mb-2 text-accent-purple">CMG</div>
+              <div className="text-gray-400 font-medium">Employees Only</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Tools Dashboard Section */}
-      <section id="tools" className="py-16 bg-gray-50">
+      <section id="tools" className="py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-cmg-dark mb-4">
-              Our Tools Dashboard
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Your Tools <span className="gradient-text">Dashboard</span>
             </h2>
-            <p className="text-lg text-cmg-gray max-w-2xl mx-auto">
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Access all of your essential tools in one place. Click on any tool to launch it in a new window.
             </p>
           </div>
 
           {/* Tool Cards Grid */}
-          <div className="space-y-8">
+          <div className="space-y-12">
             {tools.map((tool, index) => (
               <ToolCard
                 key={index}
@@ -108,39 +149,56 @@ export default function Home() {
                 description={tool.description}
                 url={tool.url}
                 category={tool.category}
-                videoUrl={tool.videoUrl}
+                thumbnailUrl={tool.thumbnailUrl}
                 icon={tool.icon}
+                accentColor={tool.accentColor}
               />
             ))}
           </div>
 
           {/* Coming Soon Section */}
-          <div className="mt-16 text-center">
-            <div className="bg-white rounded-lg shadow-md p-8 border-2 border-dashed border-cmg-blue">
-              <svg className="w-16 h-16 text-cmg-blue mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              <h3 className="text-2xl font-bold text-cmg-dark mb-2">More Tools Coming Soon</h3>
-              <p className="text-cmg-gray">
-                We&apos;re constantly expanding our suite of tools. Check back regularly for new additions!
-              </p>
+          <div className="mt-20 text-center">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-accent-purple/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition duration-500"></div>
+              <div className="relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-2xl p-12 border border-white/10 group-hover:border-accent-purple transition-all duration-500">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-accent-purple/10 border border-accent-purple/30 mb-6">
+                  <svg className="w-10 h-10 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-3">More Tools Coming Soon</h3>
+                <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                  We&apos;re constantly expanding our suite of tools. Check back regularly for new additions and exciting features!
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-cmg-blue text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Need Help?</h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+      <section className="relative py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-accent-green/10 via-transparent to-accent-blue/10"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent-green/10 border border-accent-green/30 mb-6">
+            <svg className="w-8 h-8 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <h2 className="text-4xl font-bold text-white mb-4">Need Help?</h2>
+          <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
             If you have questions about any of our tools or need technical support, our team is here to help.
           </p>
           <a
             href="mailto:support@cmgfinancial.com"
-            className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-cmg-blue bg-white hover:bg-gray-50 transition-colors duration-200"
+            className="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-xl text-dark-500 bg-gradient-to-r from-accent-green to-accent-blue hover:shadow-neon-green transition-all duration-300 transform hover:scale-105"
           >
             Contact Support
+            <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
           </a>
         </div>
       </section>
