@@ -22,6 +22,11 @@ const getToolIcon = (category?: string) => {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     ),
+    Sales: (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+      </svg>
+    ),
     default: (
       <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -95,7 +100,7 @@ export default function Home() {
       description: 'Access powerful AI chatbots for research, writing, coding, and problem-solving. Multiple models available including GPT-4, Claude, and more.',
       fullDescription: 'The AI Chatbots platform provides access to multiple state-of-the-art language models in one unified interface. Perfect for research, content creation, code generation, data analysis, and complex problem-solving. Switch between different AI models to find the best fit for your task.',
       url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new',
-      category: 'Engineering',
+      category: 'Sales',
       thumbnailUrl: 'https://app-librechat-u2uf7w.azurewebsites.net/api/og',
       accentColor: 'purple',
       features: [
@@ -154,28 +159,57 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Tool Cards Grid */}
+          {/* Tool Cards by Category - Netflix Style */}
           {isLoading ? (
             <div className="text-center py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-green"></div>
               <p className="text-gray-400 mt-4">Loading tools...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {(tools.length > 0 ? tools : fallbackTools).map((tool, index) => (
-                <ToolCard
-                  key={tool.id || index}
-                  title={tool.title}
-                  description={tool.description}
-                  url={tool.url}
-                  category={tool.category}
-                  thumbnailUrl={tool.thumbnailUrl}
-                  videoUrl={tool.videoUrl}
-                  icon={getToolIcon(tool.category)}
-                  accentColor={tool.accentColor}
-                  fullDescription={tool.fullDescription}
-                  features={tool.features}
-                />
+            <div className="space-y-12">
+              {/* Group tools by category */}
+              {Object.entries(
+                (tools.length > 0 ? tools : fallbackTools).reduce((acc: Record<string, any[]>, tool) => {
+                  const category = tool.category || 'Other';
+                  if (!acc[category]) acc[category] = [];
+                  acc[category].push(tool);
+                  return acc;
+                }, {})
+              ).map(([category, categoryTools]) => (
+                <div key={category} className="space-y-4">
+                  {/* Category Header */}
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      {getToolIcon(category)}
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">{category}</h3>
+                    <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
+                  </div>
+
+                  {/* Horizontal Scrolling Tool Cards */}
+                  <div className="relative group/scroll">
+                    <div className="overflow-x-auto overflow-y-hidden scrollbar-hide pb-4">
+                      <div className="flex space-x-6 min-w-max px-1">
+                        {categoryTools.map((tool, index) => (
+                          <div key={tool.id || index} className="w-[450px] flex-shrink-0">
+                            <ToolCard
+                              title={tool.title}
+                              description={tool.description}
+                              url={tool.url}
+                              category={tool.category}
+                              thumbnailUrl={tool.thumbnailUrl}
+                              videoUrl={tool.videoUrl}
+                              icon={getToolIcon(tool.category)}
+                              accentColor={tool.accentColor}
+                              fullDescription={tool.fullDescription}
+                              features={tool.features}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           )}

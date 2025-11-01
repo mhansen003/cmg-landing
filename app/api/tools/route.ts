@@ -53,7 +53,7 @@ export async function GET() {
           description: 'Access powerful AI chatbots for research, writing, coding, and problem-solving. Multiple models available including GPT-4, Claude, and more.',
           fullDescription: 'The AI Chatbots platform provides access to multiple state-of-the-art language models in one unified interface. Perfect for research, content creation, code generation, data analysis, and complex problem-solving. Switch between different AI models to find the best fit for your task.',
           url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new',
-          category: 'Engineering',
+          category: 'Sales',
           thumbnailUrl: 'https://app-librechat-u2uf7w.azurewebsites.net/api/og',
           accentColor: 'purple',
           features: [
