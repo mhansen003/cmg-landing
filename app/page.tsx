@@ -36,6 +36,7 @@ export default function Home() {
       url: 'https://trainbuilder.cmgfinancial.ai/',
       category: 'Marketing',
       thumbnailUrl: 'https://trainbuilder.cmgfinancial.ai/api/og',
+      videoUrl: '/videos/communications-builder-demo.mp4',
       accentColor: 'blue' as const,
       features: [
         'Multi-format output generation (Release Notes, Training Guides, FAQs)',
@@ -155,6 +156,7 @@ export default function Home() {
                 url={tool.url}
                 category={tool.category}
                 thumbnailUrl={tool.thumbnailUrl}
+                videoUrl={tool.videoUrl}
                 icon={tool.icon}
                 accentColor={tool.accentColor}
                 fullDescription={tool.fullDescription}
