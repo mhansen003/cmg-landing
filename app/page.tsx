@@ -5,11 +5,20 @@ export default function Home() {
   const tools = [
     {
       title: 'Change Management Intake',
-      description: 'Streamline your application intake process with our AI-powered change management system. Submit requests, track progress, and automatically route to the right teams. Features AI analysis for smart categorization and faster processing.',
+      description: 'Streamline your application intake process with our AI-powered change management system. Submit requests, track progress, and automatically route to the right teams.',
+      fullDescription: 'The Change Management Intake system revolutionizes how CMG handles internal requests, feature changes, and support tickets. Using advanced AI technology, it automatically categorizes submissions, routes them to the appropriate teams, and pre-fills change management forms. This dramatically reduces processing time and ensures every request gets the attention it deserves.',
       url: 'https://intake.cmgfinancial.ai/',
       category: 'Operations',
       thumbnailUrl: 'https://intake.cmgfinancial.ai/api/og',
       accentColor: 'green' as const,
+      features: [
+        'AI-powered request analysis and categorization',
+        'Automatic routing to appropriate teams',
+        'Smart form pre-filling based on request content',
+        'Real-time status tracking and notifications',
+        'Integration with Azure DevOps',
+        'Document and screenshot attachment support',
+      ],
       icon: (
         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -18,11 +27,20 @@ export default function Home() {
     },
     {
       title: 'Communications Builder',
-      description: 'Create professional communications, training materials, and release notes with AI assistance. Generate multiple output formats from a single input including training guides, email announcements, FAQ documents, and quick reference cards.',
+      description: 'Create professional communications, training materials, and release notes with AI assistance. Generate multiple output formats from a single input.',
+      fullDescription: 'The Communications Builder empowers teams to create comprehensive, professional documentation with minimal effort. Simply describe your feature or change, upload screenshots, and let AI generate perfectly formatted release notes, training guides, email announcements, FAQ documents, and quick reference cards - all from a single input.',
       url: 'https://trainbuilder.cmgfinancial.ai/',
       category: 'Marketing',
       thumbnailUrl: 'https://trainbuilder.cmgfinancial.ai/api/og',
       accentColor: 'blue' as const,
+      features: [
+        'Multi-format output generation (Release Notes, Training Guides, FAQs)',
+        'AI-powered content creation and formatting',
+        'Screenshot and document integration',
+        'Professional email templates',
+        'Quick reference card generation',
+        'Consistent branding across all materials',
+      ],
       icon: (
         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -152,6 +170,8 @@ export default function Home() {
                 thumbnailUrl={tool.thumbnailUrl}
                 icon={tool.icon}
                 accentColor={tool.accentColor}
+                fullDescription={tool.fullDescription}
+                features={tool.features}
               />
             ))}
           </div>

@@ -1,0 +1,159 @@
+'use client';
+
+import React from 'react';
+import Image from 'next/image';
+
+interface ToolDetailModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  description: string;
+  url: string;
+  thumbnailUrl?: string;
+  category?: string;
+  accentColor?: 'green' | 'blue' | 'purple';
+  fullDescription?: string;
+  features?: string[];
+}
+
+const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  description,
+  url,
+  thumbnailUrl,
+  category,
+  accentColor = 'green',
+  fullDescription,
+  features,
+}) => {
+  if (!isOpen) return null;
+
+  const accentColors = {
+    green: {
+      border: 'border-accent-green',
+      bg: 'bg-accent-green',
+      text: 'text-accent-green',
+    },
+    blue: {
+      border: 'border-accent-blue',
+      bg: 'bg-accent-blue',
+      text: 'text-accent-blue',
+    },
+    purple: {
+      border: 'border-accent-purple',
+      bg: 'bg-accent-purple',
+      text: 'text-accent-purple',
+    },
+  };
+
+  const colors = accentColors[accentColor];
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 animate-in fade-in duration-200"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div
+          className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-dark-300 to-dark-400 rounded-2xl border border-white/20 shadow-2xl pointer-events-auto animate-in zoom-in-95 duration-300"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center transition-all duration-200 group"
+          >
+            <svg className="w-5 h-5 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Header */}
+          <div className="p-8 border-b border-white/10">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                {category && (
+                  <span className={`inline-block px-3 py-1 text-xs font-bold ${colors.text} bg-white/5 rounded-full border ${colors.border} mb-4`}>
+                    {category}
+                  </span>
+                )}
+                <h2 className="text-4xl font-bold text-white mb-3">{title}</h2>
+                <p className="text-lg text-gray-400">{description}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Screenshot Preview */}
+          {thumbnailUrl && (
+            <div className="relative w-full h-96 bg-dark-500 border-y border-white/10">
+              <Image
+                src={thumbnailUrl}
+                alt={`${title} screenshot`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 80vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-dark-400 to-transparent"></div>
+            </div>
+          )}
+
+          {/* Content */}
+          <div className="p-8 space-y-6">
+            {/* Full Description */}
+            {fullDescription && (
+              <div>
+                <h3 className="text-xl font-bold text-white mb-3">About this tool</h3>
+                <p className="text-gray-400 leading-relaxed">{fullDescription}</p>
+              </div>
+            )}
+
+            {/* Features */}
+            {features && features.length > 0 && (
+              <div>
+                <h3 className="text-xl font-bold text-white mb-4">Key Features</h3>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {features.map((feature, index) => (
+                    <div key={index} className="flex items-start space-x-3 p-3 rounded-lg bg-white/5 border border-white/10">
+                      <svg className={`w-5 h-5 ${colors.text} flex-shrink-0 mt-0.5`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-300 text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer with CTA */}
+          <div className="p-8 border-t border-white/10 bg-dark-500/50">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-400">
+                Ready to get started?
+              </div>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center px-6 py-3 text-sm font-bold rounded-xl text-dark-500 ${colors.bg} hover:shadow-neon-green transition-all duration-300 transform hover:scale-105`}
+              >
+                Launch {title}
+                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default ToolDetailModal;
