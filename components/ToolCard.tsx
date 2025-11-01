@@ -106,12 +106,12 @@ const ToolCard: React.FC<ToolCardProps> = ({
         <div className={`relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-xl overflow-hidden border ${colors.hover} border-white/10 transition-all duration-500 group-hover:scale-[1.01]`}>
           <div className="flex flex-col">
             {/* Top - Video/Screenshot */}
-            <div className="relative bg-dark-500 flex items-center justify-center p-3 h-48 cursor-pointer" onClick={() => setIsModalOpen(true)}>
+            <div className="relative bg-dark-500 flex items-center justify-center p-4 h-72 cursor-pointer" onClick={() => setIsModalOpen(true)}>
               {videoUrl ? (
                 <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500">
                   <video
                     src={videoUrl}
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-full object-contain rounded-lg"
                     autoPlay
                     loop
                     muted
