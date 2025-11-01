@@ -104,6 +104,7 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
                       src={videoUrl}
                       className="w-full h-full object-contain rounded-lg bg-black"
                       style={{ minHeight: '400px' }}
+                      autoPlay
                       loop
                       playsInline
                       controls
