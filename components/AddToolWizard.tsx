@@ -27,6 +27,19 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
   const [generatedData, setGeneratedData] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editedCategory, setEditedCategory] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('#00FF88');
+
+  const colorOptions = [
+    { name: 'Green', value: '#00FF88' },
+    { name: 'Blue', value: '#00D4FF' },
+    { name: 'Purple', value: '#A855F7' },
+    { name: 'Orange', value: '#FB923C' },
+    { name: 'Pink', value: '#EC4899' },
+    { name: 'Yellow', value: '#FBBF24' },
+    { name: 'Red', value: '#EF4444' },
+    { name: 'Cyan', value: '#06B6D4' },
+  ];
 
   if (!isOpen) return null;
 
@@ -69,6 +82,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
 
       const data = await response.json();
       setGeneratedData(data);
+      setEditedCategory(data.category || '');
       setStep(2);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate tool data');
@@ -80,6 +94,8 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
   const handleSubmit = () => {
     const toolData = {
       ...generatedData,
+      category: editedCategory,
+      categoryColor: selectedColor,
       videoFile: formData.video,
       videoPreview: formData.videoPreview,
     };
@@ -253,19 +269,75 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
                     </svg>
                     <span className="text-sm font-bold text-accent-green">AI Generated Successfully!</span>
                   </div>
-                  <p className="text-sm text-gray-300">Review the generated content below and click confirm to add your tool.</p>
+                  <p className="text-sm text-gray-300">Review and edit the category and color below before confirming.</p>
+                </div>
+
+                {/* Category and Color Picker */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-white mb-2">
+                      Category <span className="text-accent-green">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={editedCategory}
+                      onChange={(e) => setEditedCategory(e.target.value)}
+                      placeholder="Enter category name"
+                      className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors"
+                    />
+                    <p className="text-xs text-gray-500 mt-2">All tools in the same category will share this color</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-white mb-2">
+                      Category Color
+                    </label>
+                    <div className="grid grid-cols-4 gap-3">
+                      {colorOptions.map((color) => (
+                        <button
+                          key={color.value}
+                          onClick={() => setSelectedColor(color.value)}
+                          className={`relative p-4 rounded-xl border-2 transition-all ${
+                            selectedColor === color.value
+                              ? 'border-white scale-105'
+                              : 'border-white/20 hover:border-white/40'
+                          }`}
+                          style={{ backgroundColor: color.value + '20' }}
+                        >
+                          <div
+                            className="w-full h-8 rounded-lg"
+                            style={{ backgroundColor: color.value }}
+                          />
+                          <p className="text-xs text-white mt-2 text-center font-medium">{color.name}</p>
+                          {selectedColor === color.value && (
+                            <div className="absolute top-2 right-2">
+                              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Preview Card */}
                 <div className="border border-white/20 rounded-xl p-6 space-y-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="inline-block px-3 py-1 text-xs font-bold text-accent-green bg-white/5 rounded-full border border-accent-green/30 mb-3">
-                        {generatedData.category}
+                      <span
+                        className="inline-block px-3 py-1 text-xs font-bold bg-white/5 rounded-full border-2 mb-3"
+                        style={{ color: selectedColor, borderColor: selectedColor }}
+                      >
+                        {editedCategory}
                       </span>
                       <h3 className="text-2xl font-bold text-white">{generatedData.title}</h3>
                     </div>
-                    <div className={`w-12 h-12 rounded-xl bg-accent-${generatedData.accentColor || 'green'} flex items-center justify-center`}>
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center"
+                      style={{ backgroundColor: selectedColor }}
+                    >
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
@@ -279,7 +351,13 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
                     <div className="grid grid-cols-2 gap-2">
                       {generatedData.features?.map((feature: string, index: number) => (
                         <div key={index} className="flex items-start space-x-2 text-xs text-gray-400">
-                          <svg className="w-4 h-4 text-accent-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-4 h-4 flex-shrink-0 mt-0.5"
+                            style={{ color: selectedColor }}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                           <span>{feature}</span>

@@ -46,6 +46,13 @@ export default function Home() {
   const [prefilledCategory, setPrefilledCategory] = useState<string | null>(null);
   const [tools, setTools] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [categoryColors, setCategoryColors] = useState<Record<string, string>>({
+    'CMG Product': '#00FF88',
+    'Sales': '#A855F7',
+    'Operations': '#00D4FF',
+    'Marketing': '#FB923C',
+    'Engineering': '#06B6D4',
+  });
 
   // Fetch tools from API on mount
   useEffect(() => {
@@ -129,6 +136,16 @@ export default function Home() {
 
   const handleAddTool = async (toolData: any) => {
     try {
+      const category = toolData.category || prefilledCategory;
+
+      // Update category color if provided
+      if (toolData.categoryColor && category) {
+        setCategoryColors(prev => ({
+          ...prev,
+          [category]: toolData.categoryColor,
+        }));
+      }
+
       // Save tool to API
       const response = await fetch('/api/tools', {
         method: 'POST',
@@ -138,10 +155,10 @@ export default function Home() {
           description: toolData.description,
           fullDescription: toolData.fullDescription,
           url: toolData.url,
-          category: toolData.category || prefilledCategory,
+          category: category,
           thumbnailUrl: toolData.thumbnailUrl,
           videoUrl: toolData.videoUrl,
-          accentColor: toolData.accentColor || 'green',
+          categoryColor: toolData.categoryColor,
           features: toolData.features,
         }),
       });
@@ -200,9 +217,9 @@ export default function Home() {
                   </div>
 
                   {/* Horizontal Scrolling Tool Cards with Border */}
-                  <div className="relative group/scroll border border-white/10 rounded-xl p-4 bg-gradient-to-br from-dark-400/30 to-dark-500/30">
+                  <div className="relative group/scroll border-2 border-white/30 rounded-xl p-6 bg-gradient-to-br from-dark-400/40 to-dark-500/40 shadow-lg">
                     <div className="overflow-x-auto overflow-y-hidden scrollbar-hide pb-4">
-                      <div className="flex space-x-6 min-w-max px-1">
+                      <div className="flex space-x-6 min-w-max px-2">
                         {categoryTools.map((tool, index) => (
                           <div key={tool.id || index} className="w-[450px] flex-shrink-0">
                             <ToolCard
@@ -214,6 +231,7 @@ export default function Home() {
                               videoUrl={tool.videoUrl}
                               icon={getToolIcon(tool.category)}
                               accentColor={tool.accentColor}
+                              categoryColor={categoryColors[tool.category]}
                               fullDescription={tool.fullDescription}
                               features={tool.features}
                             />

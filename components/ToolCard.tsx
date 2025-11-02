@@ -13,6 +13,7 @@ interface ToolCardProps {
   icon?: React.ReactNode;
   category?: string;
   accentColor?: 'green' | 'blue' | 'purple';
+  categoryColor?: string; // Hex color for category
   fullDescription?: string;
   features?: string[];
 }
@@ -26,6 +27,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
   icon,
   category,
   accentColor = 'green',
+  categoryColor,
   fullDescription,
   features,
 }) => {
@@ -35,6 +37,10 @@ const ToolCard: React.FC<ToolCardProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+
+  // Use categoryColor if provided, otherwise fall back to accentColor
+  const useCustomColor = !!categoryColor;
+  const customColor = categoryColor || '#00FF88';
 
   const accentColors = {
     green: {
