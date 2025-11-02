@@ -27,8 +27,20 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
   const [generatedData, setGeneratedData] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [manualCategory, setManualCategory] = useState<string>('');
   const [editedCategory, setEditedCategory] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('#00FF88');
+
+  const categoryOptions = [
+    'CMG Product',
+    'Sales',
+    'Operations',
+    'Marketing',
+    'Engineering',
+    'Finance',
+    'HR',
+    'Analytics',
+  ];
 
   const colorOptions = [
     { name: 'Green', value: '#00FF88' },
@@ -82,7 +94,8 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
 
       const data = await response.json();
       setGeneratedData(data);
-      setEditedCategory(data.category || '');
+      // Use manual category if set, otherwise use AI-generated category
+      setEditedCategory(manualCategory || data.category || '');
       setStep(2);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate tool data');
@@ -188,6 +201,23 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
                     className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors resize-none"
                   />
                   <p className="text-xs text-gray-500 mt-2">Help AI understand your tool better (optional)</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-white mb-2">
+                    Category <span className="text-accent-green">*</span>
+                  </label>
+                  <select
+                    value={manualCategory}
+                    onChange={(e) => setManualCategory(e.target.value)}
+                    className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-xl text-white focus:outline-none focus:border-accent-green transition-colors"
+                  >
+                    <option value="">Select a category or AI will suggest one</option>
+                    {categoryOptions.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-2">Choose a category or let AI suggest one based on the URL</p>
                 </div>
 
                 <div>

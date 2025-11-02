@@ -114,10 +114,10 @@ const ToolCard: React.FC<ToolCardProps> = ({
           style={useCustomColor ? { backgroundColor: customColor + '33' } : {}}
         ></div>
 
-        <div className="relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 group-hover:scale-[1.01]">
-          <div className="flex flex-col">
+        <div className="relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 group-hover:scale-[1.01] flex flex-col min-h-[600px]">
+          <div className="flex flex-col flex-1">
             {/* Top - Video/Screenshot */}
-            <div className="relative bg-dark-500 flex items-center justify-center p-4 h-72 cursor-pointer" onClick={() => setIsModalOpen(true)}>
+            <div className="relative bg-dark-500 flex items-center justify-center p-4 h-72 cursor-pointer flex-shrink-0" onClick={() => setIsModalOpen(true)}>
               {videoUrl ? (
                 <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500">
                   <video
@@ -178,8 +178,8 @@ const ToolCard: React.FC<ToolCardProps> = ({
             </div>
 
             {/* Bottom - Content */}
-            <div className="p-5 flex flex-col justify-between relative z-10">
-              <div>
+            <div className="p-5 flex flex-col justify-between relative z-10 flex-1">
+              <div className="flex-1">
                 {/* Category Badge and Star Rating */}
                 <div className="flex items-center justify-between mb-4">
                   {category && (
