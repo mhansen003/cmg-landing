@@ -99,11 +99,11 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
               {/* Video */}
               {videoUrl && (
                 <div className="relative bg-dark-500 flex items-center justify-center p-6">
-                  <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl">
+                  <div className="relative w-full rounded-lg overflow-hidden border border-white/10 shadow-2xl">
                     <video
                       src={videoUrl}
-                      className="w-full h-full object-contain rounded-lg bg-black"
-                      style={{ minHeight: '400px' }}
+                      className="w-full object-contain rounded-lg bg-black"
+                      style={{ maxHeight: '500px', height: 'auto' }}
                       autoPlay
                       loop
                       playsInline
