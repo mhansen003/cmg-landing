@@ -323,33 +323,40 @@ const ToolCard: React.FC<ToolCardProps> = ({
                     )}
                   </button>
 
-                  {/* View Details Button */}
-                  <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center space-x-1.5 px-3 py-2 rounded-lg border border-white/10 bg-white/5 hover:border-white/30 transition-all duration-200 group/details"
-                    title="View details"
-                  >
-                    <svg className="w-4 h-4 text-gray-400 group-hover/details:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-xs font-bold text-gray-400 group-hover/details:text-white">Details</span>
-                  </button>
                 </div>
               </div>
 
-              {/* Launch Button */}
-              <div>
+              {/* Action Buttons - Learn More and Launch Tool */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Learn More Button */}
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold rounded-lg border-2 transition-all duration-300 transform hover:scale-105 group/learn"
+                  style={useCustomColor ? {
+                    borderColor: customColor,
+                    color: customColor
+                  } : {}}
+                >
+                  <span className="flex items-center">
+                    <svg className="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Learn More
+                  </span>
+                </button>
+
+                {/* Launch Tool Button */}
                 <a
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center w-full px-4 py-2.5 text-xs font-bold rounded-lg text-dark-500 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group/button"
+                  className="inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold rounded-lg text-dark-500 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group/button"
                   style={useCustomColor ? { backgroundColor: customColor } : {}}
                 >
                   <span className="relative z-10 flex items-center">
                     Launch Tool
                     <svg
-                      className="ml-2 w-5 h-5 transform group-hover/button:translate-x-1 transition-transform duration-300"
+                      className="ml-2 w-4 h-4 transform group-hover/button:translate-x-1 transition-transform duration-300"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

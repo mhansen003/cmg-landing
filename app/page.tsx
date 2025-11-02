@@ -182,10 +182,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Your Tools <span className="gradient-text">Dashboard</span>
+              Your <span className="gradient-text">AI Tools</span>
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Access all of your essential tools in one place. Click on any tool to launch it in a new window.
+              Access all of your essential AI tools in one place. Click on any tool to launch it in a new window.
             </p>
           </div>
 
@@ -254,10 +254,22 @@ export default function Home() {
                         </svg>
                       </button>
 
+                      {/* Permanent Scroll Indicator on Right */}
+                      <div className="absolute right-6 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center space-y-1 pointer-events-none opacity-50 group-hover/scroll:opacity-0 transition-opacity duration-300">
+                        <svg className="w-5 h-5 text-white animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                        <span className="text-xs text-white font-medium">Scroll</span>
+                      </div>
+
                       <div
                         ref={scrollRef}
-                        className="overflow-x-auto overflow-y-hidden scrollbar-hide pb-4 scroll-smooth"
-                        style={{ scrollBehavior: 'smooth' }}
+                        className="overflow-x-auto overflow-y-hidden pb-4 scroll-smooth scrollbar-visible"
+                        style={{
+                          scrollBehavior: 'smooth',
+                          scrollbarWidth: 'thin',
+                          scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05)'
+                        }}
                       >
                         <div className="flex space-x-6 min-w-max px-2">
                           {categoryTools.map((tool, index) => (
