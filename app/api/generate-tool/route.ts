@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
           content: `You are an expert at analyzing web applications and creating compelling product descriptions.
           Given a URL, analyze what the tool does and generate marketing content for it.
 
-          Return a JSON object with this structure:
+          You MUST respond with ONLY a valid JSON object, no other text. Use this exact structure:
           {
             "title": "Tool Name (2-4 words)",
             "description": "Brief one-line description (under 150 characters)",
@@ -58,7 +58,6 @@ export async function POST(request: NextRequest) {
           content: `Analyze this tool and generate compelling content: ${url}${description ? `\n\nAdditional context: ${description}` : ''}`,
         },
       ],
-      response_format: { type: 'json_object' },
       temperature: 0.7,
     });
 

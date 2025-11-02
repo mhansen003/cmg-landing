@@ -109,9 +109,12 @@ const ToolCard: React.FC<ToolCardProps> = ({
     <>
       <div className="group relative">
         {/* Glow effect on hover */}
-        <div className={`absolute -inset-0.5 ${colors.glow} rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition duration-500`}></div>
+        <div
+          className="absolute -inset-0.5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition duration-500"
+          style={useCustomColor ? { backgroundColor: customColor + '33' } : {}}
+        ></div>
 
-        <div className={`relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-xl overflow-hidden border ${colors.hover} border-white/10 transition-all duration-500 group-hover:scale-[1.01]`}>
+        <div className="relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 group-hover:scale-[1.01]">
           <div className="flex flex-col">
             {/* Top - Video/Screenshot */}
             <div className="relative bg-dark-500 flex items-center justify-center p-4 h-72 cursor-pointer" onClick={() => setIsModalOpen(true)}>
@@ -164,8 +167,14 @@ const ToolCard: React.FC<ToolCardProps> = ({
                 </div>
               )}
               {/* Corner accent */}
-              <div className={`absolute top-0 right-0 w-16 h-16 ${colors.bg} opacity-10 blur-2xl`}></div>
-              <div className={`absolute bottom-0 left-0 w-16 h-16 ${colors.bg} opacity-10 blur-2xl`}></div>
+              <div
+                className="absolute top-0 right-0 w-16 h-16 opacity-10 blur-2xl"
+                style={useCustomColor ? { backgroundColor: customColor } : {}}
+              ></div>
+              <div
+                className="absolute bottom-0 left-0 w-16 h-16 opacity-10 blur-2xl"
+                style={useCustomColor ? { backgroundColor: customColor } : {}}
+              ></div>
             </div>
 
             {/* Bottom - Content */}
@@ -174,7 +183,13 @@ const ToolCard: React.FC<ToolCardProps> = ({
                 {/* Category Badge and Star Rating */}
                 <div className="flex items-center justify-between mb-4">
                   {category && (
-                    <span className={`px-3 py-1 text-xs font-bold ${colors.text} bg-white/5 rounded-full border ${colors.border} backdrop-blur-sm`}>
+                    <span
+                      className="px-3 py-1 text-xs font-bold bg-white/5 rounded-full border-2 backdrop-blur-sm"
+                      style={useCustomColor ? {
+                        color: customColor,
+                        borderColor: customColor
+                      } : {}}
+                    >
                       {category}
                     </span>
                   )}
@@ -191,11 +206,12 @@ const ToolCard: React.FC<ToolCardProps> = ({
                         title={`Rate ${star} star${star > 1 ? 's' : ''}`}
                       >
                         <svg
-                          className={`w-5 h-5 ${
-                            star <= (hoverRating || rating)
-                              ? colors.text
-                              : 'text-gray-600'
-                          } transition-colors duration-200`}
+                          className="w-5 h-5 transition-colors duration-200"
+                          style={{
+                            color: star <= (hoverRating || rating)
+                              ? (useCustomColor ? customColor : undefined)
+                              : '#4B5563'
+                          }}
                           fill={star <= (hoverRating || rating) ? 'currentColor' : 'none'}
                           stroke="currentColor"
                           strokeWidth={1.5}
@@ -216,8 +232,14 @@ const ToolCard: React.FC<ToolCardProps> = ({
                 <div className="flex items-start space-x-3 mb-3">
                   {icon && (
                     <div className="relative flex-shrink-0">
-                      <div className={`absolute inset-0 ${colors.bg} blur-md opacity-50`}></div>
-                      <div className={`relative w-10 h-10 ${colors.bg} rounded-lg flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                      <div
+                        className="absolute inset-0 blur-md opacity-50"
+                        style={useCustomColor ? { backgroundColor: customColor } : {}}
+                      ></div>
+                      <div
+                        className="relative w-10 h-10 rounded-lg flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300"
+                        style={useCustomColor ? { backgroundColor: customColor } : {}}
+                      >
                         <div className="scale-75">{icon}</div>
                       </div>
                     </div>
@@ -321,7 +343,8 @@ const ToolCard: React.FC<ToolCardProps> = ({
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`inline-flex items-center justify-center w-full px-4 py-2.5 text-xs font-bold rounded-lg text-dark-500 ${colors.bg} hover:${colors.shadow} transition-all duration-300 transform hover:scale-105 relative overflow-hidden group/button`}
+                  className="inline-flex items-center justify-center w-full px-4 py-2.5 text-xs font-bold rounded-lg text-dark-500 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group/button"
+                  style={useCustomColor ? { backgroundColor: customColor } : {}}
                 >
                   <span className="relative z-10 flex items-center">
                     Launch Tool
