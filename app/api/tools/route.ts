@@ -7,8 +7,14 @@ const getKV = async () => {
   if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
     return null;
   }
-  const { kv } = await import('@vercel/kv');
-  return kv;
+
+  try {
+    const { kv } = await import('@vercel/kv');
+    return kv;
+  } catch (error) {
+    console.error('Failed to import @vercel/kv:', error);
+    return null;
+  }
 };
 
 // Default tools to return when KV is not available
