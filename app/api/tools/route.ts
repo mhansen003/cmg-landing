@@ -70,6 +70,22 @@ const DEFAULT_TOOLS = [
     ],
   },
   {
+    title: 'Jumbo Guidelines Assistant',
+    description: 'Your on-demand guideline expert. Get instant answers to loan scenario questions with intelligent chat combining Fannie, Freddie, and CMG overlays.',
+    fullDescription: 'Tired of guideline hunting? The Jumbo Guidelines Assistant combines Fannie, Freddie, and CMG overlays in one intelligent chat. Ask any loan scenario question and get clear answers instantly. Whether it\'s DTI limits, credit requirements, or product eligibility—you\'ll have the right information for every borrower conversation. Your guideline expert, on demand.',
+    url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Jumbo+Guidelines+Assistant',
+    category: 'Sales',
+    accentColor: 'blue',
+    features: [
+      'Combined Fannie, Freddie, and CMG overlay guidelines',
+      'Instant answers to loan scenario questions',
+      'DTI limits and qualification guidance',
+      'Credit requirement specifications',
+      'Product eligibility information',
+      'On-demand guideline expertise for borrower conversations',
+    ],
+  },
+  {
     title: 'AI Chatbots',
     description: 'Access powerful AI chatbots for research, writing, coding, and problem-solving. Multiple models available including GPT-4, Claude, and more.',
     fullDescription: 'The AI Chatbots platform provides access to multiple state-of-the-art language models in one unified interface. Perfect for research, content creation, code generation, data analysis, and complex problem-solving. Switch between different AI models to find the best fit for your task.',
