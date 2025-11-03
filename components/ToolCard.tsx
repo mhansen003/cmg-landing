@@ -117,9 +117,39 @@ const ToolCard: React.FC<ToolCardProps> = ({
         <div className="relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 group-hover:scale-[1.01] flex flex-col min-h-[600px]">
           <div className="flex flex-col flex-1">
             {/* Top - Video/Screenshot */}
-            <div className="relative bg-dark-500 flex items-center justify-center p-4 h-72 cursor-pointer flex-shrink-0" onClick={() => setIsModalOpen(true)}>
+            <div className="relative bg-dark-500 flex items-center justify-center p-4 h-72 cursor-pointer flex-shrink-0 overflow-hidden" onClick={() => setIsModalOpen(true)}>
+              {/* Animated Background */}
+              <div className="absolute inset-0 overflow-hidden">
+                {/* Animated gradient background */}
+                <div
+                  className="absolute inset-0 opacity-30"
+                  style={{
+                    background: useCustomColor
+                      ? `radial-gradient(circle at 20% 50%, ${customColor}15 0%, transparent 50%),
+                         radial-gradient(circle at 80% 50%, ${customColor}10 0%, transparent 50%)`
+                      : 'radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%)',
+                    animation: 'pulse 4s ease-in-out infinite'
+                  }}
+                />
+
+                {/* Grid pattern */}
+                <div
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
+                    backgroundSize: '50px 50px',
+                    animation: 'gridScroll 20s linear infinite'
+                  }}
+                />
+
+                {/* Floating particles */}
+                <div className="absolute top-1/4 left-1/4 w-2 h-2 rounded-full opacity-20" style={{ backgroundColor: useCustomColor ? customColor : '#00FF88', animation: 'float 6s ease-in-out infinite' }} />
+                <div className="absolute top-3/4 right-1/4 w-1.5 h-1.5 rounded-full opacity-20" style={{ backgroundColor: useCustomColor ? customColor : '#00D4FF', animation: 'float 8s ease-in-out infinite 1s' }} />
+                <div className="absolute top-1/2 right-1/3 w-1 h-1 rounded-full opacity-15" style={{ backgroundColor: useCustomColor ? customColor : '#00FF88', animation: 'float 7s ease-in-out infinite 2s' }} />
+              </div>
+
               {videoUrl ? (
-                <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500">
+                <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500 z-10">
                   <video
                     src={videoUrl}
                     className="w-full h-full object-contain rounded-lg"

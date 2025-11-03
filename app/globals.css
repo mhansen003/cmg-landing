@@ -66,6 +66,46 @@ body {
   animation: neon-pulse 2s ease-in-out infinite;
 }
 
+/* Video background animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes gridScroll {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.2;
+  }
+  25% {
+    transform: translateY(-10px) translateX(5px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+    opacity: 0.2;
+  }
+  75% {
+    transform: translateY(-10px) translateX(5px);
+    opacity: 0.15;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
