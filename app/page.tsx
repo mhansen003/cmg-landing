@@ -114,6 +114,7 @@ export default function Home() {
       fullDescription: 'The Document Classification system introduces AI into CLEAR Docs to automate and improve document management tasks. Using Gemini AI, it intelligently classifies and splits bulk document packages, automatically organizing them by type (CRED, INC, ASSET, PROP) and reducing the need for manual review. Perfect for mortgage document processing workflows.',
       url: 'https://cleardocs.cmgfinancial.ai/',
       category: 'CMG Product',
+      videoUrl: '/videos/document-classification-demo.mp4',
       accentColor: 'purple',
       features: [
         'AI-powered document intelligent automation',
