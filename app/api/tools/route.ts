@@ -71,6 +71,23 @@ const DEFAULT_TOOLS = [
     ],
   },
   {
+    title: 'CMG DocuMind',
+    description: 'The future of mortgage document processing. Review loans, extract data automatically, and assign AI agents to fix document problems with intelligent automation.',
+    fullDescription: 'CMG DocuMind revolutionizes mortgage document processing with cutting-edge AI technology. Instantly review complete loan files, automatically extract critical data points, identify missing or problematic documents, and assign specialized AI agents to resolve issues. DocuMind reduces processing time from hours to minutes while improving accuracy and compliance. The intelligent system learns from each loan, continuously improving its document understanding and problem-solving capabilities.',
+    url: 'https://cmg-docu-mind.vercel.app/',
+    category: 'CMG Product',
+    videoUrl: '/videos/cmg-documind-demo.mp4',
+    accentColor: 'blue',
+    features: [
+      'Complete loan file review and analysis',
+      'Automatic data extraction from documents',
+      'AI-powered problem detection',
+      'Intelligent agent assignment for issue resolution',
+      'Real-time processing status tracking',
+      'Continuous learning and improvement',
+    ],
+  },
+  {
     title: 'Bank Statement Analyzer',
     description: 'AI-powered income verification at your fingertips. Upload bank statements and get automatic transaction analysis, recurring deposit identification, and qualifying income calculations.',
     fullDescription: 'Meet your Bank Statement Analyzer—AI-powered income verification at your fingertips. Automatically extracts transaction data, identifies recurring deposits, flags compliance concerns, and calculates qualifying income using agency guidelines. Whether it\'s self-employed borrowers or complex income scenarios, get accurate analysis and actionable recommendations instantly. Smart underwriting made simple.',
