@@ -16,6 +16,8 @@ interface ToolCardProps {
   categoryColor?: string; // Hex color for category
   fullDescription?: string;
   features?: string[];
+  onToggleFavorite?: () => void;
+  isFavorite?: boolean;
 }
 
 const ToolCard: React.FC<ToolCardProps> = ({
@@ -30,6 +32,8 @@ const ToolCard: React.FC<ToolCardProps> = ({
   categoryColor,
   fullDescription,
   features,
+  onToggleFavorite,
+  isFavorite = false,
 }) => {
   const [votes, setVotes] = useState({ up: 0, down: 0 });
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
@@ -448,6 +452,8 @@ const ToolCard: React.FC<ToolCardProps> = ({
         accentColor={accentColor}
         fullDescription={fullDescription}
         features={features}
+        onToggleFavorite={onToggleFavorite}
+        isFavorite={isFavorite}
       />
     </>
   );

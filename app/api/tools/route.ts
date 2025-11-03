@@ -93,6 +93,7 @@ const DEFAULT_TOOLS = [
     fullDescription: 'Navigate construction loan complexity with confidence. The Construction Guidelines Assistant provides instant answers to construction-to-perm scenarios, draw schedules, inspection requirements, builder qualifications, and budget guidelines. Whether you\'re handling new construction, major renovations, or lot-land transactions, get accurate CMG construction policy guidance instantly. Your construction loan expert, always available.',
     url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Construction+Guidelines+Assistant',
     category: 'Sales',
+    videoUrl: '/videos/construction-guidelines-demo.mp4',
     accentColor: 'purple',
     features: [
       'Construction-to-perm guideline expertise',
