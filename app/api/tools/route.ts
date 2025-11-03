@@ -54,6 +54,22 @@ const DEFAULT_TOOLS = [
     ],
   },
   {
+    title: 'Document Classification',
+    description: 'AI-powered document management automation for CLEAR Docs. Automatically classify, split, and organize mortgage documents with intelligent automation.',
+    fullDescription: 'The Document Classification system introduces AI into CLEAR Docs to automate and improve document management tasks. Using Gemini AI, it intelligently classifies and splits bulk document packages, automatically organizing them by type (CRED, INC, ASSET, PROP) and reducing the need for manual review. Perfect for mortgage document processing workflows.',
+    url: 'https://cleardocs.cmgfinancial.ai/',
+    category: 'CMG Product',
+    accentColor: 'purple',
+    features: [
+      'AI-powered document intelligent automation',
+      'Flexible uploads: single or bulk document packages',
+      'Smart splitting: automatic document separation',
+      'Real-time user notifications via UI refresh',
+      'Integration with CLEAR Docs drop zone',
+      'Automatic categorization (CRED, INC, ASSET, PROP)',
+    ],
+  },
+  {
     title: 'AI Chatbots',
     description: 'Access powerful AI chatbots for research, writing, coding, and problem-solving. Multiple models available including GPT-4, Claude, and more.',
     fullDescription: 'The AI Chatbots platform provides access to multiple state-of-the-art language models in one unified interface. Perfect for research, content creation, code generation, data analysis, and complex problem-solving. Switch between different AI models to find the best fit for your task.',
