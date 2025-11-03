@@ -23,9 +23,14 @@ const getToolIcon = (category?: string) => {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
       </svg>
     ),
-    Engineering: (
+    'Engineering & Dev Ops': (
       <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+    Training: (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
     ),
     'Sales AI Agents': (
@@ -57,8 +62,9 @@ export default function Home() {
     'Sales AI Agents': '#A855F7',
     'Sales Voice Agents': '#FF6B35',
     'Operations': '#00D4FF',
-    'Marketing': '#FB923C',
-    'Engineering': '#06B6D4',
+    'Marketing': '#8B5CF6',
+    'Engineering & Dev Ops': '#06B6D4',
+    'Training': '#FBBF24',
   });
 
   // Fetch tools from API on mount
@@ -222,6 +228,7 @@ export default function Home() {
       fullDescription: 'Navigate VA loans with confidence using the VA Guidelines Assistant. This specialized tool provides expert guidance on VA eligibility requirements, Certificate of Eligibility (COE) verification, funding fee calculations, occupancy and residual income requirements, and property condition standards. Perfect for helping veterans, active-duty service members, and eligible spouses achieve homeownership through their VA benefits.',
       url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=VA+Guidelines+Assistant',
       category: 'Sales AI Agents',
+      videoUrl: '/videos/va-guidelines-demo.mp4',
       accentColor: 'purple',
       features: [
         'VA eligibility and entitlement guidance',

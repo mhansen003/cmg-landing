@@ -161,6 +161,7 @@ const DEFAULT_TOOLS = [
     fullDescription: 'Navigate VA loans with confidence using the VA Guidelines Assistant. This specialized tool provides expert guidance on VA eligibility requirements, Certificate of Eligibility (COE) verification, funding fee calculations, occupancy and residual income requirements, and property condition standards. Perfect for helping veterans, active-duty service members, and eligible spouses achieve homeownership through their VA benefits.',
     url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=VA+Guidelines+Assistant',
     category: 'Sales AI Agents',
+    videoUrl: '/videos/va-guidelines-demo.mp4',
     accentColor: 'purple',
     features: [
       'VA eligibility and entitlement guidance',
