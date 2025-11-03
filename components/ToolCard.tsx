@@ -120,32 +120,60 @@ const ToolCard: React.FC<ToolCardProps> = ({
             <div className="relative bg-dark-500 flex items-center justify-center p-4 h-72 cursor-pointer flex-shrink-0 overflow-hidden" onClick={() => setIsModalOpen(true)}>
               {/* Animated Background */}
               <div className="absolute inset-0 overflow-hidden">
-                {/* Animated gradient background */}
+                {/* Animated gradient background - more prominent */}
                 <div
-                  className="absolute inset-0 opacity-30"
+                  className="absolute inset-0 opacity-60"
                   style={{
                     background: useCustomColor
-                      ? `radial-gradient(circle at 20% 50%, ${customColor}15 0%, transparent 50%),
-                         radial-gradient(circle at 80% 50%, ${customColor}10 0%, transparent 50%)`
-                      : 'radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%)',
+                      ? `radial-gradient(circle at 20% 50%, ${customColor}40 0%, transparent 50%),
+                         radial-gradient(circle at 80% 50%, ${customColor}30 0%, transparent 50%)`
+                      : 'radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.25) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(0, 212, 255, 0.2) 0%, transparent 50%)',
                     animation: 'pulse 4s ease-in-out infinite'
                   }}
                 />
 
-                {/* Grid pattern */}
+                {/* Larger gradient orbs */}
                 <div
-                  className="absolute inset-0 opacity-10"
+                  className="absolute top-0 left-0 w-32 h-32 rounded-full blur-3xl opacity-40"
                   style={{
-                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
-                    backgroundSize: '50px 50px',
+                    backgroundColor: useCustomColor ? customColor : '#00FF88',
+                    animation: 'float 8s ease-in-out infinite'
+                  }}
+                />
+                <div
+                  className="absolute bottom-0 right-0 w-40 h-40 rounded-full blur-3xl opacity-30"
+                  style={{
+                    backgroundColor: useCustomColor ? customColor : '#00D4FF',
+                    animation: 'float 10s ease-in-out infinite 2s'
+                  }}
+                />
+
+                {/* Grid pattern - more visible */}
+                <div
+                  className="absolute inset-0 opacity-25"
+                  style={{
+                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)',
+                    backgroundSize: '40px 40px',
                     animation: 'gridScroll 20s linear infinite'
                   }}
                 />
 
-                {/* Floating particles */}
-                <div className="absolute top-1/4 left-1/4 w-2 h-2 rounded-full opacity-20" style={{ backgroundColor: useCustomColor ? customColor : '#00FF88', animation: 'float 6s ease-in-out infinite' }} />
-                <div className="absolute top-3/4 right-1/4 w-1.5 h-1.5 rounded-full opacity-20" style={{ backgroundColor: useCustomColor ? customColor : '#00D4FF', animation: 'float 8s ease-in-out infinite 1s' }} />
-                <div className="absolute top-1/2 right-1/3 w-1 h-1 rounded-full opacity-15" style={{ backgroundColor: useCustomColor ? customColor : '#00FF88', animation: 'float 7s ease-in-out infinite 2s' }} />
+                {/* Diagonal lines for tech feel */}
+                <div
+                  className="absolute inset-0 opacity-15"
+                  style={{
+                    backgroundImage: `linear-gradient(45deg, ${useCustomColor ? customColor : '#00FF88'}15 25%, transparent 25%, transparent 75%, ${useCustomColor ? customColor : '#00FF88'}15 75%)`,
+                    backgroundSize: '100px 100px',
+                    animation: 'diagonalScroll 30s linear infinite'
+                  }}
+                />
+
+                {/* Floating particles - larger and more visible */}
+                <div className="absolute top-1/4 left-1/4 w-3 h-3 rounded-full opacity-40 blur-sm" style={{ backgroundColor: useCustomColor ? customColor : '#00FF88', animation: 'float 6s ease-in-out infinite' }} />
+                <div className="absolute top-3/4 right-1/4 w-4 h-4 rounded-full opacity-35 blur-sm" style={{ backgroundColor: useCustomColor ? customColor : '#00D4FF', animation: 'float 8s ease-in-out infinite 1s' }} />
+                <div className="absolute top-1/2 right-1/3 w-2.5 h-2.5 rounded-full opacity-30 blur-sm" style={{ backgroundColor: useCustomColor ? customColor : '#00FF88', animation: 'float 7s ease-in-out infinite 2s' }} />
+                <div className="absolute top-1/3 right-1/2 w-3 h-3 rounded-full opacity-25 blur-sm" style={{ backgroundColor: useCustomColor ? customColor : '#00D4FF', animation: 'float 9s ease-in-out infinite 3s' }} />
+                <div className="absolute bottom-1/4 left-1/3 w-2 h-2 rounded-full opacity-30 blur-sm" style={{ backgroundColor: useCustomColor ? customColor : '#00FF88', animation: 'float 7s ease-in-out infinite 1.5s' }} />
               </div>
 
               {videoUrl ? (
