@@ -23,8 +23,6 @@ interface CategorySectionProps {
   categoryColor: string;
   onAddTool: (category: string) => void;
   getToolIcon: (category?: string) => React.ReactNode;
-  onToggleFavorite?: (tool: Tool) => void;
-  isFavorite?: (title: string) => boolean;
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -34,8 +32,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   categoryColor,
   onAddTool,
   getToolIcon,
-  onToggleFavorite,
-  isFavorite,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -143,8 +139,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     categoryColor={categoryColor}
                     fullDescription={tool.fullDescription}
                     features={tool.features}
-                    onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(tool) : undefined}
-                    isFavorite={isFavorite ? isFavorite(tool.title) : false}
                   />
                 </div>
               ))}
@@ -190,8 +184,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   categoryColor={categoryColor}
                   fullDescription={tool.fullDescription}
                   features={tool.features}
-                  onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(tool) : undefined}
-                  isFavorite={isFavorite ? isFavorite(tool.title) : false}
                 />
               </div>
             ))}

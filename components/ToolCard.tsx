@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import ToolDetailModal from './ToolDetailModal';
+import PhoneModal from './PhoneModal';
 
 interface ToolCardProps {
   title: string;
@@ -16,8 +17,6 @@ interface ToolCardProps {
   categoryColor?: string; // Hex color for category
   fullDescription?: string;
   features?: string[];
-  onToggleFavorite?: () => void;
-  isFavorite?: boolean;
 }
 
 const ToolCard: React.FC<ToolCardProps> = ({
@@ -32,15 +31,18 @@ const ToolCard: React.FC<ToolCardProps> = ({
   categoryColor,
   fullDescription,
   features,
-  onToggleFavorite,
-  isFavorite = false,
 }) => {
   const [votes, setVotes] = useState({ up: 0, down: 0 });
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
   const [showShareToast, setShowShareToast] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+
+  // Check if this is a phone number link
+  const isPhoneNumber = url.startsWith('tel:');
+  const phoneNumber = isPhoneNumber ? url.replace('tel:+1', '').replace('tel:', '') : '';
 
   // Use categoryColor if provided, otherwise fall back to accentColor
   const useCustomColor = !!categoryColor;
@@ -190,35 +192,6 @@ const ToolCard: React.FC<ToolCardProps> = ({
                     muted
                     playsInline
                   />
-                  {/* Favorite Star Button - Top Right */}
-                  {onToggleFavorite && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleFavorite();
-                      }}
-                      className="absolute top-3 right-3 w-10 h-10 rounded-full bg-dark-500/90 hover:bg-dark-400/90 border-2 border-white/20 hover:border-white/40 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 group/star z-40"
-                      title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-                    >
-                      <svg
-                        className={`w-5 h-5 transition-all duration-300 ${
-                          isFavorite
-                            ? 'text-yellow-400 fill-current'
-                            : 'text-gray-400 group-hover/star:text-yellow-400'
-                        }`}
-                        fill={isFavorite ? "currentColor" : "none"}
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                        />
-                      </svg>
-                    </button>
-                  )}
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex items-center justify-center">
                     <div className="text-white text-center">
@@ -437,31 +410,51 @@ const ToolCard: React.FC<ToolCardProps> = ({
                 </button>
 
                 {/* Launch Tool Button */}
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold rounded-lg text-dark-500 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group/button"
-                  style={useCustomColor ? { backgroundColor: customColor } : {}}
-                >
-                  <span className="relative z-10 flex items-center">
-                    Launch Tool
-                    <svg
-                      className="ml-2 w-4 h-4 transform group-hover/button:translate-x-1 transition-transform duration-300"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M14 5l7 7m0 0l-7 7m7-7H3"
-                      />
-                    </svg>
-                  </span>
-                  <div className="absolute inset-0 bg-white/20 transform translate-x-[-100%] group-hover/button:translate-x-[100%] transition-transform duration-700"></div>
-                </a>
+                {isPhoneNumber ? (
+                  <button
+                    onClick={() => setIsPhoneModalOpen(true)}
+                    className="inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold rounded-lg text-dark-500 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group/button"
+                    style={useCustomColor ? { backgroundColor: customColor } : {}}
+                  >
+                    <span className="relative z-10 flex items-center">
+                      Call Now
+                      <svg
+                        className="ml-2 w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                    </span>
+                    <div className="absolute inset-0 bg-white/20 transform translate-x-[-100%] group-hover/button:translate-x-[100%] transition-transform duration-700"></div>
+                  </button>
+                ) : (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold rounded-lg text-dark-500 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group/button"
+                    style={useCustomColor ? { backgroundColor: customColor } : {}}
+                  >
+                    <span className="relative z-10 flex items-center">
+                      Launch Tool
+                      <svg
+                        className="ml-2 w-4 h-4 transform group-hover/button:translate-x-1 transition-transform duration-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M14 5l7 7m0 0l-7 7m7-7H3"
+                        />
+                      </svg>
+                    </span>
+                    <div className="absolute inset-0 bg-white/20 transform translate-x-[-100%] group-hover/button:translate-x-[100%] transition-transform duration-700"></div>
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -481,9 +474,19 @@ const ToolCard: React.FC<ToolCardProps> = ({
         accentColor={accentColor}
         fullDescription={fullDescription}
         features={features}
-        onToggleFavorite={onToggleFavorite}
-        isFavorite={isFavorite}
       />
+
+      {/* Phone Modal */}
+      {isPhoneNumber && (
+        <PhoneModal
+          isOpen={isPhoneModalOpen}
+          onClose={() => setIsPhoneModalOpen(false)}
+          title={title}
+          description={fullDescription || description}
+          phoneNumber={phoneNumber}
+          accentColor={accentColor === 'purple' ? 'orange' : accentColor}
+        />
+      )}
     </>
   );
 };

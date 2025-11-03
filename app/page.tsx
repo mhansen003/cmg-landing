@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import ToolCard from '@/components/ToolCard';
 import AddToolWizard from '@/components/AddToolWizard';
 import CategorySection from '@/components/CategorySection';
-import FavoritesPanel from '@/components/FavoritesPanel';
 
 // Helper function to get icon for a tool based on category
 const getToolIcon = (category?: string) => {
@@ -62,10 +61,6 @@ export default function Home() {
     'Engineering': '#06B6D4',
   });
 
-  // Favorites state
-  const [favorites, setFavorites] = useState<any[]>([]);
-  const [isFavoritesPanelOpen, setIsFavoritesPanelOpen] = useState(true); // Open by default
-
   // Fetch tools from API on mount
   useEffect(() => {
     const fetchTools = async () => {
@@ -82,72 +77,6 @@ export default function Home() {
 
     fetchTools();
   }, []);
-
-  // Load favorites from localStorage on mount (with pre-populated defaults)
-  useEffect(() => {
-    const storedFavorites = localStorage.getItem('cmg-favorites');
-    if (storedFavorites) {
-      setFavorites(JSON.parse(storedFavorites));
-    } else {
-      // Pre-populate with sample favorites to show user engagement
-      const defaultFavorites = [
-        {
-          title: 'Change Management Intake',
-          url: 'https://intake.cmgfinancial.ai/',
-          category: 'CMG Product',
-          accentColor: 'green',
-        },
-        {
-          title: 'AI Chatbots',
-          url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new',
-          category: 'Sales AI Agents',
-          accentColor: 'purple',
-        },
-        {
-          title: 'Bank Statement Analyzer',
-          url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Bank+Statement+Analyzer',
-          category: 'Sales AI Agents',
-          accentColor: 'green',
-        },
-      ];
-      setFavorites(defaultFavorites);
-      localStorage.setItem('cmg-favorites', JSON.stringify(defaultFavorites));
-    }
-  }, []);
-
-  // Save favorites to localStorage whenever they change
-  useEffect(() => {
-    if (favorites.length > 0) {
-      localStorage.setItem('cmg-favorites', JSON.stringify(favorites));
-    }
-  }, [favorites]);
-
-  // Toggle favorite
-  const toggleFavorite = (tool: any) => {
-    setFavorites((prev) => {
-      const exists = prev.find((f) => f.title === tool.title);
-      if (exists) {
-        return prev.filter((f) => f.title !== tool.title);
-      } else {
-        return [...prev, {
-          title: tool.title,
-          url: tool.url,
-          category: tool.category,
-          accentColor: tool.accentColor,
-        }];
-      }
-    });
-  };
-
-  // Check if tool is favorited
-  const isFavorite = (title: string) => {
-    return favorites.some((f) => f.title === title);
-  };
-
-  // Remove favorite
-  const removeFavorite = (title: string) => {
-    setFavorites((prev) => prev.filter((f) => f.title !== title));
-  };
 
   // Fallback tools if loading or empty (icons added dynamically in render)
   const fallbackTools = [
@@ -288,6 +217,22 @@ export default function Home() {
       ],
     },
     {
+      title: 'VA Guidelines Assistant',
+      description: 'Specialized guidance for VA loan scenarios. Get instant answers about VA eligibility, funding fees, occupancy requirements, and veteran-specific lending guidelines.',
+      fullDescription: 'Navigate VA loans with confidence using the VA Guidelines Assistant. This specialized tool provides expert guidance on VA eligibility requirements, Certificate of Eligibility (COE) verification, funding fee calculations, occupancy and residual income requirements, and property condition standards. Perfect for helping veterans, active-duty service members, and eligible spouses achieve homeownership through their VA benefits.',
+      url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=VA+Guidelines+Assistant',
+      category: 'Sales AI Agents',
+      accentColor: 'purple',
+      features: [
+        'VA eligibility and entitlement guidance',
+        'Certificate of Eligibility (COE) assistance',
+        'Funding fee calculation and exemptions',
+        'Residual income requirement analysis',
+        'Occupancy and property condition standards',
+        'Benefits for veterans and active-duty service members',
+      ],
+    },
+    {
       title: 'AI Chatbots',
       description: 'Access powerful AI chatbots for research, writing, coding, and problem-solving. Multiple models available including GPT-4, Claude, and more.',
       fullDescription: 'The AI Chatbots platform provides access to multiple state-of-the-art language models in one unified interface. Perfect for research, content creation, code generation, data analysis, and complex problem-solving. Switch between different AI models to find the best fit for your task.',
@@ -310,6 +255,7 @@ export default function Home() {
       fullDescription: 'Meet your Agentic LO Voice Agent—an intelligent AI assistant that understands mortgage lending inside and out. Simply call (949) 785-4613 and speak naturally about your loan scenarios, product questions, or borrower situations. The AI agent provides instant, accurate guidance on rates, programs, qualification criteria, and next steps. Available 24/7 with human-like conversation and deep mortgage expertise.',
       url: 'tel:+19497854613',
       category: 'Sales Voice Agents',
+      videoUrl: '/videos/lo-voice-agent-demo.mp4',
       accentColor: 'purple',
       features: [
         '24/7 availability via phone call',
@@ -412,8 +358,6 @@ export default function Home() {
                   categoryColor={categoryColors[category]}
                   onAddTool={handleOpenWizard}
                   getToolIcon={getToolIcon}
-                  onToggleFavorite={toggleFavorite}
-                  isFavorite={isFavorite}
                 />
               ))}
             </div>
@@ -437,14 +381,6 @@ export default function Home() {
         isOpen={isWizardOpen}
         onClose={() => setIsWizardOpen(false)}
         onSubmit={handleAddTool}
-      />
-
-      {/* Favorites Panel */}
-      <FavoritesPanel
-        favorites={favorites}
-        isOpen={isFavoritesPanelOpen}
-        onToggle={() => setIsFavoritesPanelOpen(!isFavoritesPanelOpen)}
-        onRemoveFavorite={removeFavorite}
       />
     </div>
   );

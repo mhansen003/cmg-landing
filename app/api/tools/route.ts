@@ -156,6 +156,22 @@ const DEFAULT_TOOLS = [
     ],
   },
   {
+    title: 'VA Guidelines Assistant',
+    description: 'Specialized guidance for VA loan scenarios. Get instant answers about VA eligibility, funding fees, occupancy requirements, and veteran-specific lending guidelines.',
+    fullDescription: 'Navigate VA loans with confidence using the VA Guidelines Assistant. This specialized tool provides expert guidance on VA eligibility requirements, Certificate of Eligibility (COE) verification, funding fee calculations, occupancy and residual income requirements, and property condition standards. Perfect for helping veterans, active-duty service members, and eligible spouses achieve homeownership through their VA benefits.',
+    url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=VA+Guidelines+Assistant',
+    category: 'Sales AI Agents',
+    accentColor: 'purple',
+    features: [
+      'VA eligibility and entitlement guidance',
+      'Certificate of Eligibility (COE) assistance',
+      'Funding fee calculation and exemptions',
+      'Residual income requirement analysis',
+      'Occupancy and property condition standards',
+      'Benefits for veterans and active-duty service members',
+    ],
+  },
+  {
     title: 'AI Chatbots',
     description: 'Access powerful AI chatbots for research, writing, coding, and problem-solving. Multiple models available including GPT-4, Claude, and more.',
     fullDescription: 'The AI Chatbots platform provides access to multiple state-of-the-art language models in one unified interface. Perfect for research, content creation, code generation, data analysis, and complex problem-solving. Switch between different AI models to find the best fit for your task.',
@@ -178,6 +194,7 @@ const DEFAULT_TOOLS = [
     fullDescription: 'Meet your Agentic LO Voice Agent—an intelligent AI assistant that understands mortgage lending inside and out. Simply call (949) 785-4613 and speak naturally about your loan scenarios, product questions, or borrower situations. The AI agent provides instant, accurate guidance on rates, programs, qualification criteria, and next steps. Available 24/7 with human-like conversation and deep mortgage expertise.',
     url: 'tel:+19497854613',
     category: 'Sales Voice Agents',
+    videoUrl: '/videos/lo-voice-agent-demo.mp4',
     accentColor: 'purple',
     features: [
       '24/7 availability via phone call',
