@@ -348,25 +348,24 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-12">
-              {/* Group tools by category */}
-              {Object.entries(
-                (tools.length > 0 ? tools : fallbackTools).reduce((acc: Record<string, any[]>, tool) => {
-                  const category = tool.category || 'Other';
-                  if (!acc[category]) acc[category] = [];
-                  acc[category].push(tool);
-                  return acc;
-                }, {})
-              ).map(([category, categoryTools]) => (
-                <CategorySection
-                  key={category}
-                  category={category}
-                  categoryTools={categoryTools}
-                  categoryIcon={getToolIcon(category)}
-                  categoryColor={categoryColors[category]}
-                  onAddTool={handleOpenWizard}
-                  getToolIcon={getToolIcon}
-                />
-              ))}
+              {/* Show all defined categories */}
+              {Object.keys(categoryColors).map((category) => {
+                // Get tools for this category
+                const activeTools = tools.length > 0 ? tools : fallbackTools;
+                const categoryTools = activeTools.filter(tool => tool.category === category);
+
+                return (
+                  <CategorySection
+                    key={category}
+                    category={category}
+                    categoryTools={categoryTools}
+                    categoryIcon={getToolIcon(category)}
+                    categoryColor={categoryColors[category]}
+                    onAddTool={handleOpenWizard}
+                    getToolIcon={getToolIcon}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
