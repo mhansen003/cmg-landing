@@ -34,7 +34,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   getToolIcon,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   // Only show View All button if there are more than 2 cards
   const showViewAllButton = categoryTools.length > 2;

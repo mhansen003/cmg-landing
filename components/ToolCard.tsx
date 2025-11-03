@@ -472,6 +472,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
         videoUrl={videoUrl}
         category={category}
         accentColor={accentColor}
+        categoryColor={categoryColor}
         fullDescription={fullDescription}
         features={features}
       />
