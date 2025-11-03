@@ -64,7 +64,7 @@ export default function Home() {
 
   // Favorites state
   const [favorites, setFavorites] = useState<any[]>([]);
-  const [isFavoritesPanelOpen, setIsFavoritesPanelOpen] = useState(false);
+  const [isFavoritesPanelOpen, setIsFavoritesPanelOpen] = useState(true); // Open by default
 
   // Fetch tools from API on mount
   useEffect(() => {
