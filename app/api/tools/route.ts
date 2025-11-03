@@ -70,6 +70,22 @@ const DEFAULT_TOOLS = [
     ],
   },
   {
+    title: 'Bank Statement Analyzer',
+    description: 'AI-powered income verification at your fingertips. Upload bank statements and get automatic transaction analysis, recurring deposit identification, and qualifying income calculations.',
+    fullDescription: 'Meet your Bank Statement Analyzer—AI-powered income verification at your fingertips. Automatically extracts transaction data, identifies recurring deposits, flags compliance concerns, and calculates qualifying income using agency guidelines. Whether it\'s self-employed borrowers or complex income scenarios, get accurate analysis and actionable recommendations instantly. Smart underwriting made simple.',
+    url: 'https://bankanalyzer.cmgfinancial.ai/',
+    category: 'Sales',
+    accentColor: 'green',
+    features: [
+      'Automatic transaction data extraction',
+      'Recurring deposit identification',
+      'Compliance concern flagging',
+      'Qualifying income calculation using agency guidelines',
+      'Self-employed borrower income analysis',
+      'Actionable recommendations for complex scenarios',
+    ],
+  },
+  {
     title: 'Jumbo Guidelines Assistant',
     description: 'Your on-demand guideline expert. Get instant answers to loan scenario questions with intelligent chat combining Fannie, Freddie, and CMG overlays.',
     fullDescription: 'Tired of guideline hunting? The Jumbo Guidelines Assistant combines Fannie, Freddie, and CMG overlays in one intelligent chat. Ask any loan scenario question and get clear answers instantly. Whether it\'s DTI limits, credit requirements, or product eligibility—you\'ll have the right information for every borrower conversation. Your guideline expert, on demand.',
