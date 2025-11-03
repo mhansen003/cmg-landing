@@ -122,6 +122,23 @@ const DEFAULT_TOOLS = [
     ],
   },
   {
+    title: 'Non-QM Guidelines Assistant',
+    description: 'Expert guidance for Non-QM loan scenarios. Get instant answers about alternative documentation, credit flexibility, and specialized underwriting requirements.',
+    fullDescription: 'Navigate the Non-QM landscape with confidence using the Non-QM Guidelines Assistant. This specialized tool provides expert guidance on alternative documentation requirements, credit flexibility options, debt-to-income considerations, and asset-based qualification strategies. Perfect for self-employed borrowers, foreign nationals, and unique income scenarios that fall outside conventional guidelines.',
+    url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Non-QM+Guidelines+Assistant',
+    category: 'Sales AI Agents',
+    videoUrl: '/videos/non-qm-guidelines-demo.mp4',
+    accentColor: 'green',
+    features: [
+      'Alternative documentation strategies',
+      'Credit flexibility and exception guidance',
+      'Debt-to-income calculation methods',
+      'Asset-based qualification scenarios',
+      'Self-employed borrower solutions',
+      'Foreign national lending requirements',
+    ],
+  },
+  {
     title: 'AI Chatbots',
     description: 'Access powerful AI chatbots for research, writing, coding, and problem-solving. Multiple models available including GPT-4, Claude, and more.',
     fullDescription: 'The AI Chatbots platform provides access to multiple state-of-the-art language models in one unified interface. Perfect for research, content creation, code generation, data analysis, and complex problem-solving. Switch between different AI models to find the best fit for your task.',
