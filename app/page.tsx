@@ -29,9 +29,14 @@ const getToolIcon = (category?: string) => {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     ),
-    Sales: (
+    'Sales AI Agents': (
       <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+      </svg>
+    ),
+    'Sales Voice Agents': (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
       </svg>
     ),
     default: (
@@ -50,7 +55,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [categoryColors, setCategoryColors] = useState<Record<string, string>>({
     'CMG Product': '#00FF88',
-    'Sales': '#A855F7',
+    'Sales AI Agents': '#A855F7',
+    'Sales Voice Agents': '#FF6B35',
     'Operations': '#00D4FF',
     'Marketing': '#FB923C',
     'Engineering': '#06B6D4',
@@ -94,13 +100,13 @@ export default function Home() {
         {
           title: 'AI Chatbots',
           url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new',
-          category: 'Sales',
+          category: 'Sales AI Agents',
           accentColor: 'purple',
         },
         {
           title: 'Bank Statement Analyzer',
-          url: 'https://bankanalyzer.cmgfinancial.ai/',
-          category: 'Sales',
+          url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Bank+Statement+Analyzer',
+          category: 'Sales AI Agents',
           accentColor: 'green',
         },
       ];
@@ -200,8 +206,8 @@ export default function Home() {
       title: 'Bank Statement Analyzer',
       description: 'AI-powered income verification at your fingertips. Upload bank statements and get automatic transaction analysis, recurring deposit identification, and qualifying income calculations.',
       fullDescription: 'Meet your Bank Statement Analyzer—AI-powered income verification at your fingertips. Automatically extracts transaction data, identifies recurring deposits, flags compliance concerns, and calculates qualifying income using agency guidelines. Whether it\'s self-employed borrowers or complex income scenarios, get accurate analysis and actionable recommendations instantly. Smart underwriting made simple.',
-      url: 'https://bankanalyzer.cmgfinancial.ai/',
-      category: 'Sales',
+      url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Bank+Statement+Analyzer',
+      category: 'Sales AI Agents',
       videoUrl: '/videos/bank-statement-analyzer-demo.mp4',
       accentColor: 'green',
       features: [
@@ -218,7 +224,7 @@ export default function Home() {
       description: 'Your construction loan expert on demand. Get instant answers about construction-to-perm guidelines, draw schedules, builder requirements, and budget specifications.',
       fullDescription: 'Navigate construction loan complexity with confidence. The Construction Guidelines Assistant provides instant answers to construction-to-perm scenarios, draw schedules, inspection requirements, builder qualifications, and budget guidelines. Whether you\'re handling new construction, major renovations, or lot-land transactions, get accurate CMG construction policy guidance instantly. Your construction loan expert, always available.',
       url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Construction+Guidelines+Assistant',
-      category: 'Sales',
+      category: 'Sales AI Agents',
       videoUrl: '/videos/construction-guidelines-demo.mp4',
       accentColor: 'purple',
       features: [
@@ -235,7 +241,7 @@ export default function Home() {
       description: 'Your on-demand guideline expert. Get instant answers to loan scenario questions with intelligent chat combining Fannie, Freddie, and CMG overlays.',
       fullDescription: 'Tired of guideline hunting? The Jumbo Guidelines Assistant combines Fannie, Freddie, and CMG overlays in one intelligent chat. Ask any loan scenario question and get clear answers instantly. Whether it\'s DTI limits, credit requirements, or product eligibility—you\'ll have the right information for every borrower conversation. Your guideline expert, on demand.',
       url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Jumbo+Guidelines+Assistant',
-      category: 'Sales',
+      category: 'Sales AI Agents',
       videoUrl: '/videos/jumbo-guidelines-demo.mp4',
       accentColor: 'blue',
       features: [
@@ -252,7 +258,7 @@ export default function Home() {
       description: 'Access powerful AI chatbots for research, writing, coding, and problem-solving. Multiple models available including GPT-4, Claude, and more.',
       fullDescription: 'The AI Chatbots platform provides access to multiple state-of-the-art language models in one unified interface. Perfect for research, content creation, code generation, data analysis, and complex problem-solving. Switch between different AI models to find the best fit for your task.',
       url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new',
-      category: 'Sales',
+      category: 'Sales AI Agents',
       videoUrl: '/videos/ai-chatbots-demo.mp4',
       accentColor: 'purple',
       features: [
@@ -262,6 +268,22 @@ export default function Home() {
         'Research and analysis assistance',
         'Document summarization',
         'Multi-language support',
+      ],
+    },
+    {
+      title: 'Agentic LO Voice Agent',
+      description: 'Your AI-powered loan officer assistant available 24/7 via phone. Call anytime to get instant answers about loan products, rates, and qualification requirements.',
+      fullDescription: 'Meet your Agentic LO Voice Agent—an intelligent AI assistant that understands mortgage lending inside and out. Simply call (949) 785-4613 and speak naturally about your loan scenarios, product questions, or borrower situations. The AI agent provides instant, accurate guidance on rates, programs, qualification criteria, and next steps. Available 24/7 with human-like conversation and deep mortgage expertise.',
+      url: 'tel:+19497854613',
+      category: 'Sales Voice Agents',
+      accentColor: 'purple',
+      features: [
+        '24/7 availability via phone call',
+        'Natural voice conversation with AI',
+        'Instant loan product recommendations',
+        'Rate and program information',
+        'Qualification requirement guidance',
+        'Human-like interaction and understanding',
       ],
     },
   ];
