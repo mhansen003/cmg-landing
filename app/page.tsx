@@ -141,6 +141,22 @@ export default function Home() {
       ],
     },
     {
+      title: 'Construction Guidelines Assistant',
+      description: 'Your construction loan expert on demand. Get instant answers about construction-to-perm guidelines, draw schedules, builder requirements, and budget specifications.',
+      fullDescription: 'Navigate construction loan complexity with confidence. The Construction Guidelines Assistant provides instant answers to construction-to-perm scenarios, draw schedules, inspection requirements, builder qualifications, and budget guidelines. Whether you\'re handling new construction, major renovations, or lot-land transactions, get accurate CMG construction policy guidance instantly. Your construction loan expert, always available.',
+      url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Construction+Guidelines+Assistant',
+      category: 'Sales',
+      accentColor: 'purple',
+      features: [
+        'Construction-to-perm guideline expertise',
+        'Draw schedule and inspection requirements',
+        'Builder qualification specifications',
+        'Budget and cost breakdown guidance',
+        'New construction and renovation scenarios',
+        'Lot-land transaction policy guidance',
+      ],
+    },
+    {
       title: 'Jumbo Guidelines Assistant',
       description: 'Your on-demand guideline expert. Get instant answers to loan scenario questions with intelligent chat combining Fannie, Freddie, and CMG overlays.',
       fullDescription: 'Tired of guideline hunting? The Jumbo Guidelines Assistant combines Fannie, Freddie, and CMG overlays in one intelligent chat. Ask any loan scenario question and get clear answers instantly. Whether it\'s DTI limits, credit requirements, or product eligibility—you\'ll have the right information for every borrower conversation. Your guideline expert, on demand.',
