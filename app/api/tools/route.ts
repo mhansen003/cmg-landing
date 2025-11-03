@@ -76,6 +76,7 @@ const DEFAULT_TOOLS = [
     fullDescription: 'Meet your Bank Statement Analyzer—AI-powered income verification at your fingertips. Automatically extracts transaction data, identifies recurring deposits, flags compliance concerns, and calculates qualifying income using agency guidelines. Whether it\'s self-employed borrowers or complex income scenarios, get accurate analysis and actionable recommendations instantly. Smart underwriting made simple.',
     url: 'https://bankanalyzer.cmgfinancial.ai/',
     category: 'Sales',
+    videoUrl: '/videos/bank-statement-analyzer-demo.mp4',
     accentColor: 'green',
     features: [
       'Automatic transaction data extraction',
@@ -108,6 +109,7 @@ const DEFAULT_TOOLS = [
     fullDescription: 'Tired of guideline hunting? The Jumbo Guidelines Assistant combines Fannie, Freddie, and CMG overlays in one intelligent chat. Ask any loan scenario question and get clear answers instantly. Whether it\'s DTI limits, credit requirements, or product eligibility—you\'ll have the right information for every borrower conversation. Your guideline expert, on demand.',
     url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Jumbo+Guidelines+Assistant',
     category: 'Sales',
+    videoUrl: '/videos/jumbo-guidelines-demo.mp4',
     accentColor: 'blue',
     features: [
       'Combined Fannie, Freddie, and CMG overlay guidelines',
