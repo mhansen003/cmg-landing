@@ -246,7 +246,7 @@ async function seedRedis() {
 
     // Verify
     const savedData = await client.get(TOOLS_KEY);
-    const savedTools = JSON.parse(savedData);
+    const savedTools = savedData ? JSON.parse(savedData) : [];
     console.log(`✓ Verified: ${savedTools.length} tools in database`);
     console.log('\n📊 Tools by category:');
 
