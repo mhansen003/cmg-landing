@@ -4,6 +4,7 @@ import { verifyAuthToken, AUTH_CONFIG } from './lib/auth-jwt';
 
 // Routes that don't require authentication
 const PUBLIC_ROUTES = [
+  '/',
   '/login',
   '/api/auth/send-otp',
   '/api/auth/verify-otp',
