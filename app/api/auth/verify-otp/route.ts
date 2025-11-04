@@ -108,24 +108,23 @@ export async function POST(request: NextRequest) {
     // Create JWT token
     const token = createAuthToken(emailLower);
 
-    // Create response with httpOnly cookie using Set-Cookie header
+    // Create response with httpOnly cookie
     const response = NextResponse.json({
       success: true,
       message: 'Authentication successful',
       email: emailLower,
     });
 
-    // Set cookie manually via header for better control
-    const cookieOptions = [
-      `${AUTH_CONFIG.COOKIE_NAME}=${token}`,
-      'Path=/',
-      `Max-Age=${AUTH_CONFIG.SESSION_EXPIRY_HOURS * 60 * 60}`,
-      'HttpOnly',
-      'SameSite=Lax',
-      process.env.NODE_ENV === 'production' ? 'Secure' : '',
-    ].filter(Boolean).join('; ');
-
-    response.headers.set('Set-Cookie', cookieOptions);
+    // Set cookie using Next.js cookies API (correct method for App Router)
+    response.cookies.set({
+      name: AUTH_CONFIG.COOKIE_NAME,
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: AUTH_CONFIG.SESSION_EXPIRY_HOURS * 60 * 60,
+    });
 
     return response;
   } catch (error) {

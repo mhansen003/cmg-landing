@@ -51,6 +51,7 @@ function LoginForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: fullEmail }),
+        credentials: 'include',
       });
 
       const data = await response.json();
@@ -120,6 +121,7 @@ function LoginForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: fullEmail, code }),
+        credentials: 'include', // Important for cookies!
       });
 
       const data = await response.json();
