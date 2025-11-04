@@ -128,17 +128,14 @@ function LoginForm() {
         throw new Error(data.error || 'Invalid code');
       }
 
-      // Success! Redirect to dashboard or original destination
-      const redirect = searchParams?.get('redirect') || '/';
-
-      // Show success message briefly before redirect
+      // Success! Redirect to landing page
       setSuccess('✅ Verified! Redirecting...');
 
-      // Wait longer to ensure cookie is set before redirect
+      // Wait to ensure cookie is fully set, then force full page reload
       setTimeout(() => {
         // Force a full page reload to ensure cookie is picked up
-        window.location.replace(redirect);
-      }, 1000);
+        window.location.href = '/';
+      }, 1500);
     } catch (err: any) {
       setError(err.message);
       // Clear OTP on error
