@@ -130,7 +130,14 @@ function LoginForm() {
 
       // Success! Redirect to dashboard or original destination
       const redirect = searchParams?.get('redirect') || '/';
-      router.push(redirect);
+
+      // Show success message briefly before redirect
+      setSuccess('✅ Verified! Redirecting...');
+
+      // Use window.location for more reliable redirect
+      setTimeout(() => {
+        window.location.href = redirect;
+      }, 500);
     } catch (err: any) {
       setError(err.message);
       // Clear OTP on error
