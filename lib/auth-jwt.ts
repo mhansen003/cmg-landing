@@ -7,7 +7,7 @@ export const AUTH_CONFIG = {
   OTP_EXPIRY_MINUTES: 5,
   MAX_ATTEMPTS: 5,
   RATE_LIMIT_WINDOW_MINUTES: 15,
-  MAX_REQUESTS_PER_WINDOW: 3,
+  MAX_REQUESTS_PER_WINDOW: 20, // Increased for testing and user convenience
   SESSION_EXPIRY_HOURS: 120, // 5 days
   ALLOWED_DOMAIN: 'cmgfi.com', // CMG Financial employees only
   COOKIE_NAME: 'cmg_auth_token',
