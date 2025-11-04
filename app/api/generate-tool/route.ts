@@ -71,7 +71,13 @@ export async function POST(request: NextRequest) {
     const toolData = JSON.parse(generatedContent);
     console.log('Tool data generated:', toolData);
 
-    return NextResponse.json(toolData);
+    // Add the URL to the tool data
+    const toolDataWithUrl = {
+      ...toolData,
+      url: url,
+    };
+
+    return NextResponse.json(toolDataWithUrl);
   } catch (error) {
     console.error('Error generating tool data:', error);
 

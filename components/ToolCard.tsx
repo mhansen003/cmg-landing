@@ -6,6 +6,7 @@ import ToolDetailModal from './ToolDetailModal';
 import PhoneModal from './PhoneModal';
 
 interface ToolCardProps {
+  id: string;
   title: string;
   description: string;
   url: string;
@@ -17,9 +18,14 @@ interface ToolCardProps {
   categoryColor?: string; // Hex color for category
   fullDescription?: string;
   features?: string[];
+  upvotes?: number;
+  downvotes?: number;
+  rating?: number;
+  ratingCount?: number;
 }
 
 const ToolCard: React.FC<ToolCardProps> = ({
+  id,
   title,
   description,
   url,
@@ -31,17 +37,22 @@ const ToolCard: React.FC<ToolCardProps> = ({
   categoryColor,
   fullDescription,
   features,
+  upvotes = 0,
+  downvotes = 0,
+  rating: initialRating = 0,
+  ratingCount = 0,
 }) => {
-  const [votes, setVotes] = useState({ up: 0, down: 0 });
+  const [votes, setVotes] = useState({ up: upvotes, down: downvotes });
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
   const [showShareToast, setShowShareToast] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(initialRating);
+  const [displayRatingCount, setDisplayRatingCount] = useState(ratingCount);
   const [hoverRating, setHoverRating] = useState(0);
 
   // Check if this is a phone number link
-  const isPhoneNumber = url.startsWith('tel:');
+  const isPhoneNumber = url?.startsWith('tel:') ?? false;
   const phoneNumber = isPhoneNumber ? url.replace('tel:+1', '').replace('tel:', '') : '';
 
   // Use categoryColor if provided, otherwise fall back to accentColor
@@ -77,18 +88,74 @@ const ToolCard: React.FC<ToolCardProps> = ({
 
   const colors = accentColors[accentColor];
 
-  const handleVote = (type: 'up' | 'down') => {
+  const handleVote = async (type: 'up' | 'down') => {
+    // Prevent duplicate votes
     if (userVote === type) {
-      // Remove vote
-      setVotes(prev => ({ ...prev, [type]: prev[type] - 1 }));
-      setUserVote(null);
-    } else {
-      // Change or add vote
-      setVotes(prev => ({
-        up: type === 'up' ? prev.up + 1 : userVote === 'up' ? prev.up - 1 : prev.up,
-        down: type === 'down' ? prev.down + 1 : userVote === 'down' ? prev.down - 1 : prev.down,
-      }));
-      setUserVote(type);
+      return;
+    }
+
+    // Optimistically update UI
+    const previousVotes = votes;
+    const previousUserVote = userVote;
+
+    setVotes(prev => ({
+      up: type === 'up' ? prev.up + 1 : userVote === 'up' ? prev.up - 1 : prev.up,
+      down: type === 'down' ? prev.down + 1 : userVote === 'down' ? prev.down - 1 : prev.down,
+    }));
+    setUserVote(type);
+
+    // Persist to API
+    try {
+      const response = await fetch(`/api/tools/${id}/vote`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voteType: type }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save vote');
+      }
+
+      const data = await response.json();
+      // Update with server data
+      setVotes({ up: data.tool.upvotes, down: data.tool.downvotes });
+    } catch (error) {
+      console.error('Error saving vote:', error);
+      // Revert on error
+      setVotes(previousVotes);
+      setUserVote(previousUserVote);
+    }
+  };
+
+  const handleRating = async (newRating: number) => {
+    // Optimistically update UI
+    const previousRating = rating;
+    const previousCount = displayRatingCount;
+
+    setRating(newRating);
+    setDisplayRatingCount(prev => prev + 1);
+
+    // Persist to API
+    try {
+      const response = await fetch(`/api/tools/${id}/rate`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating: newRating }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save rating');
+      }
+
+      const data = await response.json();
+      // Update with server data
+      setRating(data.tool.rating);
+      setDisplayRatingCount(data.tool.ratingCount);
+    } catch (error) {
+      console.error('Error saving rating:', error);
+      // Revert on error
+      setRating(previousRating);
+      setDisplayRatingCount(previousCount);
     }
   };
 
@@ -263,7 +330,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
-                        onClick={() => setRating(star)}
+                        onClick={() => handleRating(star)}
                         onMouseEnter={() => setHoverRating(star)}
                         onMouseLeave={() => setHoverRating(0)}
                         className="focus:outline-none transition-transform hover:scale-110 duration-200"

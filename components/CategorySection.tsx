@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import ToolCard from './ToolCard';
 
 interface Tool {
-  id?: string;
+  id: string;
   title: string;
   description: string;
   url: string;
@@ -14,6 +14,10 @@ interface Tool {
   accentColor?: 'green' | 'blue' | 'purple';
   fullDescription?: string;
   features?: string[];
+  upvotes?: number;
+  downvotes?: number;
+  rating?: number;
+  ratingCount?: number;
 }
 
 interface CategorySectionProps {
@@ -128,6 +132,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
               {categoryTools.map((tool, index) => (
                 <div key={tool.id || index} className="w-[450px] flex-shrink-0">
                   <ToolCard
+                    id={tool.id}
                     title={tool.title}
                     description={tool.description}
                     url={tool.url}
@@ -139,6 +144,10 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     categoryColor={categoryColor}
                     fullDescription={tool.fullDescription}
                     features={tool.features}
+                    upvotes={tool.upvotes}
+                    downvotes={tool.downvotes}
+                    rating={tool.rating}
+                    ratingCount={tool.ratingCount}
                   />
                 </div>
               ))}
@@ -173,6 +182,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             {categoryTools.map((tool, index) => (
               <div key={tool.id || index}>
                 <ToolCard
+                  id={tool.id}
                   title={tool.title}
                   description={tool.description}
                   url={tool.url}
@@ -184,6 +194,10 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   categoryColor={categoryColor}
                   fullDescription={tool.fullDescription}
                   features={tool.features}
+                  upvotes={tool.upvotes}
+                  downvotes={tool.downvotes}
+                  rating={tool.rating}
+                  ratingCount={tool.ratingCount}
                 />
               </div>
             ))}

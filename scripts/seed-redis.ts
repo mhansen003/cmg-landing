@@ -1,29 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { Tool } from '@/types/tool';
+import { createClient } from 'redis';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+// Load environment variables
+dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 
 const TOOLS_KEY = 'cmg-tools';
 
-// Lazy load Redis client only if configured
-const getRedis = async () => {
-  if (!process.env.REDIS_URL) {
-    return null;
-  }
-
-  try {
-    const { createClient } = await import('redis');
-    const client = createClient({
-      url: process.env.REDIS_URL
-    });
-
-    await client.connect();
-    return client;
-  } catch (error) {
-    console.error('Failed to connect to Redis:', error);
-    return null;
-  }
-};
-
-// Default tools to return when KV is not available
 const DEFAULT_TOOLS = [
   {
     title: 'Change Management Intake',
@@ -214,95 +197,79 @@ const DEFAULT_TOOLS = [
   },
 ];
 
-// GET - Fetch all tools
-export async function GET() {
-  let redis = null;
-  try {
-    redis = await getRedis();
+async function seedRedis() {
+  console.log('Starting Redis seeding process...\n');
 
-    // If Redis is not configured, return default tools
-    if (!redis) {
-      console.log('Redis not configured, returning default tools');
-      return NextResponse.json({ tools: DEFAULT_TOOLS });
-    }
-
-    // Try to use Redis
-    const toolsData = await redis.get(TOOLS_KEY);
-    const tools = toolsData ? JSON.parse(toolsData) : [];
-    return NextResponse.json({ tools });
-  } catch (error) {
-    console.error('Error fetching tools:', error);
-    // Return default tools if Redis fails
-    return NextResponse.json({ tools: DEFAULT_TOOLS });
-  } finally {
-    // Cleanup: disconnect Redis client
-    if (redis) {
-      try {
-        await redis.quit();
-      } catch (err) {
-        console.error('Error closing Redis connection:', err);
-      }
-    }
+  if (!process.env.REDIS_URL) {
+    console.error('❌ Error: REDIS_URL environment variable not found');
+    console.error('Please ensure .env.local file exists with REDIS_URL configured\n');
+    process.exit(1);
   }
-}
 
-// POST - Add a new tool
-export async function POST(request: NextRequest) {
-  let toolWithMetadata;
-  let redis = null;
+  console.log('✓ Found REDIS_URL environment variable');
 
+  let client;
   try {
-    const newTool = await request.json();
+    // Connect to Redis
+    console.log('→ Connecting to Redis...');
+    client = createClient({
+      url: process.env.REDIS_URL
+    });
 
-    // Add tool metadata
-    toolWithMetadata = {
-      ...newTool,
-      id: Date.now().toString(),
+    await client.connect();
+    console.log('✓ Connected to Redis\n');
+
+    // Check if tools already exist
+    const existing = await client.get(TOOLS_KEY);
+    if (existing) {
+      const existingTools = JSON.parse(existing);
+      console.log(`⚠ Warning: Found ${existingTools.length} existing tools in database`);
+      console.log('This will overwrite them. Continue? (Press Ctrl+C to cancel)\n');
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
+
+    // Add metadata to tools
+    const toolsWithMetadata = DEFAULT_TOOLS.map((tool, index) => ({
+      ...tool,
+      id: `seed-${Date.now()}-${index}`,
       createdAt: new Date().toISOString(),
       upvotes: 0,
       downvotes: 0,
       rating: 0,
       ratingCount: 0,
-    };
+    }));
 
-    redis = await getRedis();
+    // Save to Redis
+    console.log(`→ Saving ${toolsWithMetadata.length} tools to Redis...`);
+    await client.set(TOOLS_KEY, JSON.stringify(toolsWithMetadata));
+    console.log('✓ Successfully saved tools to Redis\n');
 
-    // If Redis is not configured, return tool without persistence
-    if (!redis) {
-      console.log('Redis not configured, returning tool without persistence');
-      return NextResponse.json({
-        success: true,
-        tool: toolWithMetadata,
-        warning: 'Tool not persisted - configure Redis for persistence'
-      });
-    }
+    // Verify
+    const savedData = await client.get(TOOLS_KEY);
+    const savedTools = JSON.parse(savedData);
+    console.log(`✓ Verified: ${savedTools.length} tools in database`);
+    console.log('\n📊 Tools by category:');
 
-    // Get existing tools
-    const toolsData = await redis.get(TOOLS_KEY);
-    const tools = toolsData ? JSON.parse(toolsData) : [];
-    tools.push(toolWithMetadata);
+    const categories = savedTools.reduce((acc: Record<string, number>, tool: any) => {
+      acc[tool.category] = (acc[tool.category] || 0) + 1;
+      return acc;
+    }, {});
 
-    // Save back to Redis
-    await redis.set(TOOLS_KEY, JSON.stringify(tools));
-
-    return NextResponse.json({ success: true, tool: toolWithMetadata });
-  } catch (error) {
-    console.error('Error adding tool:', error);
-
-    // Return success anyway with the tool (just not persisted)
-    return NextResponse.json({
-      success: true,
-      tool: toolWithMetadata || { error: 'Unable to parse tool data' },
-      warning: 'Tool not persisted due to database error'
+    Object.entries(categories).forEach(([category, count]) => {
+      console.log(`  • ${category}: ${count} tools`);
     });
+
+    console.log('\n✅ Seeding complete!\n');
+  } catch (error) {
+    console.error('\n❌ Error during seeding:', error);
+    process.exit(1);
   } finally {
-    // Cleanup: disconnect Redis client
-    if (redis) {
-      try {
-        await redis.quit();
-      } catch (err) {
-        console.error('Error closing Redis connection:', err);
-      }
+    if (client) {
+      await client.quit();
+      console.log('✓ Disconnected from Redis');
     }
   }
 }
+
+// Run the seeding function
+seedRedis();
