@@ -134,10 +134,11 @@ function LoginForm() {
       // Show success message briefly before redirect
       setSuccess('✅ Verified! Redirecting...');
 
-      // Use window.location for more reliable redirect
+      // Wait longer to ensure cookie is set before redirect
       setTimeout(() => {
-        window.location.href = redirect;
-      }, 500);
+        // Force a full page reload to ensure cookie is picked up
+        window.location.replace(redirect);
+      }, 1000);
     } catch (err: any) {
       setError(err.message);
       // Clear OTP on error

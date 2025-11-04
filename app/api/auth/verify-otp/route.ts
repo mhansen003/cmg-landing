@@ -121,6 +121,7 @@ export async function POST(request: NextRequest) {
       sameSite: 'lax',
       maxAge: AUTH_CONFIG.SESSION_EXPIRY_HOURS * 60 * 60,
       path: '/',
+      priority: 'high',
     });
 
     return response;
