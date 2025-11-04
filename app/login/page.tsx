@@ -35,10 +35,14 @@ function LoginForm() {
     setError('');
     setSuccess('');
 
-    if (!email.endsWith('@cmgfi.com')) {
-      setError('Only @cmgfi.com emails are allowed');
+    // Validate username is not empty
+    if (!email || email.trim().length === 0) {
+      setError('Please enter your username');
       return;
     }
+
+    // Construct full email by appending @cmgfi.com
+    const fullEmail = `${email.trim()}@cmgfi.com`;
 
     setLoading(true);
 
@@ -46,7 +50,7 @@ function LoginForm() {
       const response = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: fullEmail }),
       });
 
       const data = await response.json();
@@ -106,13 +110,16 @@ function LoginForm() {
       return;
     }
 
+    // Construct full email
+    const fullEmail = `${email.trim()}@cmgfi.com`;
+
     setLoading(true);
 
     try {
       const response = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email: fullEmail, code }),
       });
 
       const data = await response.json();
@@ -176,19 +183,19 @@ function LoginForm() {
             <form onSubmit={handleSendOTP}>
               <h2 className="text-2xl font-bold text-white mb-2">Sign In</h2>
               <p className="text-gray-400 mb-6">
-                Enter your CMG email to receive a verification code
+                Enter your CMG username to receive a verification code
               </p>
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Email Address
+                  CMG Username
                 </label>
                 <div className="relative">
                   <input
-                    type="email"
+                    type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your.name"
+                    placeholder="firstname.lastname"
                     className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors pr-24"
                     required
                     disabled={loading}
@@ -238,7 +245,7 @@ function LoginForm() {
 
               <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
                 <p className="text-xs text-gray-400 text-center">
-                  🔒 Secure email verification • Only @cmgfi.com emails allowed
+                  🔒 Secure verification • CMG employees only
                 </p>
               </div>
             </form>
@@ -261,7 +268,7 @@ function LoginForm() {
 
               <h2 className="text-2xl font-bold text-white mb-2">Enter Code</h2>
               <p className="text-gray-400 mb-6">
-                We sent a 6-digit code to <span className="text-accent-green font-medium">{email}</span>
+                We sent a 6-digit code to <span className="text-accent-green font-medium">{email}@cmgfi.com</span>
               </p>
 
               {success && (
