@@ -306,9 +306,7 @@ export default function LandingPage() {
           <div className="pt-8 border-t border-white/10">
             <div className="text-center text-gray-500 text-sm">
               <p>
-                &copy; 2025 CMG Financial Services. All rights reserved. |{' '}
-                <a href="#" className="hover:text-accent-blue transition-colors">Privacy Policy</a> |{' '}
-                <a href="#" className="hover:text-accent-blue transition-colors">Terms of Service</a>
+                &copy; 2025 CMG Financial Services. All rights reserved.
               </p>
             </div>
           </div>

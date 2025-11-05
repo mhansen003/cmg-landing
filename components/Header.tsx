@@ -108,7 +108,7 @@ const Header: React.FC<HeaderProps> = ({ pendingCount = 0, unpublishedCount = 0,
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent-green group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link
-              href="#tools"
+              href="/tools"
               className="text-gray-400 hover:text-accent-green transition-colors duration-200 font-medium relative group"
             >
               Tools
