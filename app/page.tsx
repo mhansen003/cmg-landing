@@ -5,6 +5,7 @@ import ToolCard from '@/components/ToolCard';
 import AddToolWizard from '@/components/AddToolWizard';
 import CategorySection from '@/components/CategorySection';
 import PendingQueueSection from '@/components/PendingQueueSection';
+import UnpublishedSection from '@/components/UnpublishedSection';
 import ErrorAlert from '@/components/ErrorAlert';
 
 // Helper function to get icon for a tool based on category
@@ -59,6 +60,7 @@ export default function Home() {
   const [prefilledCategory, setPrefilledCategory] = useState<string | null>(null);
   const [tools, setTools] = useState<any[]>([]);
   const [pendingTools, setPendingTools] = useState<any[]>([]);
+  const [unpublishedTools, setUnpublishedTools] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [categoryColors, setCategoryColors] = useState<Record<string, string>>({
@@ -83,11 +85,15 @@ export default function Home() {
       setTools(data.tools || []);
       setIsAdmin(data.isAdmin || false);
 
-      // If admin, also fetch pending tools
+      // If admin, also fetch pending and unpublished tools
       if (data.isAdmin) {
         const pendingResponse = await fetch('/api/tools?status=pending');
         const pendingData = await pendingResponse.json();
         setPendingTools(pendingData.tools || []);
+
+        const unpublishedResponse = await fetch('/api/tools?status=unpublished');
+        const unpublishedData = await unpublishedResponse.json();
+        setUnpublishedTools(unpublishedData.tools || []);
       }
     } catch (error) {
       console.error('Error fetching tools:', error);
@@ -101,7 +107,7 @@ export default function Home() {
     fetchTools();
   }, []);
 
-  // Handle deep linking to pending queue
+  // Handle deep linking to pending queue and unpublished section
   useEffect(() => {
     // Check for query parameters and hash
     const params = new URLSearchParams(window.location.search);
@@ -135,7 +141,35 @@ export default function Home() {
         }
       }, 500); // Wait for data to load and render
     }
-  }, [pendingTools, isAdmin]);
+
+    // If view=unpublished, scroll to unpublished section
+    if (view === 'unpublished') {
+      // Wait for unpublished section to render
+      setTimeout(() => {
+        const unpublishedSection = document.getElementById('unpublished-section');
+        if (unpublishedSection) {
+          unpublishedSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          // If there's a specific tool ID in hash, highlight it
+          if (hash) {
+            setTimeout(() => {
+              const toolCard = document.getElementById(`tool-${hash}`);
+              if (toolCard) {
+                // Add highlight effect
+                toolCard.classList.add('ring-4', 'ring-gray-500', 'ring-offset-4', 'ring-offset-dark-500');
+                toolCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Remove highlight after 3 seconds
+                setTimeout(() => {
+                  toolCard.classList.remove('ring-4', 'ring-gray-500', 'ring-offset-4', 'ring-offset-dark-500');
+                }, 3000);
+              }
+            }, 500); // Wait for scroll to complete
+          }
+        }
+      }, 500); // Wait for data to load and render
+    }
+  }, [pendingTools, unpublishedTools, isAdmin]);
 
   // Fallback tools if loading or empty (icons added dynamically in render)
   const fallbackTools = [
@@ -408,6 +442,14 @@ export default function Home() {
               {isAdmin && pendingTools.length > 0 && (
                 <PendingQueueSection
                   pendingTools={pendingTools}
+                  onUpdate={fetchTools}
+                />
+              )}
+
+              {/* Unpublished Tools Section (Admin Only) */}
+              {isAdmin && unpublishedTools.length > 0 && (
+                <UnpublishedSection
+                  unpublishedTools={unpublishedTools}
                   onUpdate={fetchTools}
                 />
               )}
