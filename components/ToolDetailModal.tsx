@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
 
 interface ToolDetailModalProps {
@@ -16,6 +16,7 @@ interface ToolDetailModalProps {
   categoryColor?: string; // Hex color for category
   fullDescription?: string;
   features?: string[];
+  tags?: string[];
 }
 
 const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
@@ -31,12 +32,22 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
   categoryColor,
   fullDescription,
   features,
+  tags,
 }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   if (!isOpen) return null;
 
   // Use categoryColor if provided, otherwise fall back to accentColor
   const useCustomColor = !!categoryColor;
   const customColor = categoryColor || '#00FF88';
+
+  // Pause video when launching tool
+  const handleLaunchTool = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  };
 
   const accentColors = {
     green: {
@@ -113,6 +124,7 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
                 <div className="relative bg-dark-500 flex items-center justify-center p-6">
                   <div className="relative w-full rounded-lg overflow-hidden border border-white/10 shadow-2xl">
                     <video
+                      ref={videoRef}
                       src={videoUrl}
                       className="w-full object-contain rounded-lg bg-black"
                       style={{ maxHeight: '500px', height: 'auto' }}
@@ -184,6 +196,23 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
                 </div>
               </div>
             )}
+
+            {/* Tags */}
+            {tags && tags.length > 0 && (
+              <div>
+                <h3 className="text-lg font-bold text-white mb-3">Related Topics</h3>
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1.5 text-xs font-medium bg-white/5 border border-white/10 rounded-full text-gray-400 hover:bg-white/10 hover:text-gray-300 transition-colors"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           </div>
 
@@ -197,6 +226,7 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={handleLaunchTool}
                 className={`inline-flex items-center px-5 py-2.5 text-xs font-bold rounded-xl text-dark-500 transition-all duration-300 transform hover:scale-105 ${!useCustomColor ? colors.bg : ''}`}
                 style={useCustomColor ? {
                   backgroundColor: customColor,
