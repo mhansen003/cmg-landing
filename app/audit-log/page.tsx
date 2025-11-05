@@ -24,6 +24,9 @@ export default function AuditLogPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [unpublishedCount, setUnpublishedCount] = useState(0);
+  const [rejectedCount, setRejectedCount] = useState(0);
 
   // Check authentication on mount
   useEffect(() => {
@@ -42,8 +45,9 @@ export default function AuditLogPage() {
             return;
           }
 
-          // Fetch audit logs
+          // Fetch audit logs and queue counts
           fetchAuditLogs();
+          fetchQueueCounts();
         } else {
           router.push('/login');
         }
@@ -69,6 +73,27 @@ export default function AuditLogPage() {
       console.error('Error fetching audit logs:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchQueueCounts = async () => {
+    try {
+      // Fetch pending tools
+      const pendingResponse = await fetch('/api/tools?status=pending');
+      const pendingData = await pendingResponse.json();
+      setPendingCount(pendingData.tools?.length || 0);
+
+      // Fetch unpublished tools
+      const unpublishedResponse = await fetch('/api/tools?status=unpublished');
+      const unpublishedData = await unpublishedResponse.json();
+      setUnpublishedCount(unpublishedData.tools?.length || 0);
+
+      // Fetch rejected tools
+      const rejectedResponse = await fetch('/api/tools?status=rejected');
+      const rejectedData = await rejectedResponse.json();
+      setRejectedCount(rejectedData.tools?.length || 0);
+    } catch (error) {
+      console.error('Error fetching queue counts:', error);
     }
   };
 
@@ -146,7 +171,11 @@ export default function AuditLogPage() {
 
   return (
     <div className="min-h-screen bg-dark-500">
-      <Header />
+      <Header
+        pendingCount={pendingCount}
+        unpublishedCount={unpublishedCount}
+        rejectedCount={rejectedCount}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
