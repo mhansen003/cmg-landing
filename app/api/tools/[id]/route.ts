@@ -25,12 +25,12 @@ const getRedis = async () => {
 // PUT - Update a tool
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   let redis = null;
 
   try {
-    const { id } = params;
+    const { id } = await params;
     const updates = await request.json();
 
     redis = await getRedis();
@@ -92,12 +92,12 @@ export async function PUT(
 // DELETE - Delete a tool
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   let redis = null;
 
   try {
-    const { id } = params;
+    const { id } = await params;
 
     redis = await getRedis();
 
