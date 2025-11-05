@@ -99,6 +99,18 @@ function LoginForm() {
     // Focus last filled input
     const lastIndex = Math.min(pastedData.length, 5);
     otpInputs.current[lastIndex]?.focus();
+
+    // Auto-submit if complete 6-digit code was pasted
+    if (pastedData.length === 6) {
+      // Small delay to ensure state is updated
+      setTimeout(() => {
+        // Programmatically trigger form submission
+        const form = otpInputs.current[0]?.closest('form');
+        if (form) {
+          form.requestSubmit();
+        }
+      }, 100);
+    }
   };
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
