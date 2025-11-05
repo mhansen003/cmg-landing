@@ -30,6 +30,9 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
     category: tool.category || '',
     features: tool.features?.join('\n') || '',
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Update form when tool changes
   useEffect(() => {
@@ -64,6 +67,32 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
       category: formData.category,
       features: featuresArray,
     });
+  };
+
+  const handleDelete = async () => {
+    if (deleteConfirmText !== 'yes please delete this') {
+      return;
+    }
+
+    setIsDeleting(true);
+
+    try {
+      const response = await fetch(`/api/tools/${tool.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete tool');
+      }
+
+      // Close modal and reload page
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting tool:', error);
+      alert('Failed to delete tool. Please try again.');
+      setIsDeleting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -205,20 +234,71 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
 
         {/* Footer */}
         <div className="sticky bottom-0 bg-dark-300/95 backdrop-blur-sm border-t border-white/10 p-6">
-          <div className="flex justify-end space-x-4">
-            <button
-              onClick={onClose}
-              className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-lg transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-6 py-3 bg-gradient-to-r from-accent-green to-accent-blue text-dark-500 font-bold rounded-lg hover:scale-105 transition-transform"
-            >
-              Save Changes
-            </button>
-          </div>
+          {!showDeleteConfirm ? (
+            <div className="flex justify-between items-center">
+              {/* Delete Button - Left Side */}
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 font-bold rounded-lg transition-colors"
+              >
+                Delete Tool
+              </button>
+
+              {/* Action Buttons - Right Side */}
+              <div className="flex space-x-4">
+                <button
+                  onClick={onClose}
+                  className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-6 py-3 bg-gradient-to-r from-accent-green to-accent-blue text-dark-500 font-bold rounded-lg hover:scale-105 transition-transform"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Delete Confirmation */
+            <div className="space-y-4">
+              <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg">
+                <p className="text-red-500 font-bold mb-2">⚠️ Delete Confirmation</p>
+                <p className="text-gray-300 text-sm mb-4">
+                  This action cannot be undone. To confirm deletion, please type: <span className="font-mono font-bold text-white">yes please delete this</span>
+                </p>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="Type here to confirm"
+                  className="w-full px-4 py-3 bg-dark-500 border border-red-500/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setDeleteConfirmText('');
+                  }}
+                  className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-lg transition-colors"
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleteConfirmText !== 'yes please delete this' || isDeleting}
+                  className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDeleting ? 'Deleting...' : 'Confirm Delete'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
