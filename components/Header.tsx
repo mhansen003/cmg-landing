@@ -1,7 +1,65 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
+interface UserSession {
+  email: string;
+  isAdmin: boolean;
+}
 
 const Header = () => {
+  const router = useRouter();
+  const [user, setUser] = useState<UserSession | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Fetch user session on mount
+  useEffect(() => {
+    fetchUserSession();
+  }, []);
+
+  const fetchUserSession = async () => {
+    try {
+      const response = await fetch('/api/auth/session');
+      const data = await response.json();
+
+      if (data.authenticated && data.user) {
+        setUser(data.user);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user session:', error);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+
+    const confirmed = confirm('Are you sure you want to logout?');
+    if (!confirmed) return;
+
+    setIsLoggingOut(true);
+
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        setUser(null);
+        // Redirect to login page
+        router.push('/auth/login');
+      } else {
+        throw new Error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <header className="bg-dark-400/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,19 +109,63 @@ const Header = () => {
             </a>
           </nav>
 
-          {/* CTA Button */}
+          {/* User Section / CTA Button */}
           <div className="flex items-center space-x-4">
-            <a
-              href="https://www.cmgfi.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center px-5 py-2.5 text-sm font-semibold rounded-lg text-dark-500 bg-gradient-to-r from-accent-green to-accent-blue hover:shadow-neon-green transition-all duration-300 transform hover:scale-105"
-            >
-              Visit CMG
-              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
+            {user ? (
+              <>
+                {/* User Info */}
+                <div className="hidden sm:flex items-center space-x-3 px-4 py-2 bg-white/5 border border-white/10 rounded-lg">
+                  <div className="flex flex-col items-end">
+                    <span className="text-sm text-white font-medium">{user.email}</span>
+                    {user.isAdmin && (
+                      <span className="text-xs font-bold text-accent-green">Admin</span>
+                    )}
+                  </div>
+                  <div className="w-8 h-8 bg-gradient-to-br from-accent-green to-accent-blue rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-dark-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Logout Button */}
+                <button
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="inline-flex items-center px-4 py-2.5 text-sm font-semibold rounded-lg text-white bg-red-500/20 border border-red-500/50 hover:bg-red-500/30 hover:border-red-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Logout"
+                >
+                  {isLoggingOut ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="hidden sm:inline">Logging out...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      <span className="hidden sm:inline">Logout</span>
+                    </>
+                  )}
+                </button>
+              </>
+            ) : (
+              <a
+                href="https://www.cmgfi.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:inline-flex items-center px-5 py-2.5 text-sm font-semibold rounded-lg text-dark-500 bg-gradient-to-r from-accent-green to-accent-blue hover:shadow-neon-green transition-all duration-300 transform hover:scale-105"
+              >
+                Visit CMG
+                <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            )}
 
             {/* Mobile menu button */}
             <button className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-accent-green focus:outline-none transition-colors duration-200">
