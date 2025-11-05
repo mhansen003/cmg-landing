@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth';
 import { canApprove } from '@/lib/permissions';
 import { sendApprovalConfirmationEmail } from '@/lib/email-service';
+import { logAuditEvent } from '@/lib/audit-log';
 
 const TOOLS_KEY = 'cmg-tools';
 
@@ -87,6 +88,18 @@ export async function PUT(
 
     // Save back to Redis
     await redis.set(TOOLS_KEY, JSON.stringify(tools));
+
+    // Log audit event
+    await logAuditEvent(
+      'tool_approved',
+      tools[toolIndex].id,
+      tools[toolIndex].title,
+      session?.email || 'Unknown',
+      {
+        previousStatus: 'pending',
+        newStatus: 'published',
+      }
+    );
 
     // Send approval confirmation email to the creator
     if (originalTool.createdBy && originalTool.createdBy !== 'system') {

@@ -3,6 +3,7 @@ import { Tool } from '@/types/tool';
 import { getSessionFromRequest } from '@/lib/auth';
 import { isAdmin, getDefaultStatus } from '@/lib/permissions';
 import { sendPendingApprovalEmail } from '@/lib/email-service';
+import { logAuditEvent } from '@/lib/audit-log';
 
 const TOOLS_KEY = 'cmg-tools';
 
@@ -363,6 +364,14 @@ export async function POST(request: NextRequest) {
 
     // Save back to Redis
     await redis.set(TOOLS_KEY, JSON.stringify(tools));
+
+    // Log audit event
+    await logAuditEvent(
+      'tool_created',
+      toolWithMetadata.id,
+      toolWithMetadata.title,
+      userEmail || 'Unknown'
+    );
 
     // Send email notification if tool is pending approval
     if (toolWithMetadata.status === 'pending') {
