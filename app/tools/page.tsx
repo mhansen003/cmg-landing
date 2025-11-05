@@ -490,9 +490,30 @@ function HomeContent() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-500">
-      {/* Header with Admin Queue Badge and Rejected Tools Notification */}
-      <Header
+    <div className="min-h-screen bg-dark-500 relative">
+      {/* Subtle Purple Gradient Background */}
+      <div className="fixed inset-0 pointer-events-none opacity-40">
+        {/* Subtle purple glow from bottom */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse 80% 40% at 50% 100%, rgba(139, 92, 246, 0.25), rgba(99, 102, 241, 0.15) 50%, transparent 70%)',
+          }}
+        ></div>
+        {/* Faint grid pattern */}
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
+            backgroundSize: '100px 100px',
+          }}
+        ></div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Header with Admin Queue Badge and Rejected Tools Notification */}
+        <Header
         pendingCount={pendingTools.length}
         unpublishedCount={unpublishedTools.length}
         rejectedCount={rejectedTools.length}
@@ -501,8 +522,12 @@ function HomeContent() {
       {/* Tools Dashboard Section */}
       <section id="tools" className="py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <div className="text-center mb-12 relative">
+            {/* Subtle glow behind heading */}
+            <div className="absolute inset-0 flex items-start justify-center pointer-events-none">
+              <div className="w-96 h-96 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-purple-600/10 blur-3xl -mt-12"></div>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 relative">
               Your <span className="gradient-text">AI Tools</span>
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
@@ -654,6 +679,7 @@ function HomeContent() {
         onClose={() => setShowError(false)}
         message={errorMessage}
       />
+      </div>
     </div>
   );
 }
