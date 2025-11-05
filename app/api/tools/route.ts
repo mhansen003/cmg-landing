@@ -306,6 +306,8 @@ export async function POST(request: NextRequest) {
     const userEmail = session?.email;
     const toolStatus = getDefaultStatus(userEmail);
 
+    console.log(`[Tool Creation] User: ${userEmail}, Status: ${toolStatus}`);
+
     // Add tool metadata
     toolWithMetadata = {
       ...newTool,
@@ -320,6 +322,8 @@ export async function POST(request: NextRequest) {
       rating: 0,
       ratingCount: 0,
     };
+
+    console.log(`[Tool Creation] Created tool "${toolWithMetadata.title}" with status: ${toolWithMetadata.status}`);
 
     redis = await getRedis();
 
@@ -343,7 +347,10 @@ export async function POST(request: NextRequest) {
 
     // Send email notification if tool is pending approval
     if (toolWithMetadata.status === 'pending') {
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cmg-landing.vercel.app';
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://product.cmgfinancial.ai';
+
+      console.log(`[Email] Sending approval email for tool "${toolWithMetadata.title}" to admins`);
+      console.log(`[Email] RESEND_API_KEY configured: ${!!process.env.RESEND_API_KEY}`);
 
       // Send email asynchronously (don't block response)
       sendPendingApprovalEmail(
@@ -357,9 +364,13 @@ export async function POST(request: NextRequest) {
           thumbnailUrl: toolWithMetadata.thumbnailUrl,
         },
         siteUrl
-      ).catch((err) => {
-        console.error('Failed to send approval email (non-blocking):', err);
+      ).then((success) => {
+        console.log(`[Email] Approval email ${success ? 'sent successfully' : 'failed to send'}`);
+      }).catch((err) => {
+        console.error('[Email] Failed to send approval email (non-blocking):', err);
       });
+    } else {
+      console.log(`[Email] Skipping email notification, tool status is: ${toolWithMetadata.status}`);
     }
 
     return NextResponse.json({ success: true, tool: toolWithMetadata });

@@ -25,9 +25,12 @@ export async function sendPendingApprovalEmail(
     const resendApiKey = process.env.RESEND_API_KEY;
 
     if (!resendApiKey) {
-      console.warn('RESEND_API_KEY not configured, skipping email notification');
+      console.error('[Email Service] RESEND_API_KEY not configured! Email notifications will not be sent.');
+      console.error('[Email Service] Please configure RESEND_API_KEY environment variable in Vercel.');
       return false;
     }
+
+    console.log(`[Email Service] Preparing approval email for tool: ${tool.title}`);
 
     // Build deep link to pending queue with highlighted tool
     const approvalLink = `${siteUrl}?view=pending#${tool.toolId}`;
@@ -180,15 +183,17 @@ export async function sendPendingApprovalEmail(
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error(`[Email Service] Resend API error: ${response.status} - ${errorText}`);
       throw new Error(`Resend API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Approval email sent successfully:', data);
+    console.log('[Email Service] ✅ Approval email sent successfully to mhansen@cmgfi.com');
+    console.log('[Email Service] Email ID:', data);
 
     return true;
   } catch (error) {
-    console.error('Failed to send approval email:', error);
+    console.error('[Email Service] ❌ Failed to send approval email:', error);
     return false;
   }
 }
