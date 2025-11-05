@@ -27,11 +27,7 @@ export function canApprove(userEmail: string | null | undefined): boolean {
 }
 
 export function getDefaultStatus(userEmail: string | null | undefined): 'published' | 'pending' {
-  // Admin items go straight to published
-  if (isAdmin(userEmail)) {
-    return 'published';
-  }
-
-  // Non-admin items need approval
+  // All items need approval, including admin items
+  // This ensures a consistent workflow where all tools go through the queue
   return 'pending';
 }
