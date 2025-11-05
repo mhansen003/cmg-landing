@@ -4,6 +4,7 @@ import { verifyAuthToken, AUTH_CONFIG } from './lib/auth-jwt';
 
 // Routes that don't require authentication
 const PUBLIC_ROUTES = [
+  '/',
   '/login',
   '/api/auth/send-otp',
   '/api/auth/verify-otp',
@@ -25,6 +26,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get(AUTH_CONFIG.COOKIE_NAME)?.value;
 
   if (!token) {
+    console.log(`[Auth] No token found for ${pathname}`);
     // Redirect to login
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
@@ -32,28 +34,38 @@ export function middleware(request: NextRequest) {
   }
 
   // Verify token
-  const session = verifyAuthToken(token);
+  try {
+    const session = verifyAuthToken(token);
 
-  if (!session) {
-    // Invalid or expired token - redirect to login
+    if (!session) {
+      console.log(`[Auth] Invalid session for ${pathname}`);
+      // Invalid or expired token - redirect to login
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      const response = NextResponse.redirect(loginUrl);
+
+      // Clear invalid cookie
+      response.cookies.set(AUTH_CONFIG.COOKIE_NAME, '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 0,
+        path: '/',
+      });
+
+      return response;
+    }
+
+    console.log(`[Auth] Valid session for ${session.email} accessing ${pathname}`);
+    // Token is valid, allow access
+    return NextResponse.next();
+  } catch (error) {
+    console.error(`[Auth] Error verifying token:`, error);
+    // On error, redirect to login
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
-    const response = NextResponse.redirect(loginUrl);
-
-    // Clear invalid cookie
-    response.cookies.set(AUTH_CONFIG.COOKIE_NAME, '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 0,
-      path: '/',
-    });
-
-    return response;
+    return NextResponse.redirect(loginUrl);
   }
-
-  // Token is valid, allow access
-  return NextResponse.next();
 }
 
 // Configure which routes use this middleware

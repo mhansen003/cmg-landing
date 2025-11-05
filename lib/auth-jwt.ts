@@ -39,6 +39,7 @@ export function createAuthToken(email: string): string {
 // Verify JWT token
 export function verifyAuthToken(token: string): AuthSession | null {
   if (!process.env.JWT_SECRET) {
+    console.error('[Auth] JWT_SECRET not configured');
     throw new Error('JWT_SECRET not configured');
   }
 
@@ -47,11 +48,13 @@ export function verifyAuthToken(token: string): AuthSession | null {
 
     // Check if token is expired
     if (decoded.expiresAt < Date.now()) {
+      console.log('[Auth] Token expired');
       return null;
     }
 
     return decoded;
   } catch (error) {
+    console.error('[Auth] Token verification failed:', error instanceof Error ? error.message : 'Unknown error');
     return null;
   }
 }

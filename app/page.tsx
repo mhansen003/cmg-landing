@@ -63,6 +63,7 @@ export default function Home() {
   const [unpublishedTools, setUnpublishedTools] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [categoryColors, setCategoryColors] = useState<Record<string, string>>({
     'CMG Product': '#00FF88',
     'Sales AI Agents': '#A855F7',
@@ -102,9 +103,28 @@ export default function Home() {
     }
   };
 
-  // Fetch tools from API on mount
+  // Check authentication on mount
   useEffect(() => {
-    fetchTools();
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/session');
+        const data = await response.json();
+
+        if (data.authenticated) {
+          setIsAuthenticated(true);
+          fetchTools();
+        } else {
+          // Not authenticated, redirect to login
+          window.location.href = '/login';
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        // On error, redirect to login
+        window.location.href = '/login';
+      }
+    };
+
+    checkAuth();
   }, []);
 
   // Handle deep linking to pending queue and unpublished section
@@ -431,10 +451,10 @@ export default function Home() {
           </div>
 
           {/* Tool Cards by Category - Netflix Style */}
-          {isLoading ? (
+          {isLoading || isAuthenticated === null ? (
             <div className="text-center py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-green"></div>
-              <p className="text-gray-400 mt-4">Loading tools...</p>
+              <p className="text-gray-400 mt-4">{isAuthenticated === null ? 'Checking authentication...' : 'Loading tools...'}</p>
             </div>
           ) : (
             <div className="space-y-12">
