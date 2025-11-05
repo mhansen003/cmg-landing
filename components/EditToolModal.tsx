@@ -48,6 +48,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
   const [showUnpublishConfirm, setShowUnpublishConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showError, setShowError] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Update form when tool changes
   useEffect(() => {
@@ -70,6 +71,53 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
   const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Check file size (3MB limit to account for base64 encoding overhead)
+      const maxSizeInBytes = 3 * 1024 * 1024; // 3MB
+      if (file.size > maxSizeInBytes) {
+        setErrorMessage(`Video file is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 3MB.`);
+        setShowError(true);
+        return;
+      }
+
+      if (file.type.startsWith('video/')) {
+        setVideoFile(file);
+        setVideoPreview(URL.createObjectURL(file));
+      } else {
+        setErrorMessage('Please upload a valid video file');
+        setShowError(true);
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+
+      // Check file size (3MB limit to account for base64 encoding overhead)
+      const maxSizeInBytes = 3 * 1024 * 1024; // 3MB
+      if (file.size > maxSizeInBytes) {
+        setErrorMessage(`Video file is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 3MB.`);
+        setShowError(true);
+        return;
+      }
+
       if (file.type.startsWith('video/')) {
         setVideoFile(file);
         setVideoPreview(URL.createObjectURL(file));
@@ -299,7 +347,16 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Demo Video File (Optional)
               </label>
-              <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center hover:border-accent-green transition-colors">
+              <div
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                  isDragging
+                    ? 'border-accent-green bg-accent-green/10'
+                    : 'border-white/20 hover:border-accent-green'
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
                 {videoPreview ? (
                   <div className="space-y-3">
                     <video
@@ -324,7 +381,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
                     <p className="text-gray-400 mb-2 text-sm">Drop video file here or click to browse</p>
-                    <p className="text-xs text-gray-500">MP4, WebM (Max 50MB)</p>
+                    <p className="text-xs text-gray-500">MP4, WebM (Max 3MB)</p>
                     <input
                       type="file"
                       accept="video/*"
