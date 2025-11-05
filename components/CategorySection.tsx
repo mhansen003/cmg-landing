@@ -28,6 +28,7 @@ interface CategorySectionProps {
   onAddTool: (category: string) => void;
   getToolIcon: (category?: string) => React.ReactNode;
   onUpdate?: () => void;
+  isAdmin?: boolean;
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -38,6 +39,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   onAddTool,
   getToolIcon,
   onUpdate,
+  isAdmin = false,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(true);
@@ -151,6 +153,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     rating={tool.rating}
                     ratingCount={tool.ratingCount}
                     onUpdate={onUpdate}
+                    isAdmin={isAdmin}
                   />
                 </div>
               ))}
@@ -202,6 +205,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   rating={tool.rating}
                   ratingCount={tool.ratingCount}
                   onUpdate={onUpdate}
+                  isAdmin={isAdmin}
                 />
               </div>
             ))}

@@ -24,6 +24,7 @@ interface ToolCardProps {
   rating?: number;
   ratingCount?: number;
   onUpdate?: () => void; // Callback to refresh data after update
+  isAdmin?: boolean; // Whether the current user is admin
 }
 
 const ToolCard: React.FC<ToolCardProps> = ({
@@ -44,6 +45,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
   rating: initialRating = 0,
   ratingCount = 0,
   onUpdate,
+  isAdmin = false,
 }) => {
   const [votes, setVotes] = useState({ up: upvotes, down: downvotes });
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
@@ -221,6 +223,22 @@ const ToolCard: React.FC<ToolCardProps> = ({
           <div className="flex flex-col flex-1">
             {/* Top - Video/Screenshot */}
             <div className="relative bg-dark-500 flex items-center justify-center p-4 h-72 cursor-pointer flex-shrink-0 overflow-hidden" onClick={() => setIsModalOpen(true)}>
+              {/* Edit Button - Overlayed on Video (Admin Only) */}
+              {isAdmin && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditModalOpen(true);
+                  }}
+                  className="absolute top-3 right-3 p-2.5 bg-orange-500 hover:bg-orange-400 rounded-lg border-2 border-orange-300 hover:border-orange-200 transition-all duration-200 group/edit z-40 shadow-lg hover:scale-110"
+                  title="Edit tool"
+                >
+                  <svg className="w-5 h-5 text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+              )}
+
               {/* Animated Background */}
               <div className="absolute inset-0 overflow-hidden">
                 {/* Animated gradient background - more prominent */}
@@ -341,17 +359,6 @@ const ToolCard: React.FC<ToolCardProps> = ({
             {/* Bottom - Content */}
             <div className="p-5 flex flex-col justify-between relative z-10 flex-1">
               <div className="flex-1">
-                {/* Edit Button - Top Right */}
-                <button
-                  onClick={() => setIsEditModalOpen(true)}
-                  className="absolute top-2 right-2 p-2 bg-dark-500/80 backdrop-blur-sm hover:bg-dark-400 rounded-lg border border-white/10 hover:border-accent-green transition-all duration-200 group/edit z-20"
-                  title="Edit tool"
-                >
-                  <svg className="w-4 h-4 text-gray-400 group-hover/edit:text-accent-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
-
                 {/* Category Badge and Star Rating */}
                 <div className="flex items-center justify-between mb-4">
                   {category && (

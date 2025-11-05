@@ -16,10 +16,12 @@ interface EditToolModalProps {
     thumbnailUrl?: string;
     category?: string;
     features?: string[];
+    status?: string;
   };
+  isApprovalMode?: boolean; // If true, show "Approve & Publish" instead of "Save"
 }
 
-const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, tool }) => {
+const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, tool, isApprovalMode = false }) => {
   const [formData, setFormData] = useState({
     title: tool.title || '',
     description: tool.description || '',
@@ -165,13 +167,28 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 URL *
               </label>
-              <input
-                type="url"
-                value={formData.url}
-                onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-                className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors"
-                placeholder="https://example.com"
-              />
+              <div className="space-y-2">
+                <input
+                  type="url"
+                  value={formData.url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+                  className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors"
+                  placeholder="https://example.com"
+                />
+                {formData.url && (
+                  <a
+                    href={formData.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-2 px-3 py-2 bg-accent-blue/10 hover:bg-accent-blue/20 border border-accent-blue/30 hover:border-accent-blue text-accent-blue rounded-lg transition-colors text-sm font-medium"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    <span>Test Link</span>
+                  </a>
+                )}
+              </div>
             </div>
 
             {/* Video URL */}
@@ -256,7 +273,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
                   onClick={handleSave}
                   className="px-6 py-3 bg-gradient-to-r from-accent-green to-accent-blue text-dark-500 font-bold rounded-lg hover:scale-105 transition-transform"
                 >
-                  Save Changes
+                  {isApprovalMode ? 'Approve & Publish' : 'Save Changes'}
                 </button>
               </div>
             </div>

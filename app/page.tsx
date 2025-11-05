@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import ToolCard from '@/components/ToolCard';
 import AddToolWizard from '@/components/AddToolWizard';
 import CategorySection from '@/components/CategorySection';
+import PendingQueueSection from '@/components/PendingQueueSection';
 
 // Helper function to get icon for a tool based on category
 const getToolIcon = (category?: string) => {
@@ -56,6 +57,8 @@ export default function Home() {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [prefilledCategory, setPrefilledCategory] = useState<string | null>(null);
   const [tools, setTools] = useState<any[]>([]);
+  const [pendingTools, setPendingTools] = useState<any[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [categoryColors, setCategoryColors] = useState<Record<string, string>>({
     'CMG Product': '#00FF88',
@@ -71,9 +74,18 @@ export default function Home() {
   const fetchTools = async () => {
     setIsLoading(true);
     try {
+      // Fetch published tools
       const response = await fetch('/api/tools');
       const data = await response.json();
       setTools(data.tools || []);
+      setIsAdmin(data.isAdmin || false);
+
+      // If admin, also fetch pending tools
+      if (data.isAdmin) {
+        const pendingResponse = await fetch('/api/tools?status=pending');
+        const pendingData = await pendingResponse.json();
+        setPendingTools(pendingData.tools || []);
+      }
     } catch (error) {
       console.error('Error fetching tools:', error);
     } finally {
@@ -350,6 +362,14 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-12">
+              {/* Pending Review Queue (Admin Only) */}
+              {isAdmin && pendingTools.length > 0 && (
+                <PendingQueueSection
+                  pendingTools={pendingTools}
+                  onUpdate={fetchTools}
+                />
+              )}
+
               {/* Group tools by category */}
               {Object.entries(
                 (tools.length > 0 ? tools : fallbackTools).reduce((acc: Record<string, any[]>, tool) => {
@@ -368,6 +388,7 @@ export default function Home() {
                   onAddTool={handleOpenWizard}
                   getToolIcon={getToolIcon}
                   onUpdate={fetchTools}
+                  isAdmin={isAdmin}
                 />
               ))}
             </div>

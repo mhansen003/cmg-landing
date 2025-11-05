@@ -217,3 +217,32 @@ export function getOTPKey(email: string): string {
 export function getRateLimitKey(email: string): string {
   return `ratelimit:${email.toLowerCase()}`;
 }
+
+// Get current user session from request
+export function getSessionFromRequest(request: Request): AuthSession | null {
+  try {
+    // Get token from cookie
+    const cookieHeader = request.headers.get('cookie');
+    if (!cookieHeader) {
+      return null;
+    }
+
+    // Parse cookie string to find auth token
+    const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+      const [key, value] = cookie.trim().split('=');
+      acc[key] = value;
+      return acc;
+    }, {} as Record<string, string>);
+
+    const token = cookies[AUTH_CONFIG.COOKIE_NAME];
+    if (!token) {
+      return null;
+    }
+
+    // Verify and return session
+    return verifyAuthToken(token);
+  } catch (error) {
+    console.error('Error getting session:', error);
+    return null;
+  }
+}

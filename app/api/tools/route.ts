@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Tool } from '@/types/tool';
+import { getSessionFromRequest } from '@/lib/auth';
+import { isAdmin, getDefaultStatus } from '@/lib/permissions';
 
 const TOOLS_KEY = 'cmg-tools';
 
@@ -214,26 +216,70 @@ const DEFAULT_TOOLS = [
   },
 ];
 
-// GET - Fetch all tools
-export async function GET() {
+// GET - Fetch tools (filtered by status)
+export async function GET(request: NextRequest) {
   let redis = null;
   try {
     redis = await getRedis();
 
-    // If Redis is not configured, return default tools
+    // Get session to check admin status
+    const session = getSessionFromRequest(request);
+    const userIsAdmin = isAdmin(session?.email);
+
+    // Get query params
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status'); // 'published', 'pending', 'unpublished', or 'all'
+
+    // If Redis is not configured, return default tools (all as published)
     if (!redis) {
       console.log('Redis not configured, returning default tools');
-      return NextResponse.json({ tools: DEFAULT_TOOLS });
+      const defaultWithStatus = DEFAULT_TOOLS.map(tool => ({
+        ...tool,
+        status: 'published',
+        createdBy: 'system',
+      }));
+      return NextResponse.json({ tools: defaultWithStatus });
     }
 
     // Try to use Redis
     const toolsData = await redis.get(TOOLS_KEY);
-    const tools = toolsData ? JSON.parse(toolsData) : [];
-    return NextResponse.json({ tools });
+    let tools = toolsData ? JSON.parse(toolsData) : [];
+
+    // Filter by status
+    if (status === 'pending') {
+      // Only admin can see pending items
+      if (userIsAdmin) {
+        tools = tools.filter((t: any) => t.status === 'pending');
+      } else {
+        tools = [];
+      }
+    } else if (status === 'unpublished') {
+      // Only admin can see unpublished items
+      if (userIsAdmin) {
+        tools = tools.filter((t: any) => t.status === 'unpublished');
+      } else {
+        tools = [];
+      }
+    } else if (status === 'all') {
+      // Only admin can see all items
+      if (!userIsAdmin) {
+        tools = tools.filter((t: any) => t.status === 'published' || !t.status);
+      }
+    } else {
+      // Default: only show published tools
+      tools = tools.filter((t: any) => t.status === 'published' || !t.status);
+    }
+
+    return NextResponse.json({ tools, isAdmin: userIsAdmin });
   } catch (error) {
     console.error('Error fetching tools:', error);
     // Return default tools if Redis fails
-    return NextResponse.json({ tools: DEFAULT_TOOLS });
+    const defaultWithStatus = DEFAULT_TOOLS.map(tool => ({
+      ...tool,
+      status: 'published',
+      createdBy: 'system',
+    }));
+    return NextResponse.json({ tools: defaultWithStatus });
   } finally {
     // Cleanup: disconnect Redis client
     if (redis) {
@@ -254,11 +300,20 @@ export async function POST(request: NextRequest) {
   try {
     const newTool = await request.json();
 
+    // Get session to check permissions
+    const session = getSessionFromRequest(request);
+    const userEmail = session?.email;
+    const toolStatus = getDefaultStatus(userEmail);
+
     // Add tool metadata
     toolWithMetadata = {
       ...newTool,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
+      createdBy: userEmail || 'anonymous',
+      status: toolStatus,
+      approvedBy: toolStatus === 'published' ? userEmail : null,
+      approvedAt: toolStatus === 'published' ? new Date().toISOString() : null,
       upvotes: 0,
       downvotes: 0,
       rating: 0,
