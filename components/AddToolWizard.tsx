@@ -73,11 +73,35 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
     }
   };
 
+  // Auto-correct URL to ensure it has http:// or https://
+  const normalizeUrl = (url: string): string => {
+    if (!url) return url;
+
+    const trimmedUrl = url.trim();
+
+    // If URL already has protocol, return as-is
+    if (trimmedUrl.match(/^https?:\/\//i)) {
+      return trimmedUrl;
+    }
+
+    // If URL starts with //, add https:
+    if (trimmedUrl.startsWith('//')) {
+      return `https:${trimmedUrl}`;
+    }
+
+    // Otherwise, add https://
+    return `https://${trimmedUrl}`;
+  };
+
   const handleGenerate = async () => {
     if (!formData.url) {
       setError('Please enter a URL');
       return;
     }
+
+    // Normalize the URL before processing
+    const normalizedUrl = normalizeUrl(formData.url);
+    setFormData(prev => ({ ...prev, url: normalizedUrl }));
 
     setIsGenerating(true);
     setError(null);
@@ -88,7 +112,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          url: formData.url,
+          url: normalizedUrl,
           description: formData.description
         }),
       });
@@ -136,7 +160,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
         const screenshotPromise = fetch('/api/capture-screenshot', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: formData.url }),
+          body: JSON.stringify({ url: normalizedUrl }),
         })
           .then((res) => res.json())
           .then((data) => {

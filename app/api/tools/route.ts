@@ -357,7 +357,7 @@ export async function POST(request: NextRequest) {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://product.cmgfinancial.ai';
 
       console.log(`[Email] Sending approval email for tool "${toolWithMetadata.title}" to admins`);
-      console.log(`[Email] RESEND_API_KEY configured: ${!!process.env.RESEND_API_KEY}`);
+      console.log(`[Email] SMTP configured: ${!!process.env.SMTP_HOST && !!process.env.SMTP_USER}`);
 
       // Send email asynchronously (don't block response)
       sendPendingApprovalEmail(

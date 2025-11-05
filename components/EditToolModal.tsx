@@ -64,6 +64,26 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
     }
   }, [tool]);
 
+  // Auto-correct URL to ensure it has http:// or https://
+  const normalizeUrl = (url: string): string => {
+    if (!url) return url;
+
+    const trimmedUrl = url.trim();
+
+    // If URL already has protocol, return as-is
+    if (trimmedUrl.match(/^https?:\/\//i)) {
+      return trimmedUrl;
+    }
+
+    // If URL starts with //, add https:
+    if (trimmedUrl.startsWith('//')) {
+      return `https:${trimmedUrl}`;
+    }
+
+    // Otherwise, add https://
+    return `https://${trimmedUrl}`;
+  };
+
   const handleSave = () => {
     // Convert features back to array
     const featuresArray = formData.features
@@ -75,9 +95,9 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
       title: formData.title,
       description: formData.description,
       fullDescription: formData.fullDescription,
-      url: formData.url,
-      videoUrl: formData.videoUrl,
-      thumbnailUrl: formData.thumbnailUrl,
+      url: normalizeUrl(formData.url),
+      videoUrl: normalizeUrl(formData.videoUrl),
+      thumbnailUrl: normalizeUrl(formData.thumbnailUrl),
       category: formData.category,
       features: featuresArray,
       tags,
