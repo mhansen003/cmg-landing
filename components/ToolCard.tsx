@@ -5,6 +5,7 @@ import Image from 'next/image';
 import ToolDetailModal from './ToolDetailModal';
 import PhoneModal from './PhoneModal';
 import EditToolModal from './EditToolModal';
+import ErrorAlert from './ErrorAlert';
 
 interface ToolCardProps {
   id: string;
@@ -58,6 +59,8 @@ const ToolCard: React.FC<ToolCardProps> = ({
   const [rating, setRating] = useState(initialRating);
   const [displayRatingCount, setDisplayRatingCount] = useState(ratingCount);
   const [hoverRating, setHoverRating] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showError, setShowError] = useState(false);
 
   // Check if this is a phone number link
   const isPhoneNumber = url?.startsWith('tel:') ?? false;
@@ -208,7 +211,8 @@ const ToolCard: React.FC<ToolCardProps> = ({
       }
     } catch (error) {
       console.error('Error updating tool:', error);
-      alert('Failed to update tool. Please try again.');
+      setErrorMessage('Failed to update tool. Please try again.');
+      setShowError(true);
     }
   };
 
@@ -626,6 +630,13 @@ const ToolCard: React.FC<ToolCardProps> = ({
           tags,
         }}
         isAdmin={isAdmin}
+      />
+
+      {/* Error Alert */}
+      <ErrorAlert
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+        message={errorMessage}
       />
     </>
   );

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog from './ConfirmDialog';
+import ErrorAlert from './ErrorAlert';
 
 interface UserSession {
   email: string;
@@ -15,6 +16,8 @@ const Header = () => {
   const [user, setUser] = useState<UserSession | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showError, setShowError] = useState(false);
 
   // Fetch user session on mount
   useEffect(() => {
@@ -58,7 +61,8 @@ const Header = () => {
       }
     } catch (error) {
       console.error('Logout error:', error);
-      alert('Failed to logout. Please try again.');
+      setErrorMessage('Failed to logout. Please try again.');
+      setShowError(true);
     } finally {
       setIsLoggingOut(false);
     }
@@ -192,6 +196,13 @@ const Header = () => {
         cancelText="Cancel"
         confirmColor="red"
         isLoading={isLoggingOut}
+      />
+
+      {/* Error Alert */}
+      <ErrorAlert
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+        message={errorMessage}
       />
     </header>
   );

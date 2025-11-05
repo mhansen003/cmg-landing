@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import EditToolModal from './EditToolModal';
+import ConfirmDialog from './ConfirmDialog';
+import ErrorAlert from './ErrorAlert';
 
 interface Tool {
   id: string;
@@ -27,6 +29,11 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
+  const [rejectingToolId, setRejectingToolId] = useState<string | null>(null);
+  const [rejectingToolTitle, setRejectingToolTitle] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showError, setShowError] = useState(false);
 
   const handleApprove = async (tool: Tool, withEdits: boolean = false) => {
     if (withEdits) {
@@ -52,7 +59,8 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
       onUpdate();
     } catch (error) {
       console.error('Error approving tool:', error);
-      alert('Failed to approve tool. Please try again.');
+      setErrorMessage('Failed to approve tool. Please try again.');
+      setShowError(true);
     } finally {
       setProcessingId(null);
     }
@@ -79,19 +87,25 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
       onUpdate();
     } catch (error) {
       console.error('Error approving tool with edits:', error);
-      alert('Failed to approve tool. Please try again.');
+      setErrorMessage('Failed to approve tool. Please try again.');
+      setShowError(true);
     } finally {
       setProcessingId(null);
     }
   };
 
-  const handleReject = async (toolId: string) => {
-    const confirmed = confirm('Are you sure you want to reject this tool? This cannot be undone.');
-    if (!confirmed) return;
+  const handleRejectClick = (tool: Tool) => {
+    setRejectingToolId(tool.id);
+    setRejectingToolTitle(tool.title);
+    setShowRejectConfirm(true);
+  };
 
-    setProcessingId(toolId);
+  const handleRejectConfirm = async () => {
+    if (!rejectingToolId) return;
+
+    setProcessingId(rejectingToolId);
     try {
-      const response = await fetch(`/api/tools/${toolId}`, {
+      const response = await fetch(`/api/tools/${rejectingToolId}`, {
         method: 'DELETE',
       });
 
@@ -99,13 +113,18 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
         throw new Error('Failed to reject tool');
       }
 
-      // Refresh the list
+      // Close dialog and refresh
+      setShowRejectConfirm(false);
       onUpdate();
     } catch (error) {
       console.error('Error rejecting tool:', error);
-      alert('Failed to reject tool. Please try again.');
+      setErrorMessage('Failed to reject tool. Please try again.');
+      setShowError(true);
+      setShowRejectConfirm(false);
     } finally {
       setProcessingId(null);
+      setRejectingToolId(null);
+      setRejectingToolTitle('');
     }
   };
 
@@ -247,7 +266,7 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
                       </button>
 
                       <button
-                        onClick={() => handleReject(tool.id)}
+                        onClick={() => handleRejectClick(tool)}
                         disabled={processingId === tool.id}
                         className="flex items-center space-x-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -278,6 +297,26 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
           isApprovalMode={true}
         />
       )}
+
+      {/* Reject Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showRejectConfirm}
+        onClose={() => setShowRejectConfirm(false)}
+        onConfirm={handleRejectConfirm}
+        title="Reject Tool"
+        message={`Are you sure you want to reject "${rejectingToolTitle}"? This will permanently delete the submission.`}
+        confirmText="Yes, Reject"
+        cancelText="Cancel"
+        confirmColor="red"
+        isLoading={processingId === rejectingToolId}
+      />
+
+      {/* Error Alert */}
+      <ErrorAlert
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+        message={errorMessage}
+      />
     </>
   );
 };

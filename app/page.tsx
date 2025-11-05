@@ -5,6 +5,7 @@ import ToolCard from '@/components/ToolCard';
 import AddToolWizard from '@/components/AddToolWizard';
 import CategorySection from '@/components/CategorySection';
 import PendingQueueSection from '@/components/PendingQueueSection';
+import ErrorAlert from '@/components/ErrorAlert';
 
 // Helper function to get icon for a tool based on category
 const getToolIcon = (category?: string) => {
@@ -69,6 +70,8 @@ export default function Home() {
     'Engineering & Dev Ops': '#06B6D4',
     'Training': '#FBBF24',
   });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showError, setShowError] = useState(false);
 
   // Fetch tools from API
   const fetchTools = async () => {
@@ -374,7 +377,8 @@ export default function Home() {
       setTools(prev => [...prev, data.tool]);
     } catch (error) {
       console.error('Error adding tool:', error);
-      alert('Failed to add tool. Please try again.');
+      setErrorMessage('Failed to add tool. Please try again.');
+      setShowError(true);
     }
   };
 
@@ -450,6 +454,13 @@ export default function Home() {
         isOpen={isWizardOpen}
         onClose={() => setIsWizardOpen(false)}
         onSubmit={handleAddTool}
+      />
+
+      {/* Error Alert */}
+      <ErrorAlert
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+        message={errorMessage}
       />
     </div>
   );

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import TagInput from './TagInput';
+import ConfirmDialog from './ConfirmDialog';
+import ErrorAlert from './ErrorAlert';
 
 interface EditToolModalProps {
   isOpen: boolean;
@@ -41,6 +43,9 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUnpublishing, setIsUnpublishing] = useState(false);
+  const [showUnpublishConfirm, setShowUnpublishConfirm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showError, setShowError] = useState(false);
 
   // Update form when tool changes
   useEffect(() => {
@@ -100,15 +105,17 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
       window.location.reload();
     } catch (error) {
       console.error('Error deleting tool:', error);
-      alert('Failed to delete tool. Please try again.');
+      setErrorMessage('Failed to delete tool. Please try again.');
+      setShowError(true);
       setIsDeleting(false);
     }
   };
 
-  const handleUnpublish = async () => {
-    const confirmed = confirm('Unpublish this tool? It will be hidden from users but not deleted.');
-    if (!confirmed) return;
+  const handleUnpublishClick = () => {
+    setShowUnpublishConfirm(true);
+  };
 
+  const handleUnpublishConfirm = async () => {
     setIsUnpublishing(true);
 
     try {
@@ -125,11 +132,14 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
       }
 
       // Close modal and reload page
+      setShowUnpublishConfirm(false);
       onClose();
       window.location.reload();
     } catch (error) {
       console.error('Error unpublishing tool:', error);
-      alert('Failed to unpublish tool. Please try again.');
+      setErrorMessage('Failed to unpublish tool. Please try again.');
+      setShowError(true);
+      setShowUnpublishConfirm(false);
       setIsUnpublishing(false);
     }
   };
@@ -320,7 +330,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
                 {/* Unpublish Button - Admin Only, for published tools */}
                 {isAdmin && tool.status === 'published' && (
                   <button
-                    onClick={handleUnpublish}
+                    onClick={handleUnpublishClick}
                     disabled={isUnpublishing}
                     className="px-6 py-3 bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/50 font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -386,6 +396,26 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
           )}
         </div>
       </div>
+
+      {/* Unpublish Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showUnpublishConfirm}
+        onClose={() => setShowUnpublishConfirm(false)}
+        onConfirm={handleUnpublishConfirm}
+        title="Unpublish Tool"
+        message="Are you sure you want to unpublish this tool? It will be hidden from users but not deleted. You can republish it later."
+        confirmText="Yes, Unpublish"
+        cancelText="Cancel"
+        confirmColor="red"
+        isLoading={isUnpublishing}
+      />
+
+      {/* Error Alert */}
+      <ErrorAlert
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+        message={errorMessage}
+      />
     </div>
   );
 };
