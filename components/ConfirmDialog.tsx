@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 interface ConfirmDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (inputValue?: string) => void;
+  onConfirm: (inputValue?: string, checkboxValue?: boolean) => void;
   title: string;
   message: string;
   confirmText?: string;
@@ -17,6 +17,9 @@ interface ConfirmDialogProps {
   textInputPlaceholder?: string;
   textInputRequired?: boolean;
   requireTextMatch?: string; // Require exact text match for confirmation
+  showCheckbox?: boolean;
+  checkboxLabel?: string;
+  checkboxDefaultChecked?: boolean;
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -34,8 +37,12 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   textInputPlaceholder = '',
   textInputRequired = false,
   requireTextMatch = undefined,
+  showCheckbox = false,
+  checkboxLabel = '',
+  checkboxDefaultChecked = false,
 }) => {
   const [inputValue, setInputValue] = useState('');
+  const [checkboxValue, setCheckboxValue] = useState(checkboxDefaultChecked);
 
   if (!isOpen) return null;
 
@@ -48,7 +55,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     if (showTextInput && textInputRequired && !inputValue.trim()) {
       return; // Don't confirm if required input is empty
     }
-    onConfirm(showTextInput ? inputValue : undefined);
+    onConfirm(showTextInput ? inputValue : undefined, showCheckbox ? checkboxValue : undefined);
   };
 
   const isTextMatchValid = !requireTextMatch || inputValue.trim().toLowerCase() === requireTextMatch.toLowerCase();
@@ -114,6 +121,22 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 {textInputRequired && !requireTextMatch && !inputValue.trim() && (
                   <p className="text-xs text-red-400 mt-1">This field is required</p>
                 )}
+              </div>
+            )}
+
+            {/* Optional Checkbox */}
+            {showCheckbox && (
+              <div className="mt-4">
+                <label className="flex items-center space-x-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={checkboxValue}
+                    onChange={(e) => setCheckboxValue(e.target.checked)}
+                    disabled={isLoading}
+                    className="w-5 h-5 bg-dark-500 border-2 border-white/20 rounded text-accent-green focus:ring-2 focus:ring-accent-green/50 focus:ring-offset-0 disabled:opacity-50 cursor-pointer"
+                  />
+                  <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{checkboxLabel}</span>
+                </label>
               </div>
             )}
           </div>

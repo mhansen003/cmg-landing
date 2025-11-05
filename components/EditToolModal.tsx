@@ -22,6 +22,7 @@ interface EditToolModalProps {
     status?: string;
     tags?: string[];
     aiGeneratedTags?: boolean;
+    createdBy?: string;
   };
   isApprovalMode?: boolean; // If true, show "Approve & Publish" instead of "Save"
   isAdmin?: boolean; // If true, show admin-only actions like unpublish
@@ -135,7 +136,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
     setShowUnpublishConfirm(true);
   };
 
-  const handleUnpublishConfirm = async () => {
+  const handleUnpublishConfirm = async (_inputValue?: string, sendEmail?: boolean) => {
     setIsUnpublishing(true);
 
     try {
@@ -144,6 +145,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           status: 'unpublished',
+          sendEmailNotification: sendEmail || false,
         }),
       });
 
@@ -428,6 +430,9 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
         cancelText="Cancel"
         confirmColor="red"
         isLoading={isUnpublishing}
+        showCheckbox={true}
+        checkboxLabel="Send email notification to the author"
+        checkboxDefaultChecked={tool.createdBy !== 'system'}
       />
 
       {/* Error Alert */}

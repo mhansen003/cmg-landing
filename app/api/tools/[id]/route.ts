@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth';
-import { sendRejectionEmail } from '@/lib/email-service';
+import { sendRejectionEmail, sendUnpublishNotificationEmail } from '@/lib/email-service';
 
 const TOOLS_KEY = 'cmg-tools';
 
@@ -33,7 +33,8 @@ export async function PUT(
 
   try {
     const { id } = await params;
-    const updates = await request.json();
+    const body = await request.json();
+    const { sendEmailNotification, ...updates } = body;
 
     redis = await getRedis();
 
@@ -59,6 +60,9 @@ export async function PUT(
       );
     }
 
+    // Store original tool data for email
+    const originalTool = tools[toolIndex];
+
     // Update tool
     tools[toolIndex] = {
       ...tools[toolIndex],
@@ -69,6 +73,35 @@ export async function PUT(
 
     // Save back to Redis
     await redis.set(TOOLS_KEY, JSON.stringify(tools));
+
+    // Send unpublish notification email if requested
+    if (sendEmailNotification && updates.status === 'unpublished' && originalTool.createdBy && originalTool.createdBy !== 'system') {
+      const session = getSessionFromRequest(request);
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://product.cmgfinancial.ai';
+
+      console.log('[API /tools PUT] Sending unpublish notification email...');
+      console.log('[API /tools PUT] Tool:', originalTool.title);
+      console.log('[API /tools PUT] Recipient:', originalTool.createdBy);
+
+      sendUnpublishNotificationEmail(
+        {
+          toolId: originalTool.id,
+          title: originalTool.title,
+          description: originalTool.description,
+          category: originalTool.category,
+          url: originalTool.url,
+          createdBy: originalTool.createdBy,
+          thumbnailUrl: originalTool.thumbnailUrl,
+        },
+        session?.email || 'Admin',
+        originalTool.createdBy,
+        siteUrl
+      ).then((success) => {
+        console.log(`[API /tools PUT] Unpublish email ${success ? 'sent successfully' : 'failed to send'}`);
+      }).catch((err) => {
+        console.error('[API /tools PUT] Failed to send unpublish email (non-blocking):', err);
+      });
+    }
 
     return NextResponse.json({
       success: true,

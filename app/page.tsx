@@ -105,8 +105,16 @@ function HomeContent() {
       }
 
       // Fetch rejected tools for current user (all users can see their own rejected tools)
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('[Page] Fetching rejected tools for current user...');
       const rejectedResponse = await fetch('/api/tools?status=rejected');
       const rejectedData = await rejectedResponse.json();
+      console.log('[Page] Rejected tools response:', rejectedData);
+      console.log('[Page] Rejected tools count:', rejectedData.tools?.length || 0);
+      if (rejectedData.tools?.length > 0) {
+        console.log('[Page] Rejected tools:', rejectedData.tools.map((t: any) => ({ id: t.id, title: t.title, status: t.status, createdBy: t.createdBy })));
+      }
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       setRejectedTools(rejectedData.tools || []);
     } catch (error) {
       console.error('Error fetching tools:', error);
@@ -436,15 +444,10 @@ function HomeContent() {
     try {
       const category = toolData.category || prefilledCategory;
 
-      // Update category color if provided
-      if (toolData.categoryColor && category) {
-        setCategoryColors(prev => ({
-          ...prev,
-          [category]: toolData.categoryColor,
-        }));
-      }
+      // DON'T update global categoryColors - save color per-tool instead
+      // This prevents all tools in the category from changing color immediately
 
-      // Save tool to API
+      // Save tool to API with its own individual color
       const response = await fetch('/api/tools', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -456,7 +459,7 @@ function HomeContent() {
           category: category,
           thumbnailUrl: toolData.thumbnailUrl,
           videoUrl: toolData.videoUrl,
-          categoryColor: toolData.categoryColor,
+          categoryColor: toolData.categoryColor, // Stored per-tool, not per-category
           features: toolData.features,
           tags: toolData.tags,
           aiGeneratedTags: toolData.aiGeneratedTags,
