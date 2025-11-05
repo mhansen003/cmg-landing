@@ -8,6 +8,7 @@ import AddToolWizard from '@/components/AddToolWizard';
 import CategorySection from '@/components/CategorySection';
 import PendingQueueSection from '@/components/PendingQueueSection';
 import UnpublishedSection from '@/components/UnpublishedSection';
+import RejectedToolsSection from '@/components/RejectedToolsSection';
 import ErrorAlert from '@/components/ErrorAlert';
 
 // Helper function to get icon for a tool based on category
@@ -66,6 +67,7 @@ function HomeContent() {
   const [tools, setTools] = useState<any[]>([]);
   const [pendingTools, setPendingTools] = useState<any[]>([]);
   const [unpublishedTools, setUnpublishedTools] = useState<any[]>([]);
+  const [rejectedTools, setRejectedTools] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -101,6 +103,11 @@ function HomeContent() {
         const unpublishedData = await unpublishedResponse.json();
         setUnpublishedTools(unpublishedData.tools || []);
       }
+
+      // Fetch rejected tools for current user (all users can see their own rejected tools)
+      const rejectedResponse = await fetch('/api/tools?status=rejected');
+      const rejectedData = await rejectedResponse.json();
+      setRejectedTools(rejectedData.tools || []);
     } catch (error) {
       console.error('Error fetching tools:', error);
     } finally {
@@ -194,7 +201,35 @@ function HomeContent() {
         }
       }, 500); // Wait for data to load and render
     }
-  }, [pendingTools, unpublishedTools, isAdmin]);
+
+    // If view=rejected, scroll to rejected tools section
+    if (view === 'rejected') {
+      // Wait for rejected tools section to render
+      setTimeout(() => {
+        const rejectedSection = document.getElementById('rejected-tools');
+        if (rejectedSection) {
+          rejectedSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          // If there's a specific tool ID in hash, highlight it
+          if (hash) {
+            setTimeout(() => {
+              const toolCard = document.getElementById(`tool-${hash}`);
+              if (toolCard) {
+                // Add highlight effect
+                toolCard.classList.add('ring-4', 'ring-red-500', 'ring-offset-4', 'ring-offset-dark-500');
+                toolCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Remove highlight after 3 seconds
+                setTimeout(() => {
+                  toolCard.classList.remove('ring-4', 'ring-red-500', 'ring-offset-4', 'ring-offset-dark-500');
+                }, 3000);
+              }
+            }, 500); // Wait for scroll to complete
+          }
+        }
+      }, 500); // Wait for data to load and render
+    }
+  }, [pendingTools, unpublishedTools, rejectedTools, isAdmin]);
 
   // Fallback tools if loading or empty (icons added dynamically in render)
   const fallbackTools = [
@@ -451,10 +486,11 @@ function HomeContent() {
 
   return (
     <div className="min-h-screen bg-dark-500">
-      {/* Header with Admin Queue Badge */}
+      {/* Header with Admin Queue Badge and Rejected Tools Notification */}
       <Header
         pendingCount={pendingTools.length}
         unpublishedCount={unpublishedTools.length}
+        rejectedCount={rejectedTools.length}
       />
 
       {/* Tools Dashboard Section */}
@@ -488,6 +524,14 @@ function HomeContent() {
               {isAdmin && view === 'unpublished' && unpublishedTools.length > 0 && (
                 <UnpublishedSection
                   unpublishedTools={unpublishedTools}
+                  onUpdate={fetchTools}
+                />
+              )}
+
+              {/* Rejected Tools Section - shown to tool creators */}
+              {view === 'rejected' && rejectedTools.length > 0 && (
+                <RejectedToolsSection
+                  rejectedTools={rejectedTools}
                   onUpdate={fetchTools}
                 />
               )}

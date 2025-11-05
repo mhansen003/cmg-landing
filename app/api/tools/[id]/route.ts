@@ -138,34 +138,57 @@ export async function DELETE(
       );
     }
 
-    // If rejection reason provided, send rejection email
-    if (rejectionReason && toolToDelete.createdBy) {
+    // If rejection reason provided, REJECT the tool (don't delete)
+    if (rejectionReason) {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://product.cmgfinancial.ai';
 
-      console.log(`[Tool Rejection] Sending rejection email for "${toolToDelete.title}" to ${toolToDelete.createdBy}`);
+      console.log(`[Tool Rejection] Rejecting tool "${toolToDelete.title}" by ${adminEmail}`);
       console.log(`[Tool Rejection] Reason: ${rejectionReason}`);
 
-      // Send email asynchronously (don't block deletion)
-      sendRejectionEmail(
-        {
-          toolId: toolToDelete.id,
-          title: toolToDelete.title,
-          description: toolToDelete.description,
-          category: toolToDelete.category,
-          url: toolToDelete.url,
-          createdBy: toolToDelete.createdBy,
-          thumbnailUrl: toolToDelete.thumbnailUrl,
-        },
-        adminEmail,
-        toolToDelete.createdBy, // Recipient email
-        rejectionReason,
-        siteUrl
-      ).then((success) => {
-        console.log(`[Tool Rejection] Email ${success ? 'sent successfully' : 'failed to send'}`);
-      }).catch((err) => {
-        console.error('[Tool Rejection] Failed to send rejection email (non-blocking):', err);
+      // Find the tool and update its status to "rejected"
+      const toolIndex = tools.findIndex((t: any) => t.id === id);
+      tools[toolIndex] = {
+        ...tools[toolIndex],
+        status: 'rejected',
+        rejectedBy: adminEmail,
+        rejectedAt: new Date().toISOString(),
+        rejectionReason: rejectionReason,
+      };
+
+      // Save back to Redis
+      await redis.set(TOOLS_KEY, JSON.stringify(tools));
+
+      // Send rejection email asynchronously
+      if (toolToDelete.createdBy) {
+        sendRejectionEmail(
+          {
+            toolId: toolToDelete.id,
+            title: toolToDelete.title,
+            description: toolToDelete.description,
+            category: toolToDelete.category,
+            url: toolToDelete.url,
+            createdBy: toolToDelete.createdBy,
+            thumbnailUrl: toolToDelete.thumbnailUrl,
+          },
+          adminEmail,
+          toolToDelete.createdBy,
+          rejectionReason,
+          siteUrl
+        ).then((success) => {
+          console.log(`[Tool Rejection] Email ${success ? 'sent successfully' : 'failed to send'}`);
+        }).catch((err) => {
+          console.error('[Tool Rejection] Failed to send rejection email (non-blocking):', err);
+        });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'Tool rejected and moved to rejected queue',
       });
     }
+
+    // No rejection reason = permanent delete (for unpublished/rejected tools)
+    console.log(`[Tool Delete] Permanently deleting tool "${toolToDelete.title}"`);
 
     // Filter out the tool to delete
     const filteredTools = tools.filter((t: any) => t.id !== id);
@@ -175,7 +198,7 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: rejectionReason ? 'Tool rejected and email sent' : 'Tool deleted successfully',
+      message: 'Tool deleted permanently',
     });
   } catch (error) {
     console.error('Error deleting tool:', error);

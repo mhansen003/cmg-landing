@@ -19,21 +19,22 @@ interface Tool {
   status: string;
   createdBy?: string;
   createdAt?: string;
-  tags?: string[];
+  rejectedBy?: string;
+  rejectedAt?: string;
+  rejectionReason?: string;
 }
 
-interface UnpublishedSectionProps {
-  unpublishedTools: Tool[];
+interface RejectedToolsSectionProps {
+  rejectedTools: Tool[];
   onUpdate: () => void;
 }
 
-const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTools, onUpdate }) => {
+const RejectedToolsSection: React.FC<RejectedToolsSectionProps> = ({ rejectedTools, onUpdate }) => {
   const router = useRouter();
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showRepublishConfirm, setShowRepublishConfirm] = useState(false);
   const [actionToolId, setActionToolId] = useState<string | null>(null);
   const [actionToolTitle, setActionToolTitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -43,39 +44,62 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
     router.push('/');
   };
 
-  const handleRepublishClick = (tool: Tool) => {
-    setActionToolId(tool.id);
-    setActionToolTitle(tool.title);
-    setShowRepublishConfirm(true);
-  };
+  const handleResubmit = async (tool: Tool, withEdits: boolean = false) => {
+    if (withEdits) {
+      // Open edit modal to make changes before resubmitting
+      setEditingTool(tool);
+      setIsEditModalOpen(true);
+      return;
+    }
 
-  const handleRepublishConfirm = async () => {
-    if (!actionToolId) return;
-
-    setProcessingId(actionToolId);
+    // Direct resubmit without edits
+    setProcessingId(tool.id);
     try {
-      const response = await fetch(`/api/tools/${actionToolId}/publish`, {
+      const response = await fetch(`/api/tools/${tool.id}/resubmit`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'published' }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to republish tool');
+        throw new Error('Failed to resubmit tool');
       }
 
-      // Close dialog and refresh
-      setShowRepublishConfirm(false);
+      // Refresh the list
       onUpdate();
     } catch (error) {
-      console.error('Error republishing tool:', error);
-      setErrorMessage('Failed to republish tool. Please try again.');
+      console.error('Error resubmitting tool:', error);
+      setErrorMessage('Failed to resubmit tool. Please try again.');
       setShowError(true);
-      setShowRepublishConfirm(false);
     } finally {
       setProcessingId(null);
-      setActionToolId(null);
-      setActionToolTitle('');
+    }
+  };
+
+  const handleResubmitWithEdits = async (updates: any) => {
+    if (!editingTool) return;
+
+    setProcessingId(editingTool.id);
+    try {
+      const response = await fetch(`/api/tools/${editingTool.id}/resubmit`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to resubmit tool with edits');
+      }
+
+      // Close modal and refresh
+      setIsEditModalOpen(false);
+      setEditingTool(null);
+      onUpdate();
+    } catch (error) {
+      console.error('Error resubmitting tool with edits:', error);
+      setErrorMessage('Failed to resubmit tool. Please try again.');
+      setShowError(true);
+    } finally {
+      setProcessingId(null);
     }
   };
 
@@ -92,6 +116,7 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
     try {
       const response = await fetch(`/api/tools/${actionToolId}`, {
         method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -113,64 +138,31 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
     }
   };
 
-  const handleEditClick = (tool: Tool) => {
-    setEditingTool(tool);
-    setIsEditModalOpen(true);
-  };
-
-  const handleEditSave = async (updates: any) => {
-    if (!editingTool) return;
-
-    setProcessingId(editingTool.id);
-    try {
-      const response = await fetch(`/api/tools/${editingTool.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update tool');
-      }
-
-      // Close modal and refresh
-      setIsEditModalOpen(false);
-      setEditingTool(null);
-      onUpdate();
-    } catch (error) {
-      console.error('Error updating tool:', error);
-      setErrorMessage('Failed to update tool. Please try again.');
-      setShowError(true);
-    } finally {
-      setProcessingId(null);
-    }
-  };
-
-  if (unpublishedTools.length === 0) {
+  if (rejectedTools.length === 0) {
     return null;
   }
 
   return (
     <>
-      <div id="unpublished-section" className="mb-12">
+      <div id="rejected-tools" className="mb-12">
         {/* Header with Back Button */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 bg-gray-500/20 border-2 border-gray-500 rounded-xl flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+              <div className="w-12 h-12 bg-red-500/20 border-2 border-red-500 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-white">Unpublished Tools</h3>
-              <p className="text-sm text-gray-400">{unpublishedTools.length} unpublished item{unpublishedTools.length !== 1 ? 's' : ''}</p>
+              <h3 className="text-2xl font-bold text-white">My Rejected Tools</h3>
+              <p className="text-sm text-gray-400">{rejectedTools.length} tool{rejectedTools.length !== 1 ? 's' : ''} needing revision</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            <div className="px-4 py-2 bg-gray-500/20 border-2 border-gray-500 rounded-lg">
-              <span className="text-gray-400 font-bold text-lg">{unpublishedTools.length}</span>
+            <div className="px-4 py-2 bg-red-500/20 border-2 border-red-500 rounded-lg">
+              <span className="text-red-500 font-bold text-lg">{rejectedTools.length}</span>
             </div>
             <button
               onClick={handleBackToTools}
@@ -184,19 +176,19 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
           </div>
         </div>
 
-        {/* Unpublished Items List */}
+        {/* Rejected Items List */}
         <div className="space-y-4">
-          {unpublishedTools.map((tool) => (
+          {rejectedTools.map((tool) => (
             <div
               key={tool.id}
               id={`tool-${tool.id}`}
-              className="relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-xl border-2 border-gray-500/30 hover:border-gray-500/50 transition-all duration-300 overflow-hidden"
+              className="relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-xl border-2 border-red-500/30 hover:border-red-500/50 transition-all duration-300 overflow-hidden"
             >
               {/* Processing Overlay */}
               {processingId === tool.id && (
                 <div className="absolute inset-0 bg-dark-500/80 backdrop-blur-sm z-50 flex items-center justify-center">
                   <div className="flex items-center space-x-3">
-                    <div className="w-6 h-6 border-3 border-accent-green border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-6 h-6 border-3 border-red-500 border-t-transparent rounded-full animate-spin"></div>
                     <span className="text-white font-bold">Processing...</span>
                   </div>
                 </div>
@@ -233,22 +225,39 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
                         <h4 className="text-xl font-bold text-white mb-2">{tool.title}</h4>
                         <div className="flex items-center space-x-2 mb-1">
                           {tool.category && (
-                            <span className="inline-block px-3 py-1 text-xs font-bold bg-white/5 text-gray-400 border border-gray-500/30 rounded-full">
+                            <span className="inline-block px-3 py-1 text-xs font-bold bg-white/5 text-red-500 border border-red-500/30 rounded-full">
                               {tool.category}
                             </span>
                           )}
-                          {/* Creator Badge - Prominent */}
-                          <span className="inline-flex items-center space-x-1.5 px-3 py-1 text-xs font-bold bg-accent-blue/10 text-accent-blue border border-accent-blue/30 rounded-full">
+                          <span className="inline-flex items-center space-x-1.5 px-3 py-1 text-xs font-bold bg-red-500/10 text-red-500 border border-red-500/30 rounded-full">
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
-                            <span>Submitted by {tool.createdBy || 'Unknown'}</span>
+                            <span>Rejected</span>
                           </span>
                         </div>
                       </div>
                     </div>
 
                     <p className="text-gray-400 text-sm mb-3 line-clamp-2">{tool.description}</p>
+
+                    {/* Rejection Reason Box - Prominent */}
+                    {tool.rejectionReason && (
+                      <div className="mb-4 p-4 bg-red-500/10 border-l-4 border-red-500 rounded-r-lg">
+                        <div className="flex items-start space-x-2">
+                          <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <div className="flex-1">
+                            <p className="text-xs font-bold text-red-500 uppercase mb-1">Rejection Reason</p>
+                            <p className="text-sm text-white leading-relaxed">{tool.rejectionReason}</p>
+                            {tool.rejectedBy && (
+                              <p className="text-xs text-gray-500 mt-2">— {tool.rejectedBy} on {tool.rejectedAt ? new Date(tool.rejectedAt).toLocaleDateString() : ''}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Metadata */}
                     <div className="flex items-center space-x-4 text-xs text-gray-500 mb-4">
@@ -257,7 +266,7 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span>{new Date(tool.createdAt).toLocaleDateString()}</span>
+                          <span>Submitted {new Date(tool.createdAt).toLocaleDateString()}</span>
                         </div>
                       )}
                       {tool.url && (
@@ -291,26 +300,25 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
                       </a>
 
                       <button
-                        onClick={() => handleRepublishClick(tool)}
+                        onClick={() => handleResubmit(tool, false)}
                         disabled={processingId === tool.id}
                         className="flex items-center space-x-2 px-4 py-2 bg-accent-green text-dark-500 font-bold rounded-lg hover:bg-accent-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
-                        <span>Republish</span>
+                        <span>Resubmit</span>
                       </button>
 
                       <button
-                        onClick={() => handleEditClick(tool)}
+                        onClick={() => handleResubmit(tool, true)}
                         disabled={processingId === tool.id}
                         className="flex items-center space-x-2 px-4 py-2 bg-accent-blue text-dark-500 font-bold rounded-lg hover:bg-accent-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                        <span>Edit</span>
+                        <span>Edit & Resubmit</span>
                       </button>
 
                       <button
@@ -321,7 +329,7 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                        <span>Delete</span>
+                        <span>Delete Forever</span>
                       </button>
                     </div>
                   </div>
@@ -332,7 +340,7 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
         </div>
       </div>
 
-      {/* Edit Modal */}
+      {/* Edit Modal for Resubmit with Edits */}
       {editingTool && (
         <EditToolModal
           isOpen={isEditModalOpen}
@@ -340,24 +348,11 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
             setIsEditModalOpen(false);
             setEditingTool(null);
           }}
-          onSave={handleEditSave}
+          onSave={handleResubmitWithEdits}
           tool={editingTool}
-          isAdmin={true}
+          isApprovalMode={false}
         />
       )}
-
-      {/* Republish Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showRepublishConfirm}
-        onClose={() => setShowRepublishConfirm(false)}
-        onConfirm={handleRepublishConfirm}
-        title="Republish Tool"
-        message={`Are you sure you want to republish "${actionToolTitle}"? It will become visible to all users again.`}
-        confirmText="Yes, Republish"
-        cancelText="Cancel"
-        confirmColor="green"
-        isLoading={processingId === actionToolId}
-      />
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
@@ -386,4 +381,4 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
   );
 };
 
-export default UnpublishedSection;
+export default RejectedToolsSection;

@@ -15,9 +15,10 @@ interface UserSession {
 interface HeaderProps {
   pendingCount?: number;
   unpublishedCount?: number;
+  rejectedCount?: number;
 }
 
-const Header: React.FC<HeaderProps> = ({ pendingCount = 0, unpublishedCount = 0 }) => {
+const Header: React.FC<HeaderProps> = ({ pendingCount = 0, unpublishedCount = 0, rejectedCount = 0 }) => {
   const router = useRouter();
   const [user, setUser] = useState<UserSession | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -62,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({ pendingCount = 0, unpublishedCount = 0 
         setUser(null);
         setShowLogoutConfirm(false);
         // Redirect to login page
-        router.push('/auth/login');
+        router.push('/login');
       } else {
         throw new Error('Logout failed');
       }
@@ -128,17 +129,24 @@ const Header: React.FC<HeaderProps> = ({ pendingCount = 0, unpublishedCount = 0 
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                {/* User Info with Admin Queue Dropdown */}
+                {/* User Info with Admin Queue Dropdown or Rejected Tools Link */}
                 <div className="relative">
                   <button
-                    onClick={() => user.isAdmin && setIsDropdownOpen(!isDropdownOpen)}
+                    onClick={() => {
+                      if (user.isAdmin) {
+                        setIsDropdownOpen(!isDropdownOpen);
+                      } else if (rejectedCount > 0) {
+                        router.push('/?view=rejected');
+                      }
+                    }}
                     className={`hidden sm:flex items-center space-x-3 px-4 py-2 bg-white/5 border border-white/10 rounded-lg ${
-                      user.isAdmin ? 'cursor-pointer hover:bg-white/10 transition-colors' : 'cursor-default'
+                      user.isAdmin || rejectedCount > 0 ? 'cursor-pointer hover:bg-white/10 transition-colors' : 'cursor-default'
                     }`}
+                    title={!user.isAdmin && rejectedCount > 0 ? 'View your rejected tools' : undefined}
                   >
                     <div className="flex flex-col items-end">
                       <span className="text-sm text-white font-medium">{user.email}</span>
-                      {user.isAdmin && (
+                      {user.isAdmin ? (
                         <div className="flex items-center space-x-2">
                           <span className="text-xs font-bold text-accent-green">Admin</span>
                           {(pendingCount > 0 || unpublishedCount > 0) && (
@@ -147,6 +155,15 @@ const Header: React.FC<HeaderProps> = ({ pendingCount = 0, unpublishedCount = 0 
                             </span>
                           )}
                         </div>
+                      ) : (
+                        rejectedCount > 0 && (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs font-bold text-red-500">Rejected Tools</span>
+                            <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded">
+                              {rejectedCount}
+                            </span>
+                          </div>
+                        )
                       )}
                     </div>
                     <div className="w-8 h-8 bg-gradient-to-br from-accent-green to-accent-blue rounded-full flex items-center justify-center">

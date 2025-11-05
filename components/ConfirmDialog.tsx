@@ -16,6 +16,7 @@ interface ConfirmDialogProps {
   textInputLabel?: string;
   textInputPlaceholder?: string;
   textInputRequired?: boolean;
+  requireTextMatch?: string; // Require exact text match for confirmation
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -32,17 +33,26 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   textInputLabel = '',
   textInputPlaceholder = '',
   textInputRequired = false,
+  requireTextMatch = undefined,
 }) => {
   const [inputValue, setInputValue] = useState('');
 
   if (!isOpen) return null;
 
   const handleConfirm = () => {
+    // Check for required text match
+    if (requireTextMatch && inputValue.trim().toLowerCase() !== requireTextMatch.toLowerCase()) {
+      return; // Don't confirm if text doesn't match
+    }
+    // Check for required input
     if (showTextInput && textInputRequired && !inputValue.trim()) {
       return; // Don't confirm if required input is empty
     }
     onConfirm(showTextInput ? inputValue : undefined);
   };
+
+  const isTextMatchValid = !requireTextMatch || inputValue.trim().toLowerCase() === requireTextMatch.toLowerCase();
+  const isInputValid = !textInputRequired || inputValue.trim().length > 0;
 
   const colorClasses = {
     red: 'bg-red-500 hover:bg-red-600 shadow-[0_0_30px_rgba(239,68,68,0.3)]',
@@ -79,19 +89,29 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 {textInputLabel && (
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     {textInputLabel}
-                    {textInputRequired && <span className="text-red-500 ml-1">*</span>}
+                    {(textInputRequired || requireTextMatch) && <span className="text-red-500 ml-1">*</span>}
                   </label>
                 )}
                 <textarea
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={textInputPlaceholder}
-                  className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-accent-green focus:ring-2 focus:ring-accent-green/50 transition-all resize-none"
-                  rows={4}
+                  className={`w-full px-4 py-3 bg-dark-500 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all resize-none ${
+                    requireTextMatch
+                      ? (isTextMatchValid ? 'border-accent-green' : 'border-red-500')
+                      : 'border-white/20 focus:border-accent-green focus:ring-2 focus:ring-accent-green/50'
+                  }`}
+                  rows={requireTextMatch ? 1 : 4}
                   disabled={isLoading}
-                  required={textInputRequired}
+                  required={textInputRequired || !!requireTextMatch}
                 />
-                {textInputRequired && !inputValue.trim() && (
+                {requireTextMatch && !isTextMatchValid && inputValue.trim() && (
+                  <p className="text-xs text-red-400 mt-1">Please type "{requireTextMatch}" to confirm</p>
+                )}
+                {requireTextMatch && !inputValue.trim() && (
+                  <p className="text-xs text-gray-400 mt-1">Type "{requireTextMatch}" to confirm deletion</p>
+                )}
+                {textInputRequired && !requireTextMatch && !inputValue.trim() && (
                   <p className="text-xs text-red-400 mt-1">This field is required</p>
                 )}
               </div>
@@ -109,7 +129,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             </button>
             <button
               onClick={handleConfirm}
-              disabled={isLoading || (showTextInput && textInputRequired && !inputValue.trim())}
+              disabled={isLoading || (showTextInput && (!isInputValid || !isTextMatchValid))}
               className={`px-6 py-3 text-dark-500 font-bold rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 ${colorClasses[confirmColor]}`}
             >
               {isLoading && (

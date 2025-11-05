@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth';
 import { canApprove } from '@/lib/permissions';
+import { sendApprovalConfirmationEmail } from '@/lib/email-service';
 
 const TOOLS_KEY = 'cmg-tools';
 
@@ -70,6 +71,9 @@ export async function PUT(
       );
     }
 
+    // Store original tool data for email
+    const originalTool = tools[toolIndex];
+
     // Update tool with approval data and any edits
     tools[toolIndex] = {
       ...tools[toolIndex],
@@ -83,6 +87,33 @@ export async function PUT(
 
     // Save back to Redis
     await redis.set(TOOLS_KEY, JSON.stringify(tools));
+
+    // Send approval confirmation email to the creator
+    if (originalTool.createdBy && originalTool.createdBy !== 'system') {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://product.cmgfinancial.ai';
+
+      console.log(`[Tool Approval] Sending confirmation email for "${tools[toolIndex].title}" to ${originalTool.createdBy}`);
+
+      // Send email asynchronously (don't block response)
+      sendApprovalConfirmationEmail(
+        {
+          toolId: tools[toolIndex].id,
+          title: tools[toolIndex].title,
+          description: tools[toolIndex].description,
+          category: tools[toolIndex].category,
+          url: tools[toolIndex].url,
+          createdBy: originalTool.createdBy,
+          thumbnailUrl: tools[toolIndex].thumbnailUrl,
+        },
+        session?.email || 'Admin',
+        originalTool.createdBy,
+        siteUrl
+      ).then((success) => {
+        console.log(`[Tool Approval] Confirmation email ${success ? 'sent successfully' : 'failed to send'}`);
+      }).catch((err) => {
+        console.error('[Tool Approval] Failed to send confirmation email (non-blocking):', err);
+      });
+    }
 
     return NextResponse.json({
       success: true,

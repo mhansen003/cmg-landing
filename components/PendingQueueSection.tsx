@@ -266,7 +266,20 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center flex-wrap gap-3">
+                      {/* Launch Tool Button */}
+                      <a
+                        href={tool.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-accent-green to-accent-blue text-dark-500 font-bold rounded-lg hover:opacity-90 transition-opacity"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        <span>Launch Tool</span>
+                      </a>
+
                       <button
                         onClick={() => handleApprove(tool, false)}
                         disabled={processingId === tool.id}

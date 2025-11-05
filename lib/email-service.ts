@@ -1,7 +1,9 @@
 /**
  * Email Notification Service
- * Sends email notifications for pending tool approvals
+ * Sends email notifications using Gmail SMTP
  */
+
+import nodemailer from 'nodemailer';
 
 interface ToolNotification {
   toolId: string;
@@ -13,20 +15,42 @@ interface ToolNotification {
   thumbnailUrl?: string;
 }
 
+// Create reusable transporter using Gmail SMTP
+const createTransporter = () => {
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpPort = process.env.SMTP_PORT;
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+
+  if (!smtpHost || !smtpPort || !smtpUser || !smtpPass) {
+    console.error('[Email Service] SMTP configuration missing! Check .env.local for SMTP_* variables.');
+    return null;
+  }
+
+  return nodemailer.createTransport({
+    host: smtpHost,
+    port: parseInt(smtpPort),
+    secure: false, // Use TLS
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+  });
+};
+
 /**
  * Send email notification for pending tool approval
- * Uses Resend API (https://resend.com/)
+ * Uses Gmail SMTP
  */
 export async function sendPendingApprovalEmail(
   tool: ToolNotification,
   siteUrl: string
 ): Promise<boolean> {
   try {
-    const resendApiKey = process.env.RESEND_API_KEY;
+    const transporter = createTransporter();
 
-    if (!resendApiKey) {
-      console.error('[Email Service] RESEND_API_KEY not configured! Email notifications will not be sent.');
-      console.error('[Email Service] Please configure RESEND_API_KEY environment variable in Vercel.');
+    if (!transporter) {
+      console.error('[Email Service] SMTP not configured! Email notifications will not be sent.');
       return false;
     }
 
@@ -166,30 +190,16 @@ export async function sendPendingApprovalEmail(
 </html>
     `.trim();
 
-    // Send email using Resend API
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'CMG Tools Hub <notifications@cmgfinancial.ai>',
-        to: ['mhansen@cmgfi.com'],
-        subject: `🔔 New Tool Pending Approval: ${tool.title}`,
-        html: emailHtml,
-      }),
+    // Send email using Gmail SMTP
+    const info = await transporter.sendMail({
+      from: `"CMG Tools Hub" <${process.env.SMTP_USER}>`,
+      to: 'mhansen@cmgfi.com',
+      subject: `🔔 New Tool Pending Approval: ${tool.title}`,
+      html: emailHtml,
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`[Email Service] Resend API error: ${response.status} - ${errorText}`);
-      throw new Error(`Resend API error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
     console.log('[Email Service] ✅ Approval email sent successfully to mhansen@cmgfi.com');
-    console.log('[Email Service] Email ID:', data);
+    console.log('[Email Service] Message ID:', info.messageId);
 
     return true;
   } catch (error) {
@@ -209,10 +219,10 @@ export async function sendRejectionEmail(
   siteUrl: string
 ): Promise<boolean> {
   try {
-    const resendApiKey = process.env.RESEND_API_KEY;
+    const transporter = createTransporter();
 
-    if (!resendApiKey) {
-      console.warn('RESEND_API_KEY not configured, skipping rejection email');
+    if (!transporter) {
+      console.warn('[Email Service] SMTP not configured, skipping rejection email');
       return false;
     }
 
@@ -339,25 +349,15 @@ export async function sendRejectionEmail(
 </html>
     `.trim();
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'CMG Tools Hub <notifications@cmgfinancial.ai>',
-        to: [recipientEmail],
-        subject: `Tool Submission Needs Revision: ${tool.title}`,
-        html: emailHtml,
-      }),
+    const info = await transporter.sendMail({
+      from: `"CMG Tools Hub" <${process.env.SMTP_USER}>`,
+      to: recipientEmail,
+      subject: `Tool Submission Needs Revision: ${tool.title}`,
+      html: emailHtml,
     });
 
-    if (!response.ok) {
-      throw new Error(`Resend API error: ${response.status}`);
-    }
-
     console.log('[Email Service] ✅ Rejection email sent to', recipientEmail);
+    console.log('[Email Service] Message ID:', info.messageId);
     return true;
   } catch (error) {
     console.error('[Email Service] ❌ Failed to send rejection email:', error);
@@ -375,10 +375,10 @@ export async function sendApprovalConfirmationEmail(
   siteUrl: string
 ): Promise<boolean> {
   try {
-    const resendApiKey = process.env.RESEND_API_KEY;
+    const transporter = createTransporter();
 
-    if (!resendApiKey) {
-      console.warn('RESEND_API_KEY not configured, skipping email notification');
+    if (!transporter) {
+      console.warn('[Email Service] SMTP not configured, skipping email notification');
       return false;
     }
 
@@ -475,27 +475,18 @@ export async function sendApprovalConfirmationEmail(
 </html>
     `.trim();
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'CMG Tools Hub <notifications@cmgfinancial.ai>',
-        to: [recipientEmail],
-        subject: `✅ Your tool "${tool.title}" has been approved!`,
-        html: emailHtml,
-      }),
+    const info = await transporter.sendMail({
+      from: `"CMG Tools Hub" <${process.env.SMTP_USER}>`,
+      to: recipientEmail,
+      subject: `✅ Your tool "${tool.title}" has been approved!`,
+      html: emailHtml,
     });
 
-    if (!response.ok) {
-      throw new Error(`Resend API error: ${response.status}`);
-    }
-
+    console.log('[Email Service] ✅ Approval confirmation email sent to', recipientEmail);
+    console.log('[Email Service] Message ID:', info.messageId);
     return true;
   } catch (error) {
-    console.error('Failed to send confirmation email:', error);
+    console.error('[Email Service] ❌ Failed to send confirmation email:', error);
     return false;
   }
 }

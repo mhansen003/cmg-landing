@@ -17,6 +17,8 @@ const AdminQueueDropdown: React.FC<AdminQueueDropdownProps> = ({
   onClose,
 }) => {
   const router = useRouter();
+  const [isBackfilling, setIsBackfilling] = useState(false);
+  const [backfillMessage, setBackfillMessage] = useState('');
 
   const handleNavigate = (view: string) => {
     router.push(`/?view=${view}`);
@@ -28,6 +30,34 @@ const AdminQueueDropdown: React.FC<AdminQueueDropdownProps> = ({
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }, 100);
+  };
+
+  const handleBackfillTags = async () => {
+    setIsBackfilling(true);
+    setBackfillMessage('');
+
+    try {
+      const response = await fetch('/api/tools/backfill-tags', {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setBackfillMessage(`✅ ${data.message}`);
+        // Refresh after 2 seconds
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        setBackfillMessage(`❌ Error: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Backfill error:', error);
+      setBackfillMessage('❌ Failed to backfill tags');
+    } finally {
+      setIsBackfilling(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -114,6 +144,42 @@ const AdminQueueDropdown: React.FC<AdminQueueDropdownProps> = ({
                 </svg>
               </div>
             </button>
+          )}
+        </div>
+
+        {/* Admin Utilities */}
+        <div className="border-t border-white/10 p-2">
+          <div className="px-2 py-1">
+            <p className="text-xs text-gray-500 font-bold uppercase">Admin Utilities</p>
+          </div>
+          <button
+            onClick={handleBackfillTags}
+            disabled={isBackfilling}
+            className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors group disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-accent-blue/20 border-2 border-accent-blue rounded-lg flex items-center justify-center flex-shrink-0">
+                {isBackfilling ? (
+                  <div className="w-5 h-5 border-2 border-accent-blue border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <svg className="w-5 h-5 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                )}
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-bold text-white">Backfill Tags</p>
+                <p className="text-xs text-gray-400">Add tags to existing tools</p>
+              </div>
+            </div>
+            <svg className="w-4 h-4 text-gray-400 group-hover:text-accent-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </button>
+          {backfillMessage && (
+            <div className="mt-2 px-3 py-2 bg-dark-500 rounded-lg">
+              <p className="text-xs text-white">{backfillMessage}</p>
+            </div>
           )}
         </div>
 

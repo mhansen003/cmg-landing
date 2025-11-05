@@ -325,13 +325,13 @@ const ToolCard: React.FC<ToolCardProps> = ({
                   </div>
                 </div>
               ) : thumbnailUrl ? (
-                <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500">
+                <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500 z-10">
                   <div className="absolute inset-0 bg-gradient-to-br from-transparent to-dark-500/50 z-10"></div>
                   <Image
                     src={thumbnailUrl}
                     alt={`${title} screenshot`}
                     fill
-                    className="object-cover"
+                    className="object-cover z-0"
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex items-center justify-center">

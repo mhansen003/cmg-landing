@@ -229,7 +229,7 @@ export async function GET(request: NextRequest) {
 
     // Get query params
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status'); // 'published', 'pending', 'unpublished', or 'all'
+    const status = searchParams.get('status'); // 'published', 'pending', 'unpublished', 'rejected', or 'all'
 
     // If Redis is not configured, return default tools (all as published)
     if (!redis) {
@@ -258,6 +258,13 @@ export async function GET(request: NextRequest) {
       // Only admin can see unpublished items
       if (userIsAdmin) {
         tools = tools.filter((t: any) => t.status === 'unpublished');
+      } else {
+        tools = [];
+      }
+    } else if (status === 'rejected') {
+      // Users can see their own rejected tools
+      if (session?.email) {
+        tools = tools.filter((t: any) => t.status === 'rejected' && t.createdBy === session.email);
       } else {
         tools = [];
       }
