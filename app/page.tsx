@@ -15,12 +15,27 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-        {/* Purple Gradient Glow Effect */}
-        <div className="absolute inset-0 flex items-end justify-center pointer-events-none">
+        {/* Enhanced Purple Gradient Background - More Dramatic */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Main purple glow from bottom */}
           <div
-            className="w-full h-2/3 opacity-30"
+            className="absolute inset-0"
             style={{
-              background: 'radial-gradient(ellipse at center bottom, rgba(139, 92, 246, 0.4), rgba(99, 102, 241, 0.2), transparent 70%)',
+              background: 'radial-gradient(ellipse 80% 50% at 50% 100%, rgba(139, 92, 246, 0.6), rgba(99, 102, 241, 0.4) 40%, rgba(59, 130, 246, 0.2) 60%, transparent 80%)',
+            }}
+          ></div>
+          {/* Additional pink/purple accent glow */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'radial-gradient(ellipse 60% 40% at 30% 80%, rgba(168, 85, 247, 0.4), transparent 60%)',
+            }}
+          ></div>
+          {/* Blue accent glow on right side */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'radial-gradient(ellipse 60% 40% at 70% 80%, rgba(59, 130, 246, 0.3), transparent 60%)',
             }}
           ></div>
         </div>
@@ -174,16 +189,92 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-dark-400/50 border-t border-white/10 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-gray-500 text-sm">
-            <p>&copy; 2025 CMG Financial Services. All rights reserved.</p>
-            <p className="mt-2">
-              <a href="https://www.cmgfi.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent-blue transition-colors">
-                Visit CMG Financial
+      {/* Enhanced Footer - Matching Showroom Design */}
+      <footer className="relative bg-gradient-to-b from-dark-500 to-dark-400 border-t border-white/10 overflow-hidden">
+        {/* Diagonal line pattern background */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none">
+          <div
+            className="w-full h-full"
+            style={{
+              backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 50px, rgba(255,255,255,0.05) 50px, rgba(255,255,255,0.05) 51px)',
+            }}
+          ></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            {/* Left Column - Brand */}
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-accent-blue to-accent-green rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-dark-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                  </svg>
+                </div>
+                <span className="text-xl font-bold text-white">CMG//Agentic</span>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Empowering loan officers with purpose-built AI agents. Secure, compliant, and ready for enterprise deployment.
+              </p>
+            </div>
+
+            {/* Middle Column - Compliance & Security */}
+            <div>
+              <h3 className="text-lg font-bold text-white mb-4">Compliance & Security</h3>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li className="flex items-center space-x-2">
+                  <svg className="w-4 h-4 text-accent-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>SOC 2 Type II Certified</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <svg className="w-4 h-4 text-accent-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>GDPR & CCPA Compliant</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <svg className="w-4 h-4 text-accent-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Enterprise SSO Integration</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <svg className="w-4 h-4 text-accent-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>End-to-End Encryption</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Right Column - AI Summit Demo */}
+            <div>
+              <h3 className="text-lg font-bold text-white mb-4">AI Summit Demo</h3>
+              <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+                Experience the future of AI-powered loan origination. See how our agents transform workflows in real-time.
+              </p>
+              <a
+                href="https://www.cmgfi.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block px-6 py-3 bg-gradient-to-r from-accent-blue to-purple-600 text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Schedule Demo
               </a>
-            </p>
+            </div>
+          </div>
+
+          {/* Bottom Copyright Bar */}
+          <div className="pt-8 border-t border-white/10">
+            <div className="text-center text-gray-500 text-sm">
+              <p>
+                &copy; 2025 CMG Financial Services. All rights reserved. |{' '}
+                <a href="#" className="hover:text-accent-blue transition-colors">Privacy Policy</a> |{' '}
+                <a href="#" className="hover:text-accent-blue transition-colors">Terms of Service</a>
+              </p>
+            </div>
           </div>
         </div>
       </footer>
