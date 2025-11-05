@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendPendingApprovalEmail } from '@/lib/email-service';
-import { verifyJWT } from '@/lib/jwt';
+import { verifyAuthToken } from '@/lib/auth-jwt';
 import { isAdmin } from '@/lib/permissions';
 
 /**
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const session = await verifyJWT(token);
+    const session = verifyAuthToken(token);
     if (!session || !isAdmin(session.email)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
