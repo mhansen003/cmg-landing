@@ -1,9 +1,15 @@
 // Permission utilities for role-based access control
 
-export const ADMIN_EMAIL = 'mhansen@cmgfi.com';
+export const ADMIN_EMAILS = [
+  'mhansen@cmgfi.com',
+  'andyg@cmgfi.com'
+];
 
 export function isAdmin(email: string | null | undefined): boolean {
-  return email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  if (!email) return false;
+  return ADMIN_EMAILS.some(adminEmail =>
+    email.toLowerCase() === adminEmail.toLowerCase()
+  );
 }
 
 export function canEdit(userEmail: string | null | undefined, toolCreatedBy?: string): boolean {

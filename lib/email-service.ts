@@ -4,6 +4,7 @@
  */
 
 import nodemailer from 'nodemailer';
+import { ADMIN_EMAILS } from './permissions';
 
 interface ToolNotification {
   toolId: string;
@@ -201,15 +202,15 @@ export async function sendPendingApprovalEmail(
 </html>
     `.trim();
 
-    // Send email using Gmail SMTP
+    // Send email using Gmail SMTP to all admins
     const info = await transporter.sendMail({
       from: `"CMG Tools Hub" <${process.env.SMTP_USER}>`,
-      to: 'mhansen@cmgfi.com',
+      to: ADMIN_EMAILS.join(', '),
       subject: `🔔 New Tool Pending Approval: ${tool.title}`,
       html: emailHtml,
     });
 
-    console.log('[Email Service] ✅ Approval email sent successfully to mhansen@cmgfi.com');
+    console.log('[Email Service] ✅ Approval email sent successfully to:', ADMIN_EMAILS.join(', '));
     console.log('[Email Service] Message ID:', info.messageId);
     console.log('[Email Service] Response:', info.response);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
