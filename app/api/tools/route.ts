@@ -328,6 +328,9 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Tool Creation] User: ${userEmail}, Status: ${toolStatus}`);
 
+    // Convert base64 video to videoUrl if present
+    const videoUrl = newTool.videoBase64 ? newTool.videoBase64 : newTool.videoUrl;
+
     // Add tool metadata
     toolWithMetadata = {
       ...newTool,
@@ -341,7 +344,11 @@ export async function POST(request: NextRequest) {
       downvotes: 0,
       rating: 0,
       ratingCount: 0,
+      videoUrl, // Use converted base64 or original URL
     };
+
+    // Remove videoBase64 from stored data to save space (it's already in videoUrl)
+    delete toolWithMetadata.videoBase64;
 
     console.log(`[Tool Creation] Created tool "${toolWithMetadata.title}" with status: ${toolWithMetadata.status}`);
 

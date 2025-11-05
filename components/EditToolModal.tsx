@@ -34,11 +34,12 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
     description: tool.description || '',
     fullDescription: tool.fullDescription || '',
     url: tool.url || '',
-    videoUrl: tool.videoUrl || '',
     thumbnailUrl: tool.thumbnailUrl || '',
     category: tool.category || '',
     features: tool.features?.join('\n') || '',
   });
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(tool.videoUrl || null);
   const [tags, setTags] = useState<string[]>(tool.tags || []);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -56,14 +57,28 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
         description: tool.description || '',
         fullDescription: tool.fullDescription || '',
         url: tool.url || '',
-        videoUrl: tool.videoUrl || '',
         thumbnailUrl: tool.thumbnailUrl || '',
         category: tool.category || '',
         features: tool.features?.join('\n') || '',
       });
+      setVideoFile(null);
+      setVideoPreview(tool.videoUrl || null);
       setTags(tool.tags || []);
     }
   }, [tool]);
+
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type.startsWith('video/')) {
+        setVideoFile(file);
+        setVideoPreview(URL.createObjectURL(file));
+      } else {
+        setErrorMessage('Please upload a valid video file');
+        setShowError(true);
+      }
+    }
+  };
 
   // Auto-correct URL to ensure it has http:// or https://
   const normalizeUrl = (url: string): string => {
@@ -85,19 +100,38 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
     return `https://${trimmedUrl}`;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Convert features back to array
     const featuresArray = formData.features
       .split('\n')
       .map(f => f.trim())
       .filter(f => f.length > 0);
 
+    let videoBase64 = null;
+
+    // Convert video file to base64 if a new file was uploaded
+    if (videoFile) {
+      try {
+        const reader = new FileReader();
+        videoBase64 = await new Promise<string>((resolve, reject) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(videoFile);
+        });
+      } catch (error) {
+        console.error('Error converting video to base64:', error);
+        setErrorMessage('Failed to process video file. Please try again.');
+        setShowError(true);
+        return;
+      }
+    }
+
     onSave({
       title: formData.title,
       description: formData.description,
       fullDescription: formData.fullDescription,
       url: normalizeUrl(formData.url),
-      videoUrl: normalizeUrl(formData.videoUrl),
+      videoBase64, // Send base64 video if new file uploaded
       thumbnailUrl: normalizeUrl(formData.thumbnailUrl),
       category: formData.category,
       features: featuresArray,
@@ -260,18 +294,53 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
               </div>
             </div>
 
-            {/* Video URL */}
+            {/* Video Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Video URL
+                Demo Video File (Optional)
               </label>
-              <input
-                type="url"
-                value={formData.videoUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
-                className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors"
-                placeholder="/videos/demo.mp4 or https://..."
-              />
+              <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center hover:border-accent-green transition-colors">
+                {videoPreview ? (
+                  <div className="space-y-3">
+                    <video
+                      src={videoPreview}
+                      controls
+                      className="w-full rounded-lg max-h-64"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVideoFile(null);
+                        setVideoPreview(null);
+                      }}
+                      className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                    >
+                      Remove video
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <svg className="w-12 h-12 text-gray-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p className="text-gray-400 mb-2 text-sm">Drop video file here or click to browse</p>
+                    <p className="text-xs text-gray-500">MP4, WebM (Max 50MB)</p>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleVideoUpload}
+                      className="hidden"
+                      id="video-upload-edit"
+                    />
+                    <label
+                      htmlFor="video-upload-edit"
+                      className="inline-block mt-3 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-sm font-medium text-white cursor-pointer transition-colors"
+                    >
+                      Choose File
+                    </label>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Thumbnail URL */}

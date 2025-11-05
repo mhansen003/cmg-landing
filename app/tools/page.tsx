@@ -460,7 +460,7 @@ function HomeContent() {
           url: toolData.url,
           category: category,
           thumbnailUrl: toolData.thumbnailUrl,
-          videoUrl: toolData.videoUrl,
+          videoBase64: toolData.videoBase64, // Send base64 video data
           categoryColor: toolData.categoryColor, // Stored per-tool, not per-category
           features: toolData.features,
           tags: toolData.tags,

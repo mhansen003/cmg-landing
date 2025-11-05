@@ -63,6 +63,12 @@ export async function PUT(
     // Store original tool data for email
     const originalTool = tools[toolIndex];
 
+    // Convert base64 video to videoUrl if present
+    if (updates.videoBase64) {
+      updates.videoUrl = updates.videoBase64;
+      delete updates.videoBase64; // Remove to save space
+    }
+
     // Update tool
     tools[toolIndex] = {
       ...tools[toolIndex],
