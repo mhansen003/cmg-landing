@@ -22,9 +22,10 @@ interface EditToolModalProps {
     aiGeneratedTags?: boolean;
   };
   isApprovalMode?: boolean; // If true, show "Approve & Publish" instead of "Save"
+  isAdmin?: boolean; // If true, show admin-only actions like unpublish
 }
 
-const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, tool, isApprovalMode = false }) => {
+const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, tool, isApprovalMode = false, isAdmin = false }) => {
   const [formData, setFormData] = useState({
     title: tool.title || '',
     description: tool.description || '',
@@ -39,6 +40,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUnpublishing, setIsUnpublishing] = useState(false);
 
   // Update form when tool changes
   useEffect(() => {
@@ -100,6 +102,35 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
       console.error('Error deleting tool:', error);
       alert('Failed to delete tool. Please try again.');
       setIsDeleting(false);
+    }
+  };
+
+  const handleUnpublish = async () => {
+    const confirmed = confirm('Unpublish this tool? It will be hidden from users but not deleted.');
+    if (!confirmed) return;
+
+    setIsUnpublishing(true);
+
+    try {
+      const response = await fetch(`/api/tools/${tool.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'unpublished',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to unpublish tool');
+      }
+
+      // Close modal and reload page
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      console.error('Error unpublishing tool:', error);
+      alert('Failed to unpublish tool. Please try again.');
+      setIsUnpublishing(false);
     }
   };
 
@@ -276,13 +307,27 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
         <div className="sticky bottom-0 bg-dark-300/95 backdrop-blur-sm border-t border-white/10 p-6">
           {!showDeleteConfirm ? (
             <div className="flex justify-between items-center">
-              {/* Delete Button - Left Side */}
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 font-bold rounded-lg transition-colors"
-              >
-                Delete Tool
-              </button>
+              {/* Left Side Actions */}
+              <div className="flex space-x-4">
+                {/* Delete Button */}
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 font-bold rounded-lg transition-colors"
+                >
+                  Delete Tool
+                </button>
+
+                {/* Unpublish Button - Admin Only, for published tools */}
+                {isAdmin && tool.status === 'published' && (
+                  <button
+                    onClick={handleUnpublish}
+                    disabled={isUnpublishing}
+                    className="px-6 py-3 bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/50 font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isUnpublishing ? 'Unpublishing...' : 'Unpublish'}
+                  </button>
+                )}
+              </div>
 
               {/* Action Buttons - Right Side */}
               <div className="flex space-x-4">

@@ -25,6 +25,7 @@ interface ToolCardProps {
   ratingCount?: number;
   onUpdate?: () => void; // Callback to refresh data after update
   isAdmin?: boolean; // Whether the current user is admin
+  tags?: string[];
 }
 
 const ToolCard: React.FC<ToolCardProps> = ({
@@ -46,6 +47,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
   ratingCount = 0,
   onUpdate,
   isAdmin = false,
+  tags,
 }) => {
   const [votes, setVotes] = useState({ up: upvotes, down: downvotes });
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
@@ -590,6 +592,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
         categoryColor={categoryColor}
         fullDescription={fullDescription}
         features={features}
+        tags={tags}
       />
 
       {/* Phone Modal */}
@@ -619,7 +622,10 @@ const ToolCard: React.FC<ToolCardProps> = ({
           thumbnailUrl,
           category,
           features,
+          status: 'published', // Published tools from the grid
+          tags,
         }}
+        isAdmin={isAdmin}
       />
     </>
   );

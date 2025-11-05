@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import ConfirmDialog from './ConfirmDialog';
 
 interface UserSession {
   email: string;
@@ -13,6 +14,7 @@ const Header = () => {
   const router = useRouter();
   const [user, setUser] = useState<UserSession | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // Fetch user session on mount
   useEffect(() => {
@@ -32,11 +34,12 @@ const Header = () => {
     }
   };
 
-  const handleLogout = async () => {
-    if (isLoggingOut) return;
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
 
-    const confirmed = confirm('Are you sure you want to logout?');
-    if (!confirmed) return;
+  const handleLogoutConfirm = async () => {
+    if (isLoggingOut) return;
 
     setIsLoggingOut(true);
 
@@ -47,6 +50,7 @@ const Header = () => {
 
       if (response.ok) {
         setUser(null);
+        setShowLogoutConfirm(false);
         // Redirect to login page
         router.push('/auth/login');
       } else {
@@ -130,7 +134,7 @@ const Header = () => {
 
                 {/* Logout Button */}
                 <button
-                  onClick={handleLogout}
+                  onClick={handleLogoutClick}
                   disabled={isLoggingOut}
                   className="inline-flex items-center px-4 py-2.5 text-sm font-semibold rounded-lg text-white bg-red-500/20 border border-red-500/50 hover:bg-red-500/30 hover:border-red-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Logout"
@@ -176,6 +180,19 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogoutConfirm}
+        title="Confirm Logout"
+        message="Are you sure you want to logout? You will need to login again to access the tools."
+        confirmText="Yes, Logout"
+        cancelText="Cancel"
+        confirmColor="red"
+        isLoading={isLoggingOut}
+      />
     </header>
   );
 };
