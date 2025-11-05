@@ -1,0 +1,672 @@
+'use client';
+
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Header from '@/components/Header';
+import ToolCard from '@/components/ToolCard';
+import AddToolWizard from '@/components/AddToolWizard';
+import CategorySection from '@/components/CategorySection';
+import PendingQueueSection from '@/components/PendingQueueSection';
+import UnpublishedSection from '@/components/UnpublishedSection';
+import RejectedToolsSection from '@/components/RejectedToolsSection';
+import ErrorAlert from '@/components/ErrorAlert';
+import TagSearch from '@/components/TagSearch';
+
+// Helper function to get icon for a tool based on category
+const getToolIcon = (category?: string) => {
+  const icons: Record<string, React.ReactNode> = {
+    'CMG Product': (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    ),
+    Operations: (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+    Marketing: (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      </svg>
+    ),
+    'Engineering & Dev Ops': (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+    Training: (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
+    'Sales AI Agents': (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+      </svg>
+    ),
+    'Sales Voice Agents': (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+      </svg>
+    ),
+    default: (
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+  };
+  return icons[category || 'default'] || icons.default;
+};
+
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const view = searchParams.get('view'); // 'pending' or 'unpublished'
+  const tagFilter = searchParams.get('tag'); // tag filter from search
+
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [prefilledCategory, setPrefilledCategory] = useState<string | null>(null);
+  const [tools, setTools] = useState<any[]>([]);
+  const [pendingTools, setPendingTools] = useState<any[]>([]);
+  const [unpublishedTools, setUnpublishedTools] = useState<any[]>([]);
+  const [rejectedTools, setRejectedTools] = useState<any[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [categoryColors, setCategoryColors] = useState<Record<string, string>>({
+    'CMG Product': '#00FF88',
+    'Sales AI Agents': '#A855F7',
+    'Sales Voice Agents': '#FF6B35',
+    'Operations': '#00D4FF',
+    'Marketing': '#8B5CF6',
+    'Engineering & Dev Ops': '#06B6D4',
+    'Training': '#FBBF24',
+  });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showError, setShowError] = useState(false);
+
+  // Fetch tools from API
+  const fetchTools = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch published tools
+      const response = await fetch('/api/tools');
+      const data = await response.json();
+      setTools(data.tools || []);
+      setIsAdmin(data.isAdmin || false);
+
+      // If admin, also fetch pending and unpublished tools
+      if (data.isAdmin) {
+        const pendingResponse = await fetch('/api/tools?status=pending');
+        const pendingData = await pendingResponse.json();
+        setPendingTools(pendingData.tools || []);
+
+        const unpublishedResponse = await fetch('/api/tools?status=unpublished');
+        const unpublishedData = await unpublishedResponse.json();
+        setUnpublishedTools(unpublishedData.tools || []);
+      }
+
+      // Fetch rejected tools for current user (all users can see their own rejected tools)
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('[Page] Fetching rejected tools for current user...');
+      const rejectedResponse = await fetch('/api/tools?status=rejected');
+      const rejectedData = await rejectedResponse.json();
+      console.log('[Page] Rejected tools response:', rejectedData);
+      console.log('[Page] Rejected tools count:', rejectedData.tools?.length || 0);
+      if (rejectedData.tools?.length > 0) {
+        console.log('[Page] Rejected tools:', rejectedData.tools.map((t: any) => ({ id: t.id, title: t.title, status: t.status, createdBy: t.createdBy })));
+      }
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      setRejectedTools(rejectedData.tools || []);
+    } catch (error) {
+      console.error('Error fetching tools:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/session');
+        const data = await response.json();
+
+        if (data.authenticated) {
+          setIsAuthenticated(true);
+          fetchTools();
+        } else {
+          // Not authenticated, redirect to login
+          window.location.href = '/login';
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        // On error, redirect to login
+        window.location.href = '/login';
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Handle deep linking to pending queue and unpublished section
+  useEffect(() => {
+    // Check for query parameters and hash
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    const hash = window.location.hash.slice(1); // Remove # prefix
+
+    // If view=pending, scroll to pending queue
+    if (view === 'pending') {
+      // Wait for pending queue to render
+      setTimeout(() => {
+        const pendingSection = document.getElementById('pending-queue');
+        if (pendingSection) {
+          pendingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          // If there's a specific tool ID in hash, highlight it
+          if (hash) {
+            setTimeout(() => {
+              const toolCard = document.getElementById(`tool-${hash}`);
+              if (toolCard) {
+                // Add highlight effect
+                toolCard.classList.add('ring-4', 'ring-accent-green', 'ring-offset-4', 'ring-offset-dark-500');
+                toolCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Remove highlight after 3 seconds
+                setTimeout(() => {
+                  toolCard.classList.remove('ring-4', 'ring-accent-green', 'ring-offset-4', 'ring-offset-dark-500');
+                }, 3000);
+              }
+            }, 500); // Wait for scroll to complete
+          }
+        }
+      }, 500); // Wait for data to load and render
+    }
+
+    // If view=unpublished, scroll to unpublished section
+    if (view === 'unpublished') {
+      // Wait for unpublished section to render
+      setTimeout(() => {
+        const unpublishedSection = document.getElementById('unpublished-section');
+        if (unpublishedSection) {
+          unpublishedSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          // If there's a specific tool ID in hash, highlight it
+          if (hash) {
+            setTimeout(() => {
+              const toolCard = document.getElementById(`tool-${hash}`);
+              if (toolCard) {
+                // Add highlight effect
+                toolCard.classList.add('ring-4', 'ring-gray-500', 'ring-offset-4', 'ring-offset-dark-500');
+                toolCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Remove highlight after 3 seconds
+                setTimeout(() => {
+                  toolCard.classList.remove('ring-4', 'ring-gray-500', 'ring-offset-4', 'ring-offset-dark-500');
+                }, 3000);
+              }
+            }, 500); // Wait for scroll to complete
+          }
+        }
+      }, 500); // Wait for data to load and render
+    }
+
+    // If view=rejected, scroll to rejected tools section
+    if (view === 'rejected') {
+      // Wait for rejected tools section to render
+      setTimeout(() => {
+        const rejectedSection = document.getElementById('rejected-tools');
+        if (rejectedSection) {
+          rejectedSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          // If there's a specific tool ID in hash, highlight it
+          if (hash) {
+            setTimeout(() => {
+              const toolCard = document.getElementById(`tool-${hash}`);
+              if (toolCard) {
+                // Add highlight effect
+                toolCard.classList.add('ring-4', 'ring-red-500', 'ring-offset-4', 'ring-offset-dark-500');
+                toolCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Remove highlight after 3 seconds
+                setTimeout(() => {
+                  toolCard.classList.remove('ring-4', 'ring-red-500', 'ring-offset-4', 'ring-offset-dark-500');
+                }, 3000);
+              }
+            }, 500); // Wait for scroll to complete
+          }
+        }
+      }, 500); // Wait for data to load and render
+    }
+  }, [pendingTools, unpublishedTools, rejectedTools, isAdmin]);
+
+  // Fallback tools if loading or empty (icons added dynamically in render)
+  const fallbackTools = [
+    {
+      title: 'Change Management Intake',
+      description: 'Streamline your application intake process with our AI-powered change management system. Submit requests, track progress, and automatically route to the right teams.',
+      fullDescription: 'The Change Management Intake system revolutionizes how CMG handles internal requests, feature changes, and support tickets. Using advanced AI technology, it automatically categorizes submissions, routes them to the appropriate teams, and pre-fills change management forms. This dramatically reduces processing time and ensures every request gets the attention it deserves.',
+      url: 'https://intake.cmgfinancial.ai/',
+      category: 'CMG Product',
+      videoUrl: '/videos/change-management-intake-demo.mp4',
+      accentColor: 'green',
+      features: [
+        'AI-powered request analysis and categorization',
+        'Automatic routing to appropriate teams',
+        'Smart form pre-filling based on request content',
+        'Real-time status tracking and notifications',
+        'Integration with Azure DevOps',
+        'Document and screenshot attachment support',
+      ],
+    },
+    {
+      title: 'Communications Builder',
+      description: 'Create professional communications, training materials, and release notes with AI assistance. Generate multiple output formats from a single input.',
+      fullDescription: 'The Communications Builder empowers teams to create comprehensive, professional documentation with minimal effort. Simply describe your feature or change, upload screenshots, and let AI generate perfectly formatted release notes, training guides, email announcements, FAQ documents, and quick reference cards - all from a single input.',
+      url: 'https://trainbuilder.cmgfinancial.ai/',
+      category: 'CMG Product',
+      videoUrl: '/videos/communications-builder-demo.mp4',
+      accentColor: 'blue',
+      features: [
+        'Multi-format output generation (Release Notes, Training Guides, FAQs)',
+        'AI-powered content creation and formatting',
+        'Screenshot and document integration',
+        'Professional email templates',
+        'Quick reference card generation',
+        'Consistent branding across all materials',
+      ],
+    },
+    {
+      title: 'Document Classification',
+      description: 'AI-powered document management automation for CLEAR Docs. Automatically classify, split, and organize mortgage documents with intelligent automation.',
+      fullDescription: 'The Document Classification system introduces AI into CLEAR Docs to automate and improve document management tasks. Using Gemini AI, it intelligently classifies and splits bulk document packages, automatically organizing them by type (CRED, INC, ASSET, PROP) and reducing the need for manual review. Perfect for mortgage document processing workflows.',
+      url: 'https://cleardocs.cmgfinancial.ai/',
+      category: 'CMG Product',
+      videoUrl: '/videos/document-classification-demo.mp4',
+      accentColor: 'purple',
+      features: [
+        'AI-powered document intelligent automation',
+        'Flexible uploads: single or bulk document packages',
+        'Smart splitting: automatic document separation',
+        'Real-time user notifications via UI refresh',
+        'Integration with CLEAR Docs drop zone',
+        'Automatic categorization (CRED, INC, ASSET, PROP)',
+      ],
+    },
+    {
+      title: 'CMG DocuMind',
+      description: 'The future of mortgage document processing. Review loans, extract data automatically, and assign AI agents to fix document problems with intelligent automation.',
+      fullDescription: 'CMG DocuMind revolutionizes mortgage document processing with cutting-edge AI technology. Instantly review complete loan files, automatically extract critical data points, identify missing or problematic documents, and assign specialized AI agents to resolve issues. DocuMind reduces processing time from hours to minutes while improving accuracy and compliance. The intelligent system learns from each loan, continuously improving its document understanding and problem-solving capabilities.',
+      url: 'https://cmg-docu-mind.vercel.app/',
+      category: 'CMG Product',
+      videoUrl: '/videos/cmg-documind-demo.mp4',
+      accentColor: 'blue',
+      features: [
+        'Complete loan file review and analysis',
+        'Automatic data extraction from documents',
+        'AI-powered problem detection',
+        'Intelligent agent assignment for issue resolution',
+        'Real-time processing status tracking',
+        'Continuous learning and improvement',
+      ],
+    },
+    {
+      title: 'Bank Statement Analyzer',
+      description: 'AI-powered income verification at your fingertips. Upload bank statements and get automatic transaction analysis, recurring deposit identification, and qualifying income calculations.',
+      fullDescription: 'Meet your Bank Statement Analyzer—AI-powered income verification at your fingertips. Automatically extracts transaction data, identifies recurring deposits, flags compliance concerns, and calculates qualifying income using agency guidelines. Whether it\'s self-employed borrowers or complex income scenarios, get accurate analysis and actionable recommendations instantly. Smart underwriting made simple.',
+      url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Bank+Statement+Analyzer',
+      category: 'Sales AI Agents',
+      videoUrl: '/videos/bank-statement-analyzer-demo.mp4',
+      accentColor: 'green',
+      features: [
+        'Automatic transaction data extraction',
+        'Recurring deposit identification',
+        'Compliance concern flagging',
+        'Qualifying income calculation using agency guidelines',
+        'Self-employed borrower income analysis',
+        'Actionable recommendations for complex scenarios',
+      ],
+    },
+    {
+      title: 'Construction Guidelines Assistant',
+      description: 'Your construction loan expert on demand. Get instant answers about construction-to-perm guidelines, draw schedules, builder requirements, and budget specifications.',
+      fullDescription: 'Navigate construction loan complexity with confidence. The Construction Guidelines Assistant provides instant answers to construction-to-perm scenarios, draw schedules, inspection requirements, builder qualifications, and budget guidelines. Whether you\'re handling new construction, major renovations, or lot-land transactions, get accurate CMG construction policy guidance instantly. Your construction loan expert, always available.',
+      url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Construction+Guidelines+Assistant',
+      category: 'Sales AI Agents',
+      videoUrl: '/videos/construction-guidelines-demo.mp4',
+      accentColor: 'purple',
+      features: [
+        'Construction-to-perm guideline expertise',
+        'Draw schedule and inspection requirements',
+        'Builder qualification specifications',
+        'Budget and cost breakdown guidance',
+        'New construction and renovation scenarios',
+        'Lot-land transaction policy guidance',
+      ],
+    },
+    {
+      title: 'Jumbo Guidelines Assistant',
+      description: 'Your on-demand guideline expert. Get instant answers to loan scenario questions with intelligent chat combining Fannie, Freddie, and CMG overlays.',
+      fullDescription: 'Tired of guideline hunting? The Jumbo Guidelines Assistant combines Fannie, Freddie, and CMG overlays in one intelligent chat. Ask any loan scenario question and get clear answers instantly. Whether it\'s DTI limits, credit requirements, or product eligibility—you\'ll have the right information for every borrower conversation. Your guideline expert, on demand.',
+      url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Jumbo+Guidelines+Assistant',
+      category: 'Sales AI Agents',
+      videoUrl: '/videos/jumbo-guidelines-demo.mp4',
+      accentColor: 'blue',
+      features: [
+        'Combined Fannie, Freddie, and CMG overlay guidelines',
+        'Instant answers to loan scenario questions',
+        'DTI limits and qualification guidance',
+        'Credit requirement specifications',
+        'Product eligibility information',
+        'On-demand guideline expertise for borrower conversations',
+      ],
+    },
+    {
+      title: 'Non-QM Guidelines Assistant',
+      description: 'Expert guidance for Non-QM loan scenarios. Get instant answers about alternative documentation, credit flexibility, and specialized underwriting requirements.',
+      fullDescription: 'Navigate the Non-QM landscape with confidence using the Non-QM Guidelines Assistant. This specialized tool provides expert guidance on alternative documentation requirements, credit flexibility options, debt-to-income considerations, and asset-based qualification strategies. Perfect for self-employed borrowers, foreign nationals, and unique income scenarios that fall outside conventional guidelines.',
+      url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=Non-QM+Guidelines+Assistant',
+      category: 'Sales AI Agents',
+      videoUrl: '/videos/non-qm-guidelines-demo.mp4',
+      accentColor: 'green',
+      features: [
+        'Alternative documentation strategies',
+        'Credit flexibility and exception guidance',
+        'Debt-to-income calculation methods',
+        'Asset-based qualification scenarios',
+        'Self-employed borrower solutions',
+        'Foreign national lending requirements',
+      ],
+    },
+    {
+      title: 'VA Guidelines Assistant',
+      description: 'Specialized guidance for VA loan scenarios. Get instant answers about VA eligibility, funding fees, occupancy requirements, and veteran-specific lending guidelines.',
+      fullDescription: 'Navigate VA loans with confidence using the VA Guidelines Assistant. This specialized tool provides expert guidance on VA eligibility requirements, Certificate of Eligibility (COE) verification, funding fee calculations, occupancy and residual income requirements, and property condition standards. Perfect for helping veterans, active-duty service members, and eligible spouses achieve homeownership through their VA benefits.',
+      url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new?spec=VA+Guidelines+Assistant',
+      category: 'Sales AI Agents',
+      videoUrl: '/videos/va-guidelines-demo.mp4',
+      accentColor: 'purple',
+      features: [
+        'VA eligibility and entitlement guidance',
+        'Certificate of Eligibility (COE) assistance',
+        'Funding fee calculation and exemptions',
+        'Residual income requirement analysis',
+        'Occupancy and property condition standards',
+        'Benefits for veterans and active-duty service members',
+      ],
+    },
+    {
+      title: 'AI Chatbots',
+      description: 'Access powerful AI chatbots for research, writing, coding, and problem-solving. Multiple models available including GPT-4, Claude, and more.',
+      fullDescription: 'The AI Chatbots platform provides access to multiple state-of-the-art language models in one unified interface. Perfect for research, content creation, code generation, data analysis, and complex problem-solving. Switch between different AI models to find the best fit for your task.',
+      url: 'https://app-librechat-u2uf7w.azurewebsites.net/c/new',
+      category: 'Sales AI Agents',
+      videoUrl: '/videos/ai-chatbots-demo.mp4',
+      accentColor: 'purple',
+      features: [
+        'Multiple AI models (GPT-4, Claude, Gemini)',
+        'Conversation history and management',
+        'Code generation and debugging',
+        'Research and analysis assistance',
+        'Document summarization',
+        'Multi-language support',
+      ],
+    },
+    {
+      title: 'Agentic LO Voice Agent',
+      description: 'Your AI-powered loan officer assistant available 24/7 via phone. Call anytime to get instant answers about loan products, rates, and qualification requirements.',
+      fullDescription: 'Meet your Agentic LO Voice Agent—an intelligent AI assistant that understands mortgage lending inside and out. Simply call (949) 785-4613 and speak naturally about your loan scenarios, product questions, or borrower situations. The AI agent provides instant, accurate guidance on rates, programs, qualification criteria, and next steps. Available 24/7 with human-like conversation and deep mortgage expertise.',
+      url: 'tel:+19497854613',
+      category: 'Sales Voice Agents',
+      videoUrl: '/videos/lo-voice-agent-demo.mp4',
+      accentColor: 'purple',
+      features: [
+        '24/7 availability via phone call',
+        'Natural voice conversation with AI',
+        'Instant loan product recommendations',
+        'Rate and program information',
+        'Qualification requirement guidance',
+        'Human-like interaction and understanding',
+      ],
+    },
+  ];
+
+  const handleOpenWizard = (category?: string) => {
+    setPrefilledCategory(category || null);
+    setIsWizardOpen(true);
+  };
+
+  const handleCloseWizard = () => {
+    setIsWizardOpen(false);
+    setPrefilledCategory(null);
+  };
+
+  const handleAddTool = async (toolData: any) => {
+    try {
+      const category = toolData.category || prefilledCategory;
+
+      // DON'T update global categoryColors - save color per-tool instead
+      // This prevents all tools in the category from changing color immediately
+
+      // Save tool to API with its own individual color
+      const response = await fetch('/api/tools', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: toolData.title,
+          description: toolData.description,
+          fullDescription: toolData.fullDescription,
+          url: toolData.url,
+          category: category,
+          thumbnailUrl: toolData.thumbnailUrl,
+          videoUrl: toolData.videoUrl,
+          categoryColor: toolData.categoryColor, // Stored per-tool, not per-category
+          features: toolData.features,
+          tags: toolData.tags,
+          aiGeneratedTags: toolData.aiGeneratedTags,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to add tool');
+
+      const data = await response.json();
+
+      // Add new tool to appropriate state based on status
+      if (data.tool.status === 'pending') {
+        setPendingTools(prev => [...prev, data.tool]);
+      } else if (data.tool.status === 'published') {
+        setTools(prev => [...prev, data.tool]);
+      } else if (data.tool.status === 'unpublished') {
+        setUnpublishedTools(prev => [...prev, data.tool]);
+      }
+
+      console.log(`[Tool Added] Added "${data.tool.title}" to ${data.tool.status} state`);
+    } catch (error) {
+      console.error('Error adding tool:', error);
+      setErrorMessage('Failed to add tool. Please try again.');
+      setShowError(true);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-dark-500">
+      {/* Header with Admin Queue Badge and Rejected Tools Notification */}
+      <Header
+        pendingCount={pendingTools.length}
+        unpublishedCount={unpublishedTools.length}
+        rejectedCount={rejectedTools.length}
+      />
+
+      {/* Tools Dashboard Section */}
+      <section id="tools" className="py-24 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Your <span className="gradient-text">AI Tools</span>
+            </h2>
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
+              Access all of your essential AI tools in one place. Click on any tool to launch it in a new window.
+            </p>
+
+            {/* Tag Search Component */}
+            <div className="mb-8">
+              <TagSearch
+                placeholder="Search by tag..."
+                initialValue={tagFilter || ''}
+              />
+            </div>
+
+            {/* Tag Filter Active Message */}
+            {tagFilter && (
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-accent-blue/20 border border-accent-blue/50 rounded-lg text-accent-blue">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                <span className="font-medium">Filtering by tag: "{tagFilter}"</span>
+                <button
+                  onClick={() => window.location.href = '/tools'}
+                  className="ml-2 hover:text-accent-green transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Tool Cards by Category - Netflix Style */}
+          {isLoading || isAuthenticated === null ? (
+            <div className="text-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-green"></div>
+              <p className="text-gray-400 mt-4">{isAuthenticated === null ? 'Checking authentication...' : 'Loading tools...'}</p>
+            </div>
+          ) : (
+            <div className="space-y-12">
+              {/* Admin Queue Sections - shown only when navigated to via dropdown */}
+              {isAdmin && view === 'pending' && pendingTools.length > 0 && (
+                <PendingQueueSection
+                  pendingTools={pendingTools}
+                  onUpdate={fetchTools}
+                />
+              )}
+
+              {isAdmin && view === 'unpublished' && unpublishedTools.length > 0 && (
+                <UnpublishedSection
+                  unpublishedTools={unpublishedTools}
+                  onUpdate={fetchTools}
+                />
+              )}
+
+              {/* Rejected Tools Section - shown to tool creators automatically */}
+              {rejectedTools.length > 0 && (
+                <RejectedToolsSection
+                  rejectedTools={rejectedTools}
+                  onUpdate={fetchTools}
+                />
+              )}
+
+              {/* Group tools by category */}
+              {(() => {
+                const filteredTools = (tools.length > 0 ? tools : fallbackTools)
+                  // Filter by tag if tagFilter is active
+                  .filter((tool: any) => {
+                    if (!tagFilter) return true;
+                    const lowerTag = tagFilter.toLowerCase();
+
+                    // Check in regular tags
+                    const hasTag = tool.tags?.some((tag: string) => tag.toLowerCase().includes(lowerTag));
+                    // Check in AI-generated tags
+                    const hasAITag = tool.aiGeneratedTags?.some((tag: string) => tag.toLowerCase().includes(lowerTag));
+
+                    return hasTag || hasAITag;
+                  });
+
+                // Show no results message if filtering returns empty
+                if (tagFilter && filteredTools.length === 0) {
+                  return (
+                    <div className="text-center py-20">
+                      <div className="inline-flex items-center justify-center w-20 h-20 bg-dark-400 rounded-full mb-6">
+                        <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-2">No tools found</h3>
+                      <p className="text-gray-400 mb-6">No tools match the tag "{tagFilter}"</p>
+                      <button
+                        onClick={() => window.location.href = '/tools'}
+                        className="px-6 py-3 bg-gradient-to-r from-accent-blue to-accent-green text-dark-500 font-bold rounded-lg hover:opacity-90 transition-opacity"
+                      >
+                        Clear Filter
+                      </button>
+                    </div>
+                  );
+                }
+
+                return Object.entries(
+                  filteredTools.reduce((acc: Record<string, any[]>, tool) => {
+                    const category = tool.category || 'Other';
+                    if (!acc[category]) acc[category] = [];
+                    acc[category].push(tool);
+                    return acc;
+                  }, {})
+                ).map(([category, categoryTools]) => (
+                <CategorySection
+                  key={category}
+                  category={category}
+                  categoryTools={categoryTools}
+                  categoryIcon={getToolIcon(category)}
+                  categoryColor={categoryColors[category]}
+                  onAddTool={handleOpenWizard}
+                  getToolIcon={getToolIcon}
+                  onUpdate={fetchTools}
+                  isAdmin={isAdmin}
+                />
+                ));
+              })()}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Floating Add Tool Button */}
+      <button
+        onClick={() => handleOpenWizard()}
+        className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-accent-green to-accent-blue rounded-full shadow-neon-green hover:scale-110 transition-all duration-300 z-40 flex items-center justify-center group"
+        title="Add New Tool"
+      >
+        <svg className="w-8 h-8 text-dark-500 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      </button>
+
+      {/* Add Tool Wizard */}
+      <AddToolWizard
+        isOpen={isWizardOpen}
+        onClose={() => setIsWizardOpen(false)}
+        onSubmit={handleAddTool}
+      />
+
+      {/* Error Alert */}
+      <ErrorAlert
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+        message={errorMessage}
+      />
+    </div>
+  );
+}
+
+// Wrap with Suspense for useSearchParams
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-dark-500 flex items-center justify-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-green"></div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
+  );
+}
