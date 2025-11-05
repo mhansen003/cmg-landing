@@ -149,9 +149,9 @@ const Header: React.FC<HeaderProps> = ({ pendingCount = 0, unpublishedCount = 0,
                       {user.isAdmin ? (
                         <div className="flex items-center space-x-2">
                           <span className="text-xs font-bold text-accent-green">Admin</span>
-                          {(pendingCount > 0 || unpublishedCount > 0) && (
+                          {(pendingCount > 0 || unpublishedCount > 0 || rejectedCount > 0) && (
                             <span className="px-1.5 py-0.5 bg-orange-500 text-white text-xs font-bold rounded">
-                              {pendingCount + unpublishedCount}
+                              {pendingCount + unpublishedCount + rejectedCount}
                             </span>
                           )}
                         </div>
@@ -178,6 +178,7 @@ const Header: React.FC<HeaderProps> = ({ pendingCount = 0, unpublishedCount = 0,
                     <AdminQueueDropdown
                       pendingCount={pendingCount}
                       unpublishedCount={unpublishedCount}
+                      rejectedCount={rejectedCount}
                       isOpen={isDropdownOpen}
                       onClose={() => setIsDropdownOpen(false)}
                     />

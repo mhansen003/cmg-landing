@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 interface AdminQueueDropdownProps {
   pendingCount: number;
   unpublishedCount: number;
+  rejectedCount?: number;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -13,6 +14,7 @@ interface AdminQueueDropdownProps {
 const AdminQueueDropdown: React.FC<AdminQueueDropdownProps> = ({
   pendingCount,
   unpublishedCount,
+  rejectedCount = 0,
   isOpen,
   onClose,
 }) => {
@@ -23,7 +25,11 @@ const AdminQueueDropdown: React.FC<AdminQueueDropdownProps> = ({
     onClose();
     // Small delay to ensure navigation completes, then scroll
     setTimeout(() => {
-      const section = document.getElementById(view === 'pending' ? 'pending-queue' : 'unpublished-section');
+      let sectionId = 'pending-queue';
+      if (view === 'unpublished') sectionId = 'unpublished-section';
+      if (view === 'rejected') sectionId = 'rejected-tools';
+
+      const section = document.getElementById(sectionId);
       if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -109,6 +115,32 @@ const AdminQueueDropdown: React.FC<AdminQueueDropdownProps> = ({
               </div>
               <div className="flex items-center space-x-2">
                 <span className="px-2 py-1 bg-gray-500 text-dark-500 text-xs font-bold rounded">{unpublishedCount}</span>
+                <svg className="w-4 h-4 text-gray-400 group-hover:text-accent-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
+          )}
+
+          {/* Rejected Items - shown to admins who are also authors */}
+          {rejectedCount > 0 && (
+            <button
+              onClick={() => handleNavigate('rejected')}
+              className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors group mt-2"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-red-500/20 border-2 border-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-white">My Rejected Tools</p>
+                  <p className="text-xs text-gray-400">{rejectedCount} item{rejectedCount !== 1 ? 's' : ''} needs revision</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">{rejectedCount}</span>
                 <svg className="w-4 h-4 text-gray-400 group-hover:text-accent-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>

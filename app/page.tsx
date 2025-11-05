@@ -531,8 +531,8 @@ function HomeContent() {
                 />
               )}
 
-              {/* Rejected Tools Section - shown to tool creators */}
-              {view === 'rejected' && rejectedTools.length > 0 && (
+              {/* Rejected Tools Section - shown to tool creators automatically */}
+              {rejectedTools.length > 0 && (
                 <RejectedToolsSection
                   rejectedTools={rejectedTools}
                   onUpdate={fetchTools}
