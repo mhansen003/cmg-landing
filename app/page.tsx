@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Header from '@/components/Header';
 import ToolCard from '@/components/ToolCard';
 import AddToolWizard from '@/components/AddToolWizard';
 import CategorySection from '@/components/CategorySection';
@@ -55,7 +57,10 @@ const getToolIcon = (category?: string) => {
   return icons[category || 'default'] || icons.default;
 };
 
-export default function Home() {
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const view = searchParams.get('view'); // 'pending' or 'unpublished'
+
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [prefilledCategory, setPrefilledCategory] = useState<string | null>(null);
   const [tools, setTools] = useState<any[]>([]);
@@ -427,8 +432,16 @@ export default function Home() {
 
       const data = await response.json();
 
-      // Add new tool to local state
-      setTools(prev => [...prev, data.tool]);
+      // Add new tool to appropriate state based on status
+      if (data.tool.status === 'pending') {
+        setPendingTools(prev => [...prev, data.tool]);
+      } else if (data.tool.status === 'published') {
+        setTools(prev => [...prev, data.tool]);
+      } else if (data.tool.status === 'unpublished') {
+        setUnpublishedTools(prev => [...prev, data.tool]);
+      }
+
+      console.log(`[Tool Added] Added "${data.tool.title}" to ${data.tool.status} state`);
     } catch (error) {
       console.error('Error adding tool:', error);
       setErrorMessage('Failed to add tool. Please try again.');
@@ -438,6 +451,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-dark-500">
+      {/* Header with Admin Queue Badge */}
+      <Header
+        pendingCount={pendingTools.length}
+        unpublishedCount={unpublishedTools.length}
+      />
+
       {/* Tools Dashboard Section */}
       <section id="tools" className="py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -458,16 +477,15 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-12">
-              {/* Pending Review Queue (Admin Only) */}
-              {isAdmin && pendingTools.length > 0 && (
+              {/* Admin Queue Sections - shown only when navigated to via dropdown */}
+              {isAdmin && view === 'pending' && pendingTools.length > 0 && (
                 <PendingQueueSection
                   pendingTools={pendingTools}
                   onUpdate={fetchTools}
                 />
               )}
 
-              {/* Unpublished Tools Section (Admin Only) */}
-              {isAdmin && unpublishedTools.length > 0 && (
+              {isAdmin && view === 'unpublished' && unpublishedTools.length > 0 && (
                 <UnpublishedSection
                   unpublishedTools={unpublishedTools}
                   onUpdate={fetchTools}
@@ -525,5 +543,18 @@ export default function Home() {
         message={errorMessage}
       />
     </div>
+  );
+}
+
+// Wrap with Suspense for useSearchParams
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-dark-500 flex items-center justify-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-green"></div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

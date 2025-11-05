@@ -5,19 +5,26 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog from './ConfirmDialog';
 import ErrorAlert from './ErrorAlert';
+import AdminQueueDropdown from './AdminQueueDropdown';
 
 interface UserSession {
   email: string;
   isAdmin: boolean;
 }
 
-const Header = () => {
+interface HeaderProps {
+  pendingCount?: number;
+  unpublishedCount?: number;
+}
+
+const Header: React.FC<HeaderProps> = ({ pendingCount = 0, unpublishedCount = 0 }) => {
   const router = useRouter();
   const [user, setUser] = useState<UserSession | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showError, setShowError] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Fetch user session on mount
   useEffect(() => {
@@ -121,19 +128,43 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                {/* User Info */}
-                <div className="hidden sm:flex items-center space-x-3 px-4 py-2 bg-white/5 border border-white/10 rounded-lg">
-                  <div className="flex flex-col items-end">
-                    <span className="text-sm text-white font-medium">{user.email}</span>
-                    {user.isAdmin && (
-                      <span className="text-xs font-bold text-accent-green">Admin</span>
-                    )}
-                  </div>
-                  <div className="w-8 h-8 bg-gradient-to-br from-accent-green to-accent-blue rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-dark-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
-                  </div>
+                {/* User Info with Admin Queue Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => user.isAdmin && setIsDropdownOpen(!isDropdownOpen)}
+                    className={`hidden sm:flex items-center space-x-3 px-4 py-2 bg-white/5 border border-white/10 rounded-lg ${
+                      user.isAdmin ? 'cursor-pointer hover:bg-white/10 transition-colors' : 'cursor-default'
+                    }`}
+                  >
+                    <div className="flex flex-col items-end">
+                      <span className="text-sm text-white font-medium">{user.email}</span>
+                      {user.isAdmin && (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs font-bold text-accent-green">Admin</span>
+                          {(pendingCount > 0 || unpublishedCount > 0) && (
+                            <span className="px-1.5 py-0.5 bg-orange-500 text-white text-xs font-bold rounded">
+                              {pendingCount + unpublishedCount}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="w-8 h-8 bg-gradient-to-br from-accent-green to-accent-blue rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-dark-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {/* Admin Queue Dropdown */}
+                  {user.isAdmin && (
+                    <AdminQueueDropdown
+                      pendingCount={pendingCount}
+                      unpublishedCount={unpublishedCount}
+                      isOpen={isDropdownOpen}
+                      onClose={() => setIsDropdownOpen(false)}
+                    />
+                  )}
                 </div>
 
                 {/* Logout Button */}

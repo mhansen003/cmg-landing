@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
@@ -17,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="flex flex-col min-h-screen bg-dark-500 text-white antialiased">
-        <Header />
+        {/* Header moved to page.tsx to access pending/unpublished counts */}
         <main className="flex-grow">
           {children}
         </main>
