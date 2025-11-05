@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import type { Transporter } from 'nodemailer';
 import { AUTH_CONFIG } from './auth-jwt';
 
 // Generate random 6-digit OTP
@@ -6,13 +7,22 @@ export function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Create email transporter
+// Singleton transporter with connection pooling
+let transporter: Transporter | null = null;
+
+// Create email transporter with connection pooling
 export function createEmailTransporter() {
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     throw new Error('SMTP credentials not configured');
   }
 
-  return nodemailer.createTransport({
+  // Return existing transporter if available
+  if (transporter) {
+    return transporter;
+  }
+
+  // Create new transporter with optimized settings
+  transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587'),
     secure: false, // Use STARTTLS (Gmail supports both 587 and 465)
@@ -20,11 +30,23 @@ export function createEmailTransporter() {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+    // Connection pooling for faster emails
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100,
+    rateDelta: 1000, // 1 second between messages
+    rateLimit: 5, // Max 5 emails per rateDelta
+    // Keep connections alive
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 5000, // 5 seconds
+    socketTimeout: 10000, // 10 seconds
     tls: {
       // For Gmail, allow less secure TLS versions if needed
       rejectUnauthorized: false
     }
   });
+
+  return transporter;
 }
 
 // Send OTP email

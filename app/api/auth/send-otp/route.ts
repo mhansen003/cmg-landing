@@ -100,9 +100,12 @@ export async function POST(request: NextRequest) {
       { EX: AUTH_CONFIG.OTP_EXPIRY_MINUTES * 60 }
     );
 
-    // Send email
+    // Send email with performance logging
     try {
+      const emailStartTime = Date.now();
       await sendOTPEmail(emailLower, code);
+      const emailDuration = Date.now() - emailStartTime;
+      console.log(`[Performance] Email sent in ${emailDuration}ms to ${emailLower}`);
     } catch (emailError) {
       console.error('Failed to send email:', emailError);
       return NextResponse.json(
