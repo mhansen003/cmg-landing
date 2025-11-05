@@ -15,6 +15,8 @@ interface ToolFormData {
   description: string;
   video: File | null;
   videoPreview: string | null;
+  thumbnailUrl: string;
+  videoUrl: string;
 }
 
 const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -24,6 +26,8 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
     description: '',
     video: null,
     videoPreview: null,
+    thumbnailUrl: '',
+    videoUrl: '',
   });
   const [generatedData, setGeneratedData] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -155,8 +159,8 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
 
       aiPromises.push(tagsPromise);
 
-      // Capture screenshot if no video was uploaded
-      if (!formData.video) {
+      // Capture screenshot if no video was uploaded AND no manual thumbnail provided
+      if (!formData.video && !formData.videoUrl && !formData.thumbnailUrl) {
         const screenshotPromise = fetch('/api/capture-screenshot', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -178,6 +182,12 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
           });
 
         aiPromises.push(screenshotPromise);
+      } else if (formData.thumbnailUrl) {
+        // Use manually provided thumbnail
+        setGeneratedData((prev: any) => ({
+          ...prev,
+          thumbnailUrl: normalizeUrl(formData.thumbnailUrl),
+        }));
       }
 
       // Wait for all AI operations to complete
@@ -198,6 +208,8 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
       categoryColor: selectedColor,
       videoFile: formData.video,
       videoPreview: formData.videoPreview,
+      videoUrl: formData.videoUrl ? normalizeUrl(formData.videoUrl) : generatedData.videoUrl,
+      thumbnailUrl: formData.thumbnailUrl ? normalizeUrl(formData.thumbnailUrl) : generatedData.thumbnailUrl,
       tags,
       aiGeneratedTags: true, // Mark tags as AI-generated
     };
@@ -207,7 +219,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
 
   const handleClose = () => {
     setStep(1);
-    setFormData({ url: '', description: '', video: null, videoPreview: null });
+    setFormData({ url: '', description: '', video: null, videoPreview: null, thumbnailUrl: '', videoUrl: '' });
     setGeneratedData(null);
     setError(null);
     setTags([]);
@@ -315,7 +327,21 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
 
                 <div>
                   <label className="block text-sm font-bold text-white mb-2">
-                    Demo Video (Optional)
+                    Video URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.videoUrl}
+                    onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
+                    placeholder="/videos/demo.mp4 or https://..."
+                    className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">Link to a hosted video or upload below</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-white mb-2">
+                    Demo Video File (Optional)
                   </label>
                   <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-accent-green transition-colors">
                     {formData.videoPreview ? (
@@ -355,6 +381,24 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
                       </>
                     )}
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-white mb-2">
+                    Thumbnail URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.thumbnailUrl}
+                    onChange={(e) => setFormData(prev => ({ ...prev, thumbnailUrl: e.target.value }))}
+                    placeholder="https://example.com/thumbnail.jpg"
+                    className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    {formData.video || formData.videoUrl
+                      ? "Thumbnail will be shown when video isn't playing"
+                      : "AI will auto-capture a screenshot if not provided"}
+                  </p>
                 </div>
 
                 {error && (

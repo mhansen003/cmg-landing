@@ -303,6 +303,18 @@ const ToolCard: React.FC<ToolCardProps> = ({
                 <div className="absolute bottom-1/4 left-1/3 w-2 h-2 rounded-full opacity-30 blur-sm" style={{ backgroundColor: useCustomColor ? customColor : '#00FF88', animation: 'float 7s ease-in-out infinite 1.5s' }} />
               </div>
 
+              {(() => {
+                // Debug logging
+                if (title.toLowerCase().includes('amazon')) {
+                  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                  console.log('[ToolCard Debug] Tool:', title);
+                  console.log('[ToolCard Debug] videoUrl:', videoUrl || 'NOT SET');
+                  console.log('[ToolCard Debug] thumbnailUrl:', thumbnailUrl || 'NOT SET');
+                  console.log('[ToolCard Debug] Showing:', videoUrl ? 'VIDEO' : thumbnailUrl ? 'THUMBNAIL' : 'PLACEHOLDER');
+                  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+                }
+                return null;
+              })()}
               {videoUrl ? (
                 <div className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500 z-10">
                   <video
