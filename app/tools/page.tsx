@@ -575,10 +575,10 @@ function HomeContent() {
                     if (!tagFilter) return true;
                     const lowerTag = tagFilter.toLowerCase();
 
-                    // Check in regular tags
-                    const hasTag = tool.tags?.some((tag: string) => tag.toLowerCase().includes(lowerTag));
-                    // Check in AI-generated tags
-                    const hasAITag = tool.aiGeneratedTags?.some((tag: string) => tag.toLowerCase().includes(lowerTag));
+                    // Check in regular tags (ensure it's an array)
+                    const hasTag = Array.isArray(tool.tags) && tool.tags.some((tag: string) => tag.toLowerCase().includes(lowerTag));
+                    // Check in AI-generated tags (ensure it's an array)
+                    const hasAITag = Array.isArray(tool.aiGeneratedTags) && tool.aiGeneratedTags.some((tag: string) => tag.toLowerCase().includes(lowerTag));
 
                     return hasTag || hasAITag;
                   });
