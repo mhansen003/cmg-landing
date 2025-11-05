@@ -136,7 +136,7 @@ const Header: React.FC<HeaderProps> = ({ pendingCount = 0, unpublishedCount = 0,
                       if (user.isAdmin) {
                         setIsDropdownOpen(!isDropdownOpen);
                       } else if (rejectedCount > 0) {
-                        router.push('/?view=rejected');
+                        router.push('/tools?view=rejected');
                       }
                     }}
                     className={`hidden sm:flex items-center space-x-3 px-4 py-2 bg-white/5 border border-white/10 rounded-lg ${

@@ -68,7 +68,7 @@ export async function sendPendingApprovalEmail(
     console.log(`[Email Service] ✓ Transporter created successfully`);
 
     // Build deep link to pending queue with highlighted tool
-    const approvalLink = `${siteUrl}?view=pending#${tool.toolId}`;
+    const approvalLink = `${siteUrl}/tools?view=pending#${tool.toolId}`;
 
     // Email HTML content
     const emailHtml = `
@@ -245,7 +245,7 @@ export async function sendRejectionEmail(
     }
 
     // Build link to rejected tools section where user can view, edit, and resubmit
-    const rejectedLink = `${siteUrl}?view=rejected`;
+    const rejectedLink = `${siteUrl}/tools?view=rejected`;
 
     const emailHtml = `
 <!DOCTYPE html>

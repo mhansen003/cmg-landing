@@ -21,7 +21,7 @@ const AdminQueueDropdown: React.FC<AdminQueueDropdownProps> = ({
   const router = useRouter();
 
   const handleNavigate = (view: string) => {
-    router.push(`/?view=${view}`);
+    router.push(`/tools?view=${view}`);
     onClose();
     // Small delay to ensure navigation completes, then scroll
     setTimeout(() => {
