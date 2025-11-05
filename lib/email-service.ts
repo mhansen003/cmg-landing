@@ -521,7 +521,7 @@ export async function sendApprovalConfirmationEmail(
       return false;
     }
 
-    const toolLink = `${siteUrl}#${tool.toolId}`;
+    const toolLink = `${siteUrl}/tools#${tool.toolId}`;
 
     const emailHtml = `
 <!DOCTYPE html>
