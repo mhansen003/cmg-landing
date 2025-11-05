@@ -11,6 +11,15 @@ export interface Tool {
   features?: string[];
   categoryColor?: string;
   createdAt: string;
+  // Workflow
+  status?: 'published' | 'pending' | 'unpublished';
+  createdBy?: string;
+  approvedBy?: string;
+  approvedAt?: string;
+  updatedAt?: string;
+  // Tags for search and categorization
+  tags?: string[];
+  aiGeneratedTags?: boolean; // Track if tags were AI-generated
   // Voting and ranking
   upvotes: number;
   downvotes: number;

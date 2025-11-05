@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import TagInput from './TagInput';
 
 interface AddToolWizardProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
   const [manualCategory, setManualCategory] = useState<string>('');
   const [editedCategory, setEditedCategory] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('#00FF88');
+  const [tags, setTags] = useState<string[]>([]);
 
   const categoryOptions = [
     'CMG Product',
@@ -111,6 +113,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
       categoryColor: selectedColor,
       videoFile: formData.video,
       videoPreview: formData.videoPreview,
+      tags,
     };
     onSubmit(toolData);
     handleClose();
@@ -121,6 +124,10 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
     setFormData({ url: '', description: '', video: null, videoPreview: null });
     setGeneratedData(null);
     setError(null);
+    setTags([]);
+    setManualCategory('');
+    setEditedCategory('');
+    setSelectedColor('#00FF88');
     onClose();
   };
 
@@ -350,6 +357,22 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
                       ))}
                     </div>
                   </div>
+                </div>
+
+                {/* Tags Section */}
+                <div>
+                  <label className="block text-sm font-bold text-white mb-2">
+                    Tags (Optional)
+                  </label>
+                  <TagInput
+                    tags={tags}
+                    onChange={setTags}
+                    placeholder="Add tags for search and categorization"
+                    maxTags={10}
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Tags help users find your tool. Example: Sales, Operations, IT, Training, AI
+                  </p>
                 </div>
 
                 {/* Preview Card */}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import TagInput from './TagInput';
 
 interface EditToolModalProps {
   isOpen: boolean;
@@ -17,6 +18,8 @@ interface EditToolModalProps {
     category?: string;
     features?: string[];
     status?: string;
+    tags?: string[];
+    aiGeneratedTags?: boolean;
   };
   isApprovalMode?: boolean; // If true, show "Approve & Publish" instead of "Save"
 }
@@ -32,6 +35,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
     category: tool.category || '',
     features: tool.features?.join('\n') || '',
   });
+  const [tags, setTags] = useState<string[]>(tool.tags || []);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -49,6 +53,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
         category: tool.category || '',
         features: tool.features?.join('\n') || '',
       });
+      setTags(tool.tags || []);
     }
   }, [tool]);
 
@@ -68,6 +73,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
       thumbnailUrl: formData.thumbnailUrl,
       category: formData.category,
       features: featuresArray,
+      tags,
     });
   };
 
@@ -245,6 +251,23 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
                 className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-accent-green transition-colors resize-none font-mono text-sm"
                 placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
               />
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Tags
+              </label>
+              <TagInput
+                tags={tags}
+                onChange={setTags}
+                aiGenerated={tool.aiGeneratedTags}
+                placeholder="Add tags for search and categorization"
+                maxTags={10}
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Tags help users find this tool through search
+              </p>
             </div>
           </div>
         </div>
