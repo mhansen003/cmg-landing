@@ -27,6 +27,7 @@ interface CategorySectionProps {
   categoryColor: string;
   onAddTool: (category: string) => void;
   getToolIcon: (category?: string) => React.ReactNode;
+  onUpdate?: () => void;
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -36,6 +37,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   categoryColor,
   onAddTool,
   getToolIcon,
+  onUpdate,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(true);
@@ -148,6 +150,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     downvotes={tool.downvotes}
                     rating={tool.rating}
                     ratingCount={tool.ratingCount}
+                    onUpdate={onUpdate}
                   />
                 </div>
               ))}
@@ -198,6 +201,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   downvotes={tool.downvotes}
                   rating={tool.rating}
                   ratingCount={tool.ratingCount}
+                  onUpdate={onUpdate}
                 />
               </div>
             ))}

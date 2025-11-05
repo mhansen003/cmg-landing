@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import ToolDetailModal from './ToolDetailModal';
 import PhoneModal from './PhoneModal';
+import EditToolModal from './EditToolModal';
 
 interface ToolCardProps {
   id: string;
@@ -22,6 +23,7 @@ interface ToolCardProps {
   downvotes?: number;
   rating?: number;
   ratingCount?: number;
+  onUpdate?: () => void; // Callback to refresh data after update
 }
 
 const ToolCard: React.FC<ToolCardProps> = ({
@@ -41,12 +43,14 @@ const ToolCard: React.FC<ToolCardProps> = ({
   downvotes = 0,
   rating: initialRating = 0,
   ratingCount = 0,
+  onUpdate,
 }) => {
   const [votes, setVotes] = useState({ up: upvotes, down: downvotes });
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
   const [showShareToast, setShowShareToast] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [rating, setRating] = useState(initialRating);
   const [displayRatingCount, setDisplayRatingCount] = useState(ratingCount);
   const [hoverRating, setHoverRating] = useState(0);
@@ -175,6 +179,32 @@ const ToolCard: React.FC<ToolCardProps> = ({
       }
     } catch (err) {
       console.log('Share failed:', err);
+    }
+  };
+
+  const handleEditSave = async (updates: any) => {
+    try {
+      const response = await fetch(`/api/tools/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update tool');
+      }
+
+      // Close modal and refresh data
+      setIsEditModalOpen(false);
+      if (onUpdate) {
+        onUpdate();
+      } else {
+        // Fallback: reload page if no callback provided
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error updating tool:', error);
+      alert('Failed to update tool. Please try again.');
     }
   };
 
@@ -311,6 +341,17 @@ const ToolCard: React.FC<ToolCardProps> = ({
             {/* Bottom - Content */}
             <div className="p-5 flex flex-col justify-between relative z-10 flex-1">
               <div className="flex-1">
+                {/* Edit Button - Top Right */}
+                <button
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="absolute top-2 right-2 p-2 bg-dark-500/80 backdrop-blur-sm hover:bg-dark-400 rounded-lg border border-white/10 hover:border-accent-green transition-all duration-200 group/edit z-20"
+                  title="Edit tool"
+                >
+                  <svg className="w-4 h-4 text-gray-400 group-hover/edit:text-accent-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+
                 {/* Category Badge and Star Rating */}
                 <div className="flex items-center justify-between mb-4">
                   {category && (
@@ -555,6 +596,24 @@ const ToolCard: React.FC<ToolCardProps> = ({
           accentColor={accentColor === 'purple' ? 'orange' : accentColor}
         />
       )}
+
+      {/* Edit Modal */}
+      <EditToolModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleEditSave}
+        tool={{
+          id,
+          title,
+          description,
+          fullDescription,
+          url,
+          videoUrl,
+          thumbnailUrl,
+          category,
+          features,
+        }}
+      />
     </>
   );
 };

@@ -67,20 +67,22 @@ export default function Home() {
     'Training': '#FBBF24',
   });
 
+  // Fetch tools from API
+  const fetchTools = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/tools');
+      const data = await response.json();
+      setTools(data.tools || []);
+    } catch (error) {
+      console.error('Error fetching tools:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Fetch tools from API on mount
   useEffect(() => {
-    const fetchTools = async () => {
-      try {
-        const response = await fetch('/api/tools');
-        const data = await response.json();
-        setTools(data.tools || []);
-      } catch (error) {
-        console.error('Error fetching tools:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchTools();
   }, []);
 
@@ -365,6 +367,7 @@ export default function Home() {
                   categoryColor={categoryColors[category]}
                   onAddTool={handleOpenWizard}
                   getToolIcon={getToolIcon}
+                  onUpdate={fetchTools}
                 />
               ))}
             </div>
