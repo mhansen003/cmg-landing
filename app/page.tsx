@@ -98,6 +98,42 @@ export default function Home() {
     fetchTools();
   }, []);
 
+  // Handle deep linking to pending queue
+  useEffect(() => {
+    // Check for query parameters and hash
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    const hash = window.location.hash.slice(1); // Remove # prefix
+
+    // If view=pending, scroll to pending queue
+    if (view === 'pending') {
+      // Wait for pending queue to render
+      setTimeout(() => {
+        const pendingSection = document.getElementById('pending-queue');
+        if (pendingSection) {
+          pendingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          // If there's a specific tool ID in hash, highlight it
+          if (hash) {
+            setTimeout(() => {
+              const toolCard = document.getElementById(`tool-${hash}`);
+              if (toolCard) {
+                // Add highlight effect
+                toolCard.classList.add('ring-4', 'ring-accent-green', 'ring-offset-4', 'ring-offset-dark-500');
+                toolCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Remove highlight after 3 seconds
+                setTimeout(() => {
+                  toolCard.classList.remove('ring-4', 'ring-accent-green', 'ring-offset-4', 'ring-offset-dark-500');
+                }, 3000);
+              }
+            }, 500); // Wait for scroll to complete
+          }
+        }
+      }, 500); // Wait for data to load and render
+    }
+  }, [pendingTools, isAdmin]);
+
   // Fallback tools if loading or empty (icons added dynamically in render)
   const fallbackTools = [
     {
@@ -325,6 +361,8 @@ export default function Home() {
           videoUrl: toolData.videoUrl,
           categoryColor: toolData.categoryColor,
           features: toolData.features,
+          tags: toolData.tags,
+          aiGeneratedTags: toolData.aiGeneratedTags,
         }),
       });
 

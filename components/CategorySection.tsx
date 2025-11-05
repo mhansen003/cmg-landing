@@ -154,6 +154,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     ratingCount={tool.ratingCount}
                     onUpdate={onUpdate}
                     isAdmin={isAdmin}
+                    tags={tool.tags}
                   />
                 </div>
               ))}
@@ -206,6 +207,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   ratingCount={tool.ratingCount}
                   onUpdate={onUpdate}
                   isAdmin={isAdmin}
+                  tags={tool.tags}
                 />
               </div>
             ))}

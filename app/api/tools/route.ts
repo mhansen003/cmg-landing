@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Tool } from '@/types/tool';
 import { getSessionFromRequest } from '@/lib/auth';
 import { isAdmin, getDefaultStatus } from '@/lib/permissions';
+import { sendPendingApprovalEmail } from '@/lib/email-service';
 
 const TOOLS_KEY = 'cmg-tools';
 
@@ -339,6 +340,27 @@ export async function POST(request: NextRequest) {
 
     // Save back to Redis
     await redis.set(TOOLS_KEY, JSON.stringify(tools));
+
+    // Send email notification if tool is pending approval
+    if (toolWithMetadata.status === 'pending') {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cmg-landing.vercel.app';
+
+      // Send email asynchronously (don't block response)
+      sendPendingApprovalEmail(
+        {
+          toolId: toolWithMetadata.id,
+          title: toolWithMetadata.title,
+          description: toolWithMetadata.description,
+          category: toolWithMetadata.category,
+          url: toolWithMetadata.url,
+          createdBy: toolWithMetadata.createdBy,
+          thumbnailUrl: toolWithMetadata.thumbnailUrl,
+        },
+        siteUrl
+      ).catch((err) => {
+        console.error('Failed to send approval email (non-blocking):', err);
+      });
+    }
 
     return NextResponse.json({ success: true, tool: toolWithMetadata });
   } catch (error) {

@@ -83,7 +83,8 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
     setError(null);
 
     try {
-      const response = await fetch('/api/generate-tool', {
+      // Step 1: Generate tool data
+      const toolResponse = await fetch('/api/generate-tool', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -92,12 +93,72 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to generate tool data');
+      if (!toolResponse.ok) throw new Error('Failed to generate tool data');
 
-      const data = await response.json();
-      setGeneratedData(data);
+      const toolData = await toolResponse.json();
+      setGeneratedData(toolData);
+
       // Use manual category if set, otherwise use AI-generated category
-      setEditedCategory(manualCategory || data.category || '');
+      const finalCategory = manualCategory || toolData.category || '';
+      setEditedCategory(finalCategory);
+
+      // Step 2: Generate AI tags in parallel with screenshot capture
+      const aiPromises = [];
+
+      // Generate tags
+      const tagsPromise = fetch('/api/generate-tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: toolData.title,
+          description: toolData.description,
+          fullDescription: toolData.fullDescription,
+          category: finalCategory,
+          url: formData.url,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.tags) {
+            setTags(data.tags);
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to generate tags:', err);
+          // Set fallback tags
+          setTags([finalCategory, 'Tools']);
+        });
+
+      aiPromises.push(tagsPromise);
+
+      // Capture screenshot if no video was uploaded
+      if (!formData.video) {
+        const screenshotPromise = fetch('/api/capture-screenshot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: formData.url }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success && data.screenshotUrl) {
+              // Add screenshot URL to generated data
+              setGeneratedData((prev: any) => ({
+                ...prev,
+                thumbnailUrl: data.screenshotUrl,
+              }));
+            }
+          })
+          .catch((err) => {
+            console.error('Failed to capture screenshot:', err);
+            // Non-critical error, continue without screenshot
+          });
+
+        aiPromises.push(screenshotPromise);
+      }
+
+      // Wait for all AI operations to complete
+      await Promise.all(aiPromises);
+
       setStep(2);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate tool data');
@@ -114,6 +175,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
       videoFile: formData.video,
       videoPreview: formData.videoPreview,
       tags,
+      aiGeneratedTags: true, // Mark tags as AI-generated
     };
     onSubmit(toolData);
     handleClose();

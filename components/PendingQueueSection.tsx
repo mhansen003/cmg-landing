@@ -115,7 +115,7 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
 
   return (
     <>
-      <div className="mb-12">
+      <div id="pending-queue" className="mb-12">
         {/* Header */}
         <div className="flex items-center space-x-3 mb-6">
           <div className="flex-shrink-0">
@@ -139,6 +139,7 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
           {pendingTools.map((tool) => (
             <div
               key={tool.id}
+              id={`tool-${tool.id}`}
               className="relative bg-gradient-to-br from-dark-300 to-dark-400 rounded-xl border-2 border-orange-500/30 hover:border-orange-500/50 transition-all duration-300 overflow-hidden"
             >
               {/* Processing Overlay */}
