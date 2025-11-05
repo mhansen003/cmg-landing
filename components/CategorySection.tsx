@@ -18,6 +18,7 @@ interface Tool {
   downvotes?: number;
   rating?: number;
   ratingCount?: number;
+  tags?: string[];
 }
 
 interface CategorySectionProps {
