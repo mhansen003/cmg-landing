@@ -1,17 +1,21 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (inputValue?: string) => void;
   title: string;
   message: string;
   confirmText?: string;
   cancelText?: string;
   confirmColor?: 'red' | 'green' | 'blue';
   isLoading?: boolean;
+  showTextInput?: boolean;
+  textInputLabel?: string;
+  textInputPlaceholder?: string;
+  textInputRequired?: boolean;
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -24,8 +28,21 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   cancelText = 'Cancel',
   confirmColor = 'green',
   isLoading = false,
+  showTextInput = false,
+  textInputLabel = '',
+  textInputPlaceholder = '',
+  textInputRequired = false,
 }) => {
+  const [inputValue, setInputValue] = useState('');
+
   if (!isOpen) return null;
+
+  const handleConfirm = () => {
+    if (showTextInput && textInputRequired && !inputValue.trim()) {
+      return; // Don't confirm if required input is empty
+    }
+    onConfirm(showTextInput ? inputValue : undefined);
+  };
 
   const colorClasses = {
     red: 'bg-red-500 hover:bg-red-600 shadow-[0_0_30px_rgba(239,68,68,0.3)]',
@@ -54,7 +71,31 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
           {/* Content */}
           <div className="p-6">
-            <p className="text-gray-300 leading-relaxed">{message}</p>
+            <p className="text-gray-300 leading-relaxed mb-4">{message}</p>
+
+            {/* Optional Text Input */}
+            {showTextInput && (
+              <div className="mt-4">
+                {textInputLabel && (
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    {textInputLabel}
+                    {textInputRequired && <span className="text-red-500 ml-1">*</span>}
+                  </label>
+                )}
+                <textarea
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={textInputPlaceholder}
+                  className="w-full px-4 py-3 bg-dark-500 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-accent-green focus:ring-2 focus:ring-accent-green/50 transition-all resize-none"
+                  rows={4}
+                  disabled={isLoading}
+                  required={textInputRequired}
+                />
+                {textInputRequired && !inputValue.trim() && (
+                  <p className="text-xs text-red-400 mt-1">This field is required</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Footer */}
@@ -67,8 +108,8 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               {cancelText}
             </button>
             <button
-              onClick={onConfirm}
-              disabled={isLoading}
+              onClick={handleConfirm}
+              disabled={isLoading || (showTextInput && textInputRequired && !inputValue.trim())}
               className={`px-6 py-3 text-dark-500 font-bold rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 ${colorClasses[confirmColor]}`}
             >
               {isLoading && (

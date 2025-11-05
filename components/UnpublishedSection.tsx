@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import EditToolModal from './EditToolModal';
 import ConfirmDialog from './ConfirmDialog';
 import ErrorAlert from './ErrorAlert';
@@ -27,6 +28,7 @@ interface UnpublishedSectionProps {
 }
 
 const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTools, onUpdate }) => {
+  const router = useRouter();
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
@@ -36,6 +38,10 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
   const [actionToolTitle, setActionToolTitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showError, setShowError] = useState(false);
+
+  const handleBackToTools = () => {
+    router.push('/');
+  };
 
   const handleRepublishClick = (tool: Tool) => {
     setActionToolId(tool.id);
@@ -147,21 +153,34 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
   return (
     <>
       <div id="unpublished-section" className="mb-12">
-        {/* Header */}
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="flex-shrink-0">
-            <div className="w-12 h-12 bg-gray-500/20 border-2 border-gray-500 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-              </svg>
+        {/* Header with Back Button */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <div className="flex-shrink-0">
+              <div className="w-12 h-12 bg-gray-500/20 border-2 border-gray-500 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-white">Unpublished Tools</h3>
+              <p className="text-sm text-gray-400">{unpublishedTools.length} unpublished item{unpublishedTools.length !== 1 ? 's' : ''}</p>
             </div>
           </div>
-          <div className="flex-1">
-            <h3 className="text-2xl font-bold text-white">Unpublished Tools</h3>
-            <p className="text-sm text-gray-400">{unpublishedTools.length} unpublished item{unpublishedTools.length !== 1 ? 's' : ''}</p>
-          </div>
-          <div className="px-4 py-2 bg-gray-500/20 border-2 border-gray-500 rounded-lg">
-            <span className="text-gray-400 font-bold text-lg">{unpublishedTools.length}</span>
+          <div className="flex items-center space-x-3">
+            <div className="px-4 py-2 bg-gray-500/20 border-2 border-gray-500 rounded-lg">
+              <span className="text-gray-400 font-bold text-lg">{unpublishedTools.length}</span>
+            </div>
+            <button
+              onClick={handleBackToTools}
+              className="flex items-center space-x-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-lg text-gray-300 hover:text-white transition-all"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span className="text-sm font-medium">Hide Section</span>
+            </button>
           </div>
         </div>
 
@@ -211,12 +230,21 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
-                        <h4 className="text-xl font-bold text-white mb-1">{tool.title}</h4>
-                        {tool.category && (
-                          <span className="inline-block px-3 py-1 text-xs font-bold bg-white/5 text-gray-400 border border-gray-500/30 rounded-full">
-                            {tool.category}
+                        <h4 className="text-xl font-bold text-white mb-2">{tool.title}</h4>
+                        <div className="flex items-center space-x-2 mb-1">
+                          {tool.category && (
+                            <span className="inline-block px-3 py-1 text-xs font-bold bg-white/5 text-gray-400 border border-gray-500/30 rounded-full">
+                              {tool.category}
+                            </span>
+                          )}
+                          {/* Creator Badge - Prominent */}
+                          <span className="inline-flex items-center space-x-1.5 px-3 py-1 text-xs font-bold bg-accent-blue/10 text-accent-blue border border-accent-blue/30 rounded-full">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span>Submitted by {tool.createdBy || 'Unknown'}</span>
                           </span>
-                        )}
+                        </div>
                       </div>
                     </div>
 
@@ -224,12 +252,6 @@ const UnpublishedSection: React.FC<UnpublishedSectionProps> = ({ unpublishedTool
 
                     {/* Metadata */}
                     <div className="flex items-center space-x-4 text-xs text-gray-500 mb-4">
-                      <div className="flex items-center space-x-1">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span>By: {tool.createdBy || 'Unknown'}</span>
-                      </div>
                       {tool.createdAt && (
                         <div className="flex items-center space-x-1">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import EditToolModal from './EditToolModal';
 import ConfirmDialog from './ConfirmDialog';
 import ErrorAlert from './ErrorAlert';
@@ -26,6 +27,7 @@ interface PendingQueueSectionProps {
 }
 
 const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools, onUpdate }) => {
+  const router = useRouter();
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
@@ -34,6 +36,10 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
   const [rejectingToolTitle, setRejectingToolTitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showError, setShowError] = useState(false);
+
+  const handleBackToTools = () => {
+    router.push('/');
+  };
 
   const handleApprove = async (tool: Tool, withEdits: boolean = false) => {
     if (withEdits) {
@@ -100,13 +106,15 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
     setShowRejectConfirm(true);
   };
 
-  const handleRejectConfirm = async () => {
+  const handleRejectConfirm = async (rejectionReason?: string) => {
     if (!rejectingToolId) return;
 
     setProcessingId(rejectingToolId);
     try {
       const response = await fetch(`/api/tools/${rejectingToolId}`, {
         method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rejectionReason }),
       });
 
       if (!response.ok) {
@@ -135,21 +143,34 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
   return (
     <>
       <div id="pending-queue" className="mb-12">
-        {/* Header */}
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="flex-shrink-0">
-            <div className="w-12 h-12 bg-orange-500/20 border-2 border-orange-500 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+        {/* Header with Back Button */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <div className="flex-shrink-0">
+              <div className="w-12 h-12 bg-orange-500/20 border-2 border-orange-500 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-white">Pending Review Queue</h3>
+              <p className="text-sm text-gray-400">{pendingTools.length} item{pendingTools.length !== 1 ? 's' : ''} awaiting approval</p>
             </div>
           </div>
-          <div className="flex-1">
-            <h3 className="text-2xl font-bold text-white">Pending Review Queue</h3>
-            <p className="text-sm text-gray-400">{pendingTools.length} item{pendingTools.length !== 1 ? 's' : ''} awaiting approval</p>
-          </div>
-          <div className="px-4 py-2 bg-orange-500/20 border-2 border-orange-500 rounded-lg">
-            <span className="text-orange-500 font-bold text-lg">{pendingTools.length}</span>
+          <div className="flex items-center space-x-3">
+            <div className="px-4 py-2 bg-orange-500/20 border-2 border-orange-500 rounded-lg">
+              <span className="text-orange-500 font-bold text-lg">{pendingTools.length}</span>
+            </div>
+            <button
+              onClick={handleBackToTools}
+              className="flex items-center space-x-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-lg text-gray-300 hover:text-white transition-all"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span className="text-sm font-medium">Hide Queue</span>
+            </button>
           </div>
         </div>
 
@@ -199,12 +220,21 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
-                        <h4 className="text-xl font-bold text-white mb-1">{tool.title}</h4>
-                        {tool.category && (
-                          <span className="inline-block px-3 py-1 text-xs font-bold bg-white/5 text-orange-500 border border-orange-500/30 rounded-full">
-                            {tool.category}
+                        <h4 className="text-xl font-bold text-white mb-2">{tool.title}</h4>
+                        <div className="flex items-center space-x-2 mb-1">
+                          {tool.category && (
+                            <span className="inline-block px-3 py-1 text-xs font-bold bg-white/5 text-orange-500 border border-orange-500/30 rounded-full">
+                              {tool.category}
+                            </span>
+                          )}
+                          {/* Creator Badge - Prominent */}
+                          <span className="inline-flex items-center space-x-1.5 px-3 py-1 text-xs font-bold bg-accent-blue/10 text-accent-blue border border-accent-blue/30 rounded-full">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span>Submitted by {tool.createdBy || 'Unknown'}</span>
                           </span>
-                        )}
+                        </div>
                       </div>
                     </div>
 
@@ -212,12 +242,6 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
 
                     {/* Metadata */}
                     <div className="flex items-center space-x-4 text-xs text-gray-500 mb-4">
-                      <div className="flex items-center space-x-1">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span>By: {tool.createdBy || 'Unknown'}</span>
-                      </div>
                       {tool.createdAt && (
                         <div className="flex items-center space-x-1">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -303,12 +327,16 @@ const PendingQueueSection: React.FC<PendingQueueSectionProps> = ({ pendingTools,
         isOpen={showRejectConfirm}
         onClose={() => setShowRejectConfirm(false)}
         onConfirm={handleRejectConfirm}
-        title="Reject Tool"
-        message={`Are you sure you want to reject "${rejectingToolTitle}"? This will permanently delete the submission.`}
-        confirmText="Yes, Reject"
+        title="Reject Tool Submission"
+        message={`You are about to reject "${rejectingToolTitle}". The submitter will receive an email with your feedback and a link to edit and resubmit.`}
+        confirmText="Send Rejection Email"
         cancelText="Cancel"
         confirmColor="red"
         isLoading={processingId === rejectingToolId}
+        showTextInput={true}
+        textInputLabel="Rejection Reason"
+        textInputPlaceholder="Please explain why this tool submission is being rejected (e.g., missing information, incorrect category, duplicate submission, etc.)"
+        textInputRequired={true}
       />
 
       {/* Error Alert */}

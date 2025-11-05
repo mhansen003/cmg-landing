@@ -199,6 +199,173 @@ export async function sendPendingApprovalEmail(
 }
 
 /**
+ * Send email notification when a tool is rejected
+ */
+export async function sendRejectionEmail(
+  tool: ToolNotification,
+  rejectedBy: string,
+  recipientEmail: string,
+  rejectionReason: string,
+  siteUrl: string
+): Promise<boolean> {
+  try {
+    const resendApiKey = process.env.RESEND_API_KEY;
+
+    if (!resendApiKey) {
+      console.warn('RESEND_API_KEY not configured, skipping rejection email');
+      return false;
+    }
+
+    // Build edit link - we'll just link back to the main page where they can add a new tool
+    // In a full implementation, you might create a special token to allow editing the rejected tool
+    const editLink = `${siteUrl}`;
+
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+      color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .rejection-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    .reason-box {
+      background-color: #FEF2F2;
+      border-left: 4px solid #EF4444;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 6px;
+    }
+    .reason-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #DC2626;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .reason-text {
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #00FF88 0%, #00D4FF 100%);
+      color: #1a1a1a;
+      text-decoration: none;
+      padding: 14px 30px;
+      border-radius: 8px;
+      font-weight: 700;
+      margin: 20px 0;
+    }
+    .footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      color: #666;
+      font-size: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="rejection-icon">⚠️</div>
+      <h1>Tool Submission Needs Revision</h1>
+    </div>
+
+    <p>Your tool submission "<strong>${tool.title}</strong>" has been reviewed and requires some changes before it can be approved.</p>
+
+    <div class="reason-box">
+      <div class="reason-label">Reason for Rejection</div>
+      <div class="reason-text">${rejectionReason}</div>
+    </div>
+
+    <p><strong>What happens next?</strong></p>
+    <ul>
+      <li>Review the feedback provided above</li>
+      <li>Make the necessary changes to your tool submission</li>
+      <li>Resubmit your tool for approval</li>
+    </ul>
+
+    <div style="text-align: center;">
+      <a href="${editLink}" class="cta-button">
+        Submit Updated Tool →
+      </a>
+    </div>
+
+    <p style="color: #666; font-size: 14px; margin-top: 20px;">
+      If you have any questions about this feedback, please contact ${rejectedBy} or reply to this email.
+    </p>
+
+    <div class="footer">
+      <p>
+        This is an automated notification from CMG Tools Hub.<br>
+        Reviewed by: ${rejectedBy}
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim();
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'CMG Tools Hub <notifications@cmgfinancial.ai>',
+        to: [recipientEmail],
+        subject: `Tool Submission Needs Revision: ${tool.title}`,
+        html: emailHtml,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Resend API error: ${response.status}`);
+    }
+
+    console.log('[Email Service] ✅ Rejection email sent to', recipientEmail);
+    return true;
+  } catch (error) {
+    console.error('[Email Service] ❌ Failed to send rejection email:', error);
+    return false;
+  }
+}
+
+/**
  * Send email notification when a tool is approved
  */
 export async function sendApprovalConfirmationEmail(
