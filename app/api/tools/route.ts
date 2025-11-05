@@ -375,30 +375,30 @@ export async function POST(request: NextRequest) {
       console.log('[API /tools POST] Triggering approval email...');
       console.log(`[API /tools POST] SMTP configured: ${!!process.env.SMTP_HOST && !!process.env.SMTP_USER}`);
 
-      // Send email asynchronously (don't block response)
-      sendPendingApprovalEmail(
-        {
-          toolId: toolWithMetadata.id,
-          title: toolWithMetadata.title,
-          description: toolWithMetadata.description,
-          category: toolWithMetadata.category,
-          url: toolWithMetadata.url,
-          createdBy: toolWithMetadata.createdBy,
-          thumbnailUrl: toolWithMetadata.thumbnailUrl,
-        },
-        siteUrl
-      ).then((success) => {
+      // CRITICAL: Must await email in serverless environment or it gets killed
+      try {
+        const emailSuccess = await sendPendingApprovalEmail(
+          {
+            toolId: toolWithMetadata.id,
+            title: toolWithMetadata.title,
+            description: toolWithMetadata.description,
+            category: toolWithMetadata.category,
+            url: toolWithMetadata.url,
+            createdBy: toolWithMetadata.createdBy,
+            thumbnailUrl: toolWithMetadata.thumbnailUrl,
+          },
+          siteUrl
+        );
         console.log('[API /tools POST] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log(`[API /tools POST] Email result: ${success ? '✅ SENT SUCCESSFULLY' : '❌ FAILED TO SEND'}`);
+        console.log(`[API /tools POST] Email result: ${emailSuccess ? '✅ SENT SUCCESSFULLY' : '❌ FAILED TO SEND'}`);
         console.log('[API /tools POST] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      }).catch((err) => {
+      } catch (err) {
         console.error('[API /tools POST] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.error('[API /tools POST] ❌ EXCEPTION in email sending (non-blocking):');
+        console.error('[API /tools POST] ❌ EXCEPTION in email sending:');
         console.error('[API /tools POST] Error:', err);
         console.error('[API /tools POST] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      });
-      console.log('[API /tools POST] Email function triggered (async - will complete in background)');
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        // Don't fail the request if email fails
+      }
     } else {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.log(`[API /tools POST] ⏭️  Skipping email notification`);

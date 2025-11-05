@@ -52,9 +52,11 @@ export async function sendPendingApprovalEmail(
   console.log('[Email Service] Tool:', tool.title);
   console.log('[Email Service] Created by:', tool.createdBy);
   console.log('[Email Service] Site URL:', siteUrl);
+  console.log('[Email Service] Recipients (ADMIN_EMAILS):', ADMIN_EMAILS);
   console.log('[Email Service] SMTP_HOST:', process.env.SMTP_HOST || 'NOT SET');
   console.log('[Email Service] SMTP_USER:', process.env.SMTP_USER || 'NOT SET');
   console.log('[Email Service] SMTP_PASS:', process.env.SMTP_PASS ? '***SET***' : 'NOT SET');
+  console.log('[Email Service] SMTP_PORT:', process.env.SMTP_PORT || 'NOT SET');
 
   try {
     const transporter = createTransporter();
