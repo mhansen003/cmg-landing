@@ -46,15 +46,26 @@ export async function sendPendingApprovalEmail(
   tool: ToolNotification,
   siteUrl: string
 ): Promise<boolean> {
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('[Email Service] 🚀 sendPendingApprovalEmail() CALLED');
+  console.log('[Email Service] Tool:', tool.title);
+  console.log('[Email Service] Created by:', tool.createdBy);
+  console.log('[Email Service] Site URL:', siteUrl);
+  console.log('[Email Service] SMTP_HOST:', process.env.SMTP_HOST || 'NOT SET');
+  console.log('[Email Service] SMTP_USER:', process.env.SMTP_USER || 'NOT SET');
+  console.log('[Email Service] SMTP_PASS:', process.env.SMTP_PASS ? '***SET***' : 'NOT SET');
+
   try {
     const transporter = createTransporter();
 
     if (!transporter) {
-      console.error('[Email Service] SMTP not configured! Email notifications will not be sent.');
+      console.error('[Email Service] ❌ SMTP not configured! Email notifications will not be sent.');
+      console.error('[Email Service] Check that SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS are set');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       return false;
     }
 
-    console.log(`[Email Service] Preparing approval email for tool: ${tool.title}`);
+    console.log(`[Email Service] ✓ Transporter created successfully`);
 
     // Build deep link to pending queue with highlighted tool
     const approvalLink = `${siteUrl}?view=pending#${tool.toolId}`;
@@ -200,10 +211,17 @@ export async function sendPendingApprovalEmail(
 
     console.log('[Email Service] ✅ Approval email sent successfully to mhansen@cmgfi.com');
     console.log('[Email Service] Message ID:', info.messageId);
+    console.log('[Email Service] Response:', info.response);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     return true;
   } catch (error) {
-    console.error('[Email Service] ❌ Failed to send approval email:', error);
+    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.error('[Email Service] ❌ CRITICAL ERROR sending approval email');
+    console.error('[Email Service] Error type:', error instanceof Error ? error.name : typeof error);
+    console.error('[Email Service] Error message:', error instanceof Error ? error.message : String(error));
+    console.error('[Email Service] Full error:', error);
+    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     return false;
   }
 }
@@ -226,9 +244,8 @@ export async function sendRejectionEmail(
       return false;
     }
 
-    // Build edit link - we'll just link back to the main page where they can add a new tool
-    // In a full implementation, you might create a special token to allow editing the rejected tool
-    const editLink = `${siteUrl}`;
+    // Build link to rejected tools section where user can view, edit, and resubmit
+    const rejectedLink = `${siteUrl}?view=rejected`;
 
     const emailHtml = `
 <!DOCTYPE html>
@@ -329,13 +346,14 @@ export async function sendRejectionEmail(
     </ul>
 
     <div style="text-align: center;">
-      <a href="${editLink}" class="cta-button">
-        Submit Updated Tool →
+      <a href="${rejectedLink}" class="cta-button">
+        View Your Rejected Tools →
       </a>
     </div>
 
     <p style="color: #666; font-size: 14px; margin-top: 20px;">
-      If you have any questions about this feedback, please contact ${rejectedBy} or reply to this email.
+      Click the button above to view your rejected tool, where you can edit and resubmit it for approval.
+      If you have any questions about this feedback, please contact ${rejectedBy}.
     </p>
 
     <div class="footer">

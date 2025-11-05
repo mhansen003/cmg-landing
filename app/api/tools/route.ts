@@ -263,11 +263,23 @@ export async function GET(request: NextRequest) {
       }
     } else if (status === 'rejected') {
       // Users can see their own rejected tools
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('[API /tools GET] Fetching REJECTED tools');
+      console.log('[API /tools GET] Session email:', session?.email || 'NO SESSION');
+      console.log('[API /tools GET] Total tools in DB:', tools.length);
+
       if (session?.email) {
-        tools = tools.filter((t: any) => t.status === 'rejected' && t.createdBy === session.email);
+        const rejectedTools = tools.filter((t: any) => t.status === 'rejected' && t.createdBy === session.email);
+        console.log('[API /tools GET] Rejected tools for user:', rejectedTools.length);
+        if (rejectedTools.length > 0) {
+          console.log('[API /tools GET] Rejected tools:', rejectedTools.map((t: any) => ({ id: t.id, title: t.title, status: t.status, createdBy: t.createdBy })));
+        }
+        tools = rejectedTools;
       } else {
+        console.log('[API /tools GET] ❌ No session found - returning empty array');
         tools = [];
       }
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     } else if (status === 'all') {
       // Only admin can see all items
       if (!userIsAdmin) {
@@ -356,8 +368,12 @@ export async function POST(request: NextRequest) {
     if (toolWithMetadata.status === 'pending') {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://product.cmgfinancial.ai';
 
-      console.log(`[Email] Sending approval email for tool "${toolWithMetadata.title}" to admins`);
-      console.log(`[Email] SMTP configured: ${!!process.env.SMTP_HOST && !!process.env.SMTP_USER}`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('[API /tools POST] Tool created with status: PENDING');
+      console.log('[API /tools POST] Tool title:', toolWithMetadata.title);
+      console.log('[API /tools POST] Created by:', toolWithMetadata.createdBy);
+      console.log('[API /tools POST] Triggering approval email...');
+      console.log(`[API /tools POST] SMTP configured: ${!!process.env.SMTP_HOST && !!process.env.SMTP_USER}`);
 
       // Send email asynchronously (don't block response)
       sendPendingApprovalEmail(
@@ -372,12 +388,22 @@ export async function POST(request: NextRequest) {
         },
         siteUrl
       ).then((success) => {
-        console.log(`[Email] Approval email ${success ? 'sent successfully' : 'failed to send'}`);
+        console.log('[API /tools POST] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log(`[API /tools POST] Email result: ${success ? '✅ SENT SUCCESSFULLY' : '❌ FAILED TO SEND'}`);
+        console.log('[API /tools POST] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       }).catch((err) => {
-        console.error('[Email] Failed to send approval email (non-blocking):', err);
+        console.error('[API /tools POST] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.error('[API /tools POST] ❌ EXCEPTION in email sending (non-blocking):');
+        console.error('[API /tools POST] Error:', err);
+        console.error('[API /tools POST] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       });
+      console.log('[API /tools POST] Email function triggered (async - will complete in background)');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     } else {
-      console.log(`[Email] Skipping email notification, tool status is: ${toolWithMetadata.status}`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(`[API /tools POST] ⏭️  Skipping email notification`);
+      console.log(`[API /tools POST] Tool status is: ${toolWithMetadata.status} (only 'pending' triggers email)`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     }
 
     return NextResponse.json({ success: true, tool: toolWithMetadata });
