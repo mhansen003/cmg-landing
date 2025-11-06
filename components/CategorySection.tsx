@@ -19,6 +19,7 @@ interface Tool {
   rating?: number;
   ratingCount?: number;
   tags?: string[];
+  isChatbot?: boolean;
 }
 
 interface CategorySectionProps {
@@ -156,6 +157,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                     onUpdate={onUpdate}
                     isAdmin={isAdmin}
                     tags={tool.tags}
+                    isChatbot={tool.isChatbot}
                   />
                 </div>
               ))}
@@ -209,6 +211,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
                   onUpdate={onUpdate}
                   isAdmin={isAdmin}
                   tags={tool.tags}
+                  isChatbot={tool.isChatbot}
                 />
               </div>
             ))}

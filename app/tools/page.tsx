@@ -319,6 +319,7 @@ function HomeContent() {
       category: 'Sales AI Agents',
       videoUrl: '/videos/bank-statement-analyzer-demo.mp4',
       accentColor: 'green',
+      isChatbot: true,
       features: [
         'Automatic transaction data extraction',
         'Recurring deposit identification',
@@ -336,6 +337,7 @@ function HomeContent() {
       category: 'Sales AI Agents',
       videoUrl: '/videos/construction-guidelines-demo.mp4',
       accentColor: 'purple',
+      isChatbot: true,
       features: [
         'Construction-to-perm guideline expertise',
         'Draw schedule and inspection requirements',
@@ -353,6 +355,7 @@ function HomeContent() {
       category: 'Sales AI Agents',
       videoUrl: '/videos/jumbo-guidelines-demo.mp4',
       accentColor: 'blue',
+      isChatbot: true,
       features: [
         'Combined Fannie, Freddie, and CMG overlay guidelines',
         'Instant answers to loan scenario questions',
@@ -370,6 +373,7 @@ function HomeContent() {
       category: 'Sales AI Agents',
       videoUrl: '/videos/non-qm-guidelines-demo.mp4',
       accentColor: 'green',
+      isChatbot: true,
       features: [
         'Alternative documentation strategies',
         'Credit flexibility and exception guidance',
@@ -387,6 +391,7 @@ function HomeContent() {
       category: 'Sales AI Agents',
       videoUrl: '/videos/va-guidelines-demo.mp4',
       accentColor: 'purple',
+      isChatbot: true,
       features: [
         'VA eligibility and entitlement guidance',
         'Certificate of Eligibility (COE) assistance',
@@ -404,6 +409,7 @@ function HomeContent() {
       category: 'Sales AI Agents',
       videoUrl: '/videos/ai-chatbots-demo.mp4',
       accentColor: 'purple',
+      isChatbot: true,
       features: [
         'Multiple AI models (GPT-4, Claude, Gemini)',
         'Conversation history and management',
