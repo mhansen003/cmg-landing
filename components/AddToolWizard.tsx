@@ -34,6 +34,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
   const [editedCategory, setEditedCategory] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('#00FF88');
   const [tags, setTags] = useState<string[]>([]);
+  const [isChatbot, setIsChatbot] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
   const categoryOptions = [
@@ -273,6 +274,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
       thumbnailUrl: formData.thumbnailUrl ? normalizeUrl(formData.thumbnailUrl) : generatedData.thumbnailUrl,
       tags,
       aiGeneratedTags: true, // Mark tags as AI-generated
+      isChatbot, // Include chatbot flag
     };
     onSubmit(toolData);
     handleClose();
@@ -284,6 +286,7 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
     setGeneratedData(null);
     setError(null);
     setTags([]);
+    setIsChatbot(false);
     setManualCategory('');
     setEditedCategory('');
     setSelectedColor('#00FF88');
@@ -559,6 +562,25 @@ const AddToolWizard: React.FC<AddToolWizardProps> = ({ isOpen, onClose, onSubmit
                   <p className="text-xs text-gray-500 mt-2">
                     Tags help users find your tool. Example: Sales, Operations, IT, Training, AI
                   </p>
+                </div>
+
+                {/* Chatbot Personality Checkbox */}
+                <div className="flex items-start space-x-3 p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl">
+                  <input
+                    type="checkbox"
+                    id="isChatbot"
+                    checked={isChatbot}
+                    onChange={(e) => setIsChatbot(e.target.checked)}
+                    className="mt-1 w-5 h-5 rounded border-purple-500/50 bg-dark-500 text-purple-500 focus:ring-purple-500 focus:ring-offset-dark-500"
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="isChatbot" className="block text-sm font-bold text-white cursor-pointer">
+                      🤖 Prompt for Personality
+                    </label>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Enable this if your tool is a chatbot that requires personality selection before launching. Users will be prompted to choose a personality from your admin system.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Preview Card */}

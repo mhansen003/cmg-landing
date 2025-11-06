@@ -23,6 +23,7 @@ interface EditToolModalProps {
     tags?: string[];
     aiGeneratedTags?: boolean;
     createdBy?: string;
+    isChatbot?: boolean;
   };
   isApprovalMode?: boolean; // If true, show "Approve & Publish" instead of "Save"
   isAdmin?: boolean; // If true, show admin-only actions like unpublish
@@ -41,6 +42,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(tool.videoUrl || null);
   const [tags, setTags] = useState<string[]>(tool.tags || []);
+  const [isChatbot, setIsChatbot] = useState(tool.isChatbot || false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -65,6 +67,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
       setVideoFile(null);
       setVideoPreview(tool.videoUrl || null);
       setTags(tool.tags || []);
+      setIsChatbot(tool.isChatbot || false);
     }
   }, [tool]);
 
@@ -184,6 +187,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
       category: formData.category,
       features: featuresArray,
       tags,
+      isChatbot, // Include chatbot flag
     });
   };
 
@@ -457,6 +461,25 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
               <p className="text-xs text-gray-500 mt-2">
                 Tags help users find this tool through search
               </p>
+            </div>
+
+            {/* Chatbot Personality Checkbox */}
+            <div className="flex items-start space-x-3 p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl">
+              <input
+                type="checkbox"
+                id="isChatbot"
+                checked={isChatbot}
+                onChange={(e) => setIsChatbot(e.target.checked)}
+                className="mt-1 w-5 h-5 rounded border-purple-500/50 bg-dark-500 text-purple-500 focus:ring-purple-500 focus:ring-offset-dark-500"
+              />
+              <div className="flex-1">
+                <label htmlFor="isChatbot" className="block text-sm font-bold text-white cursor-pointer">
+                  🤖 Prompt for Personality
+                </label>
+                <p className="text-xs text-gray-400 mt-1">
+                  Enable this if your tool is a chatbot that requires personality selection before launching. Users will be prompted to choose a personality from your admin system.
+                </p>
+              </div>
             </div>
           </div>
         </div>
