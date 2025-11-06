@@ -20,6 +20,8 @@ export interface Tool {
   // Tags for search and categorization
   tags?: string[];
   aiGeneratedTags?: boolean; // Track if tags were AI-generated
+  // Chatbot functionality
+  isChatbot?: boolean; // Flag to identify chatbot tools
   // Voting and ranking
   upvotes: number;
   downvotes: number;
@@ -33,4 +35,15 @@ export interface VoteRequest {
 
 export interface RatingRequest {
   rating: number; // 1-5
+}
+
+// Chatbot Personality System
+export interface Personality {
+  id: string;
+  name: string;
+  description: string;
+  promptUrl: string; // URL that returns the personality prompt
+  icon?: string; // Emoji or icon identifier
+  createdAt: string;
+  publishedPrompts?: number; // Count of published prompts
 }

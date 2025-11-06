@@ -6,6 +6,7 @@ import ToolDetailModal from './ToolDetailModal';
 import PhoneModal from './PhoneModal';
 import EditToolModal from './EditToolModal';
 import ErrorAlert from './ErrorAlert';
+import PersonalityModal from './PersonalityModal';
 
 interface ToolCardProps {
   id: string;
@@ -27,6 +28,7 @@ interface ToolCardProps {
   onUpdate?: () => void; // Callback to refresh data after update
   isAdmin?: boolean; // Whether the current user is admin
   tags?: string[];
+  isChatbot?: boolean; // Flag to identify chatbot tools
 }
 
 const ToolCard: React.FC<ToolCardProps> = ({
@@ -49,6 +51,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
   onUpdate,
   isAdmin = false,
   tags,
+  isChatbot = false,
 }) => {
   const [votes, setVotes] = useState({ up: upvotes, down: downvotes });
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
@@ -56,6 +59,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPersonalityModalOpen, setIsPersonalityModalOpen] = useState(false);
   const [rating, setRating] = useState(initialRating);
   const [displayRatingCount, setDisplayRatingCount] = useState(ratingCount);
   const [hoverRating, setHoverRating] = useState(0);
@@ -213,6 +217,25 @@ const ToolCard: React.FC<ToolCardProps> = ({
       console.error('Error updating tool:', error);
       setErrorMessage('Failed to update tool. Please try again.');
       setShowError(true);
+    }
+  };
+
+  const handleLaunchWithPersonality = (personalityUrl: string) => {
+    // Construct the URL with personality parameter
+    const separator = url.includes('?') ? '&' : '?';
+    const launchUrl = `${url}${separator}personality=${encodeURIComponent(personalityUrl)}`;
+
+    // Open in new tab
+    window.open(launchUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleLaunchClick = () => {
+    if (isChatbot) {
+      // Show personality modal for chatbots
+      setIsPersonalityModalOpen(true);
+    } else {
+      // Direct launch for non-chatbot tools
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -562,15 +585,13 @@ const ToolCard: React.FC<ToolCardProps> = ({
                     <div className="absolute inset-0 bg-white/20 transform translate-x-[-100%] group-hover/button:translate-x-[100%] transition-transform duration-700"></div>
                   </button>
                 ) : (
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={handleLaunchClick}
                     className="inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold rounded-lg text-dark-500 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group/button"
                     style={useCustomColor ? { backgroundColor: customColor } : {}}
                   >
                     <span className="relative z-10 flex items-center">
-                      Launch Tool
+                      {isChatbot ? 'Launch Chatbot' : 'Launch Tool'}
                       <svg
                         className="ml-2 w-4 h-4 transform group-hover/button:translate-x-1 transition-transform duration-300"
                         fill="none"
@@ -586,7 +607,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
                       </svg>
                     </span>
                     <div className="absolute inset-0 bg-white/20 transform translate-x-[-100%] group-hover/button:translate-x-[100%] transition-transform duration-700"></div>
-                  </a>
+                  </button>
                 )}
               </div>
             </div>
@@ -643,6 +664,18 @@ const ToolCard: React.FC<ToolCardProps> = ({
         }}
         isAdmin={isAdmin}
       />
+
+      {/* Personality Modal */}
+      {isChatbot && (
+        <PersonalityModal
+          isOpen={isPersonalityModalOpen}
+          onClose={() => setIsPersonalityModalOpen(false)}
+          onLaunch={handleLaunchWithPersonality}
+          toolTitle={title}
+          accentColor={accentColor}
+          customColor={categoryColor}
+        />
+      )}
 
       {/* Error Alert */}
       <ErrorAlert
