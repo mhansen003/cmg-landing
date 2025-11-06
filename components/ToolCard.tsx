@@ -221,9 +221,14 @@ const ToolCard: React.FC<ToolCardProps> = ({
   };
 
   const handleLaunchWithPersonality = (personalityUrl: string) => {
-    // Construct the URL with personality parameter
-    const separator = url.includes('?') ? '&' : '?';
-    const launchUrl = `${url}${separator}personality=${encodeURIComponent(personalityUrl)}`;
+    // If no personality URL (user has no published personalities), launch without parameter
+    let launchUrl = url;
+
+    if (personalityUrl) {
+      // Construct the URL with personality parameter
+      const separator = url.includes('?') ? '&' : '?';
+      launchUrl = `${url}${separator}personality=${encodeURIComponent(personalityUrl)}`;
+    }
 
     // Open in new tab
     window.open(launchUrl, '_blank', 'noopener,noreferrer');

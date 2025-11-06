@@ -1,39 +1,76 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Personality } from '@/types/tool';
+import { getSessionFromRequest } from '@/lib/auth';
 
 /**
  * GET /api/personalities
  *
- * Fetches the list of available chatbot personalities.
- *
- * TODO: Replace this placeholder implementation with your actual endpoint.
- * Once you have your personality management system set up, update this endpoint
- * to fetch from your real API or database.
- *
- * Expected response format:
- * {
- *   personalities: Personality[]
- * }
+ * Fetches the list of available chatbot personalities from the prompt engine.
+ * If user has no published personalities, returns empty array (bypasses modal).
  */
 export async function GET(request: NextRequest) {
   try {
-    // ==================================================================================
-    // PLACEHOLDER IMPLEMENTATION
-    // ==================================================================================
-    // Replace this with your actual API call once you have the endpoint ready.
-    //
-    // Example with real endpoint:
-    // const response = await fetch('https://your-api.com/api/personalities', {
-    //   headers: {
-    //     'Authorization': `Bearer ${process.env.PERSONALITY_API_KEY}`,
-    //   },
-    // });
-    // const data = await response.json();
-    // return NextResponse.json(data);
-    // ==================================================================================
+    // Get session to extract username
+    const session = getSessionFromRequest(request);
+    const userEmail = session?.email;
 
-    // Mock data based on the screenshot provided
-    const mockPersonalities: Personality[] = [
+    if (!userEmail) {
+      console.log('[Personalities API] No user session found, returning empty array');
+      return NextResponse.json({ personalities: [] });
+    }
+
+    // Extract username from email (part before @)
+    const username = userEmail.split('@')[0];
+
+    // Fetch personalities from the prompt engine
+    const personalitiesUrl = `https://prompt.cmgfinancial.ai/api/personalities/${username}`;
+    console.log(`[Personalities API] Fetching from: ${personalitiesUrl}`);
+
+    const response = await fetch(personalitiesUrl, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      // Add cache control to get fresh data
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      console.error(`[Personalities API] Failed to fetch: ${response.status} ${response.statusText}`);
+      return NextResponse.json({ personalities: [] });
+    }
+
+    const data = await response.json();
+
+    // If the API returns no personalities, return empty array (will bypass modal)
+    if (!data.personalities || data.personalities.length === 0) {
+      console.log(`[Personalities API] No published personalities found for user: ${username}`);
+      return NextResponse.json({ personalities: [] });
+    }
+
+    // Transform the data to match our Personality interface
+    const personalities: Personality[] = data.personalities.map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      description: '', // Prompt engine doesn't provide descriptions
+      promptUrl: `https://prompt.cmgfinancial.ai${p.url}`, // Full URL to the personality
+      icon: p.emoji,
+      createdAt: p.createdAt,
+    }));
+
+    console.log(`[Personalities API] Found ${personalities.length} personalities for user: ${username}`);
+    return NextResponse.json({ personalities });
+
+  } catch (error) {
+    console.error('[Personalities API] Error fetching personalities:', error);
+    // Return empty array on error - this will trigger the bypass logic
+    return NextResponse.json({ personalities: [] });
+  }
+}
+
+// ==================================================================================
+// BACKUP: Mock data in case we need to revert
+// ==================================================================================
+const mockPersonalities_BACKUP: Personality[] = [
       {
         id: '1',
         name: 'Executive Briefing (CMG)',

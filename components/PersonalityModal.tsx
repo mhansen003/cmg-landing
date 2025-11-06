@@ -68,15 +68,27 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
         throw new Error('Failed to fetch personalities');
       }
       const data = await response.json();
-      setPersonalities(data.personalities || []);
+      const personalitiesData = data.personalities || [];
+      setPersonalities(personalitiesData);
+
+      // If no personalities found, bypass modal and launch directly
+      if (personalitiesData.length === 0) {
+        console.log('No personalities found, bypassing modal and launching directly');
+        onLaunch(''); // Launch without personality parameter
+        onClose();
+        return;
+      }
 
       // Auto-select first personality if available
-      if (data.personalities && data.personalities.length > 0) {
-        setSelectedPersonality(data.personalities[0].promptUrl);
+      if (personalitiesData.length > 0) {
+        setSelectedPersonality(personalitiesData[0].promptUrl);
       }
     } catch (err) {
       console.error('Error fetching personalities:', err);
-      setError('Unable to load personalities. Please try again.');
+      // On error, bypass modal and launch directly
+      console.log('Error fetching personalities, bypassing modal and launching directly');
+      onLaunch(''); // Launch without personality parameter
+      onClose();
     } finally {
       setIsLoading(false);
     }
