@@ -273,7 +273,7 @@ const EditToolModal: React.FC<EditToolModalProps> = ({ isOpen, onClose, onSave, 
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+        <div className="p-6 pb-16 overflow-y-auto max-h-[calc(90vh-140px)]">
           <div className="space-y-6">
             {/* Title */}
             <div>
