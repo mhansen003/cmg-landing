@@ -119,7 +119,7 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
       ></div>
 
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-gradient-to-br from-dark-300 to-dark-400 rounded-2xl shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-2xl bg-gradient-to-br from-dark-300 to-dark-400 rounded-2xl shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 duration-300">
         {/* Header with glow effect */}
         <div className="relative p-6 border-b border-white/10">
           <div
@@ -288,35 +288,45 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
               </label>
               <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
                 {personalities.map((personality) => (
-                  <button
-                    key={personality.id}
-                    onClick={() => setSelectedPersonality(personality.promptUrl)}
-                    className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02] ${
-                      selectedPersonality === personality.promptUrl
-                        ? 'bg-white/10 shadow-lg'
-                        : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
-                    }`}
-                    style={
-                      selectedPersonality === personality.promptUrl && useCustomColor
-                        ? { borderColor: effectiveColor, boxShadow: `0 0 20px ${effectiveColor}40` }
-                        : {}
-                    }
-                  >
-                    <div className="flex items-start space-x-3">
-                      {/* Icon */}
-                      {personality.icon && (
-                        <div className="text-2xl flex-shrink-0">
-                          {personality.icon}
-                        </div>
-                      )}
+                    <button
+                      key={personality.id}
+                      onClick={() => setSelectedPersonality(personality.promptUrl)}
+                      className={`w-full text-left p-5 rounded-xl border-2 transition-all duration-200 hover:scale-[1.01] ${
+                        selectedPersonality === personality.promptUrl
+                          ? 'bg-white/10 shadow-lg'
+                          : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                      }`}
+                      style={
+                        selectedPersonality === personality.promptUrl && useCustomColor
+                          ? { borderColor: effectiveColor, boxShadow: `0 0 20px ${effectiveColor}40` }
+                          : {}
+                      }
+                    >
+                      <div className="flex items-start space-x-5">
+                        {/* Icon/Image - Larger showcase */}
+                        {(personality.imageUrl || personality.emoji || personality.icon) && (
+                          <div className="flex-shrink-0">
+                            {personality.imageUrl ? (
+                              <img
+                                src={personality.imageUrl}
+                                alt={personality.name}
+                                className="w-20 h-20 rounded-xl object-cover shadow-lg ring-2 ring-white/10"
+                              />
+                            ) : (
+                              <div className="w-20 h-20 flex items-center justify-center text-5xl">
+                                {personality.emoji || personality.icon}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-bold text-white truncate">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-bold text-white text-lg truncate">
                             {personality.name}
                           </h3>
                           {selectedPersonality === personality.promptUrl && (
                             <svg
-                              className="w-5 h-5 flex-shrink-0 ml-2"
+                              className="w-6 h-6 flex-shrink-0 ml-2"
                               style={useCustomColor ? { color: effectiveColor } : {}}
                               fill="none"
                               stroke="currentColor"
@@ -325,17 +335,17 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                strokeWidth={2}
+                                strokeWidth={2.5}
                                 d="M5 13l4 4L19 7"
                               />
                             </svg>
                           )}
                         </div>
-                        <p className="text-xs text-gray-400 line-clamp-2">
+                        <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">
                           {personality.description}
                         </p>
                         {personality.publishedPrompts !== undefined && (
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-gray-500 mt-2">
                             {personality.publishedPrompts} published prompt{personality.publishedPrompts !== 1 ? 's' : ''}
                           </p>
                         )}

@@ -43,7 +43,9 @@ export interface Personality {
   name: string;
   description: string;
   promptUrl: string; // URL that returns the personality prompt
-  icon?: string; // Emoji or icon identifier
+  emoji?: string; // Emoji character (fallback if no imageUrl)
+  imageUrl?: string; // URL to persona image (preferred over emoji)
+  icon?: string; // Emoji or icon identifier (legacy support)
   createdAt: string;
   publishedPrompts?: number; // Count of published prompts
 }

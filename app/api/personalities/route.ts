@@ -54,7 +54,9 @@ export async function GET(request: NextRequest) {
       name: p.name,
       description: p.description || '', // Brief description from persona engine
       promptUrl: `https://persona.cmgfinancial.ai${p.url}`, // Full URL to the personality
-      icon: p.emoji,
+      emoji: p.emoji, // Emoji character (fallback)
+      imageUrl: p.imageUrl, // Image URL (preferred)
+      icon: p.emoji, // Legacy support
       createdAt: p.createdAt,
     }));
 
