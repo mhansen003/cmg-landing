@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     const personalities: Personality[] = data.personalities.map((p: any) => ({
       id: p.id,
       name: p.name,
-      description: '', // Prompt engine doesn't provide descriptions
+      description: p.description || '', // Brief description from prompt engine
       promptUrl: `https://prompt.cmgfinancial.ai${p.url}`, // Full URL to the personality
       icon: p.emoji,
       createdAt: p.createdAt,
