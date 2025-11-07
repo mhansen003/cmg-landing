@@ -95,24 +95,15 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
   };
 
   const handleSetupPersona = () => {
-    console.log('[PersonalityModal] Launching tool via onLaunch()...');
-    // Open both windows synchronously to avoid popup blocker
-    // Launch the tool first
-    onLaunch('');
-
-    console.log('[PersonalityModal] Opening persona setup page...');
-    // Immediately open persona setup (both in same click context)
-    const personaWindow = window.open('https://persona.cmgfinancial.ai/', '_blank', 'noopener,noreferrer');
-    console.log('[PersonalityModal] Persona window opened:', personaWindow !== null);
-
-    // Delay closing modal slightly to ensure windows have opened
-    setTimeout(() => {
-      onClose();
-    }, 50);
+    console.log('[PersonalityModal] Redirecting to persona setup page...');
+    // Only open persona setup page
+    window.open('https://persona.cmgfinancial.ai/', '_blank', 'noopener,noreferrer');
+    onClose();
   };
 
   const handleLaunchWithoutPersona = () => {
-    // Launch tool without persona parameter
+    console.log('[PersonalityModal] Launching tool without persona...');
+    // Only launch the tool without persona parameter
     onLaunch('');
     onClose();
   };
@@ -224,7 +215,6 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
                 </h3>
                 <p className="text-gray-400 text-sm leading-relaxed px-4">
                   Would you like to set up a persona to improve the behavior of your prompts?
-                  You can continue using the tool while setting up your persona.
                 </p>
               </div>
 
@@ -253,7 +243,7 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
                       d="M12 4v16m8-8H4"
                     />
                   </svg>
-                  <span>Set Up Persona</span>
+                  <span>Yes, Set Up Persona</span>
                   <svg
                     className="w-4 h-4"
                     fill="none"
@@ -274,7 +264,7 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
                   onClick={handleLaunchWithoutPersona}
                   className="w-full px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 text-white font-semibold flex items-center justify-center space-x-2"
                 >
-                  <span>Launch Without Persona</span>
+                  <span>No, Launch Tool</span>
                   <svg
                     className="w-4 h-4"
                     fill="none"
