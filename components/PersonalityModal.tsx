@@ -71,13 +71,8 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
       const personalitiesData = data.personalities || [];
       setPersonalities(personalitiesData);
 
-      // If no personalities found, bypass modal and launch directly
-      if (personalitiesData.length === 0) {
-        console.log('No personalities found, bypassing modal and launching directly');
-        onLaunch(''); // Launch without personality parameter
-        onClose();
-        return;
-      }
+      // Keep the modal open if no personalities found - show setup prompt
+      // (Removed the auto-close behavior)
 
       // Auto-select first personality if available
       if (personalitiesData.length > 0) {
@@ -85,10 +80,8 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
       }
     } catch (err) {
       console.error('Error fetching personalities:', err);
-      // On error, bypass modal and launch directly
-      console.log('Error fetching personalities, bypassing modal and launching directly');
-      onLaunch(''); // Launch without personality parameter
-      onClose();
+      // Keep modal open on error - show the empty state with setup option
+      setPersonalities([]);
     } finally {
       setIsLoading(false);
     }
@@ -99,6 +92,20 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
       onLaunch(selectedPersonality);
       onClose();
     }
+  };
+
+  const handleSetupPersona = () => {
+    // Open persona setup in new tab
+    window.open('https://persona.cmgfinancial.ai/', '_blank', 'noopener,noreferrer');
+    // Launch the tool without persona so user can continue working
+    onLaunch('');
+    onClose();
+  };
+
+  const handleLaunchWithoutPersona = () => {
+    // Launch tool without persona parameter
+    onLaunch('');
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -184,21 +191,96 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
               </button>
             </div>
           ) : personalities.length === 0 ? (
-            <div className="py-8 text-center">
-              <svg
-                className="w-12 h-12 text-gray-500 mx-auto mb-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                />
-              </svg>
-              <p className="text-gray-400">No personalities available</p>
+            <div className="py-6">
+              {/* Icon and Message */}
+              <div className="text-center mb-6">
+                <div className="flex items-center justify-center mb-4">
+                  <svg
+                    className="w-16 h-16 mx-auto"
+                    style={useCustomColor ? { color: effectiveColor } : {}}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">
+                  No Persona Found
+                </h3>
+                <p className="text-gray-400 text-sm leading-relaxed px-4">
+                  Would you like to set up a persona to improve the behavior of your prompts?
+                  You can continue using the tool while setting up your persona.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                {/* Set Up Persona Button - Primary */}
+                <button
+                  onClick={handleSetupPersona}
+                  className="w-full px-6 py-3.5 rounded-xl font-bold text-dark-500 transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 shadow-lg"
+                  style={
+                    useCustomColor
+                      ? { backgroundColor: effectiveColor, boxShadow: `0 0 20px ${effectiveColor}40` }
+                      : {}
+                  }
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  <span>Set Up Persona</span>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </button>
+
+                {/* Launch Without Persona Button - Secondary */}
+                <button
+                  onClick={handleLaunchWithoutPersona}
+                  className="w-full px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 text-white font-semibold flex items-center justify-center space-x-2"
+                >
+                  <span>Launch Without Persona</span>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
           ) : (
             <>
