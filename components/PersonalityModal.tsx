@@ -95,11 +95,20 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({
   };
 
   const handleSetupPersona = () => {
-    // Open persona setup in new tab
-    window.open('https://persona.cmgfinancial.ai/', '_blank', 'noopener,noreferrer');
-    // Launch the tool without persona so user can continue working
+    console.log('[PersonalityModal] Launching tool via onLaunch()...');
+    // Open both windows synchronously to avoid popup blocker
+    // Launch the tool first
     onLaunch('');
-    onClose();
+
+    console.log('[PersonalityModal] Opening persona setup page...');
+    // Immediately open persona setup (both in same click context)
+    const personaWindow = window.open('https://persona.cmgfinancial.ai/', '_blank', 'noopener,noreferrer');
+    console.log('[PersonalityModal] Persona window opened:', personaWindow !== null);
+
+    // Delay closing modal slightly to ensure windows have opened
+    setTimeout(() => {
+      onClose();
+    }, 50);
   };
 
   const handleLaunchWithoutPersona = () => {

@@ -230,8 +230,10 @@ const ToolCard: React.FC<ToolCardProps> = ({
       launchUrl = `${url}${separator}personality=${encodeURIComponent(personalityUrl)}`;
     }
 
+    console.log('[ToolCard] Launching tool:', launchUrl);
     // Open in new tab
-    window.open(launchUrl, '_blank', 'noopener,noreferrer');
+    const toolWindow = window.open(launchUrl, '_blank', 'noopener,noreferrer');
+    console.log('[ToolCard] Tool window opened:', toolWindow !== null);
   };
 
   const handleLaunchClick = () => {
