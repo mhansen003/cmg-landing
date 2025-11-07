@@ -5,7 +5,8 @@ import { getSessionFromRequest } from '@/lib/auth';
 /**
  * GET /api/personalities
  *
- * Fetches the list of available chatbot personalities from the prompt engine.
+ * Fetches the list of available chatbot personalities from the persona engine.
+ * Endpoint: https://persona.cmgfinancial.ai/api/personalities/{username}
  * If user has no published personalities, returns empty array (bypasses modal).
  */
 export async function GET(request: NextRequest) {
@@ -22,8 +23,8 @@ export async function GET(request: NextRequest) {
     // Extract username from email (part before @)
     const username = userEmail.split('@')[0];
 
-    // Fetch personalities from the prompt engine
-    const personalitiesUrl = `https://prompt.cmgfinancial.ai/api/personalities/${username}`;
+    // Fetch personalities from the persona engine
+    const personalitiesUrl = `https://persona.cmgfinancial.ai/api/personalities/${username}`;
     console.log(`[Personalities API] Fetching from: ${personalitiesUrl}`);
 
     const response = await fetch(personalitiesUrl, {
@@ -51,8 +52,8 @@ export async function GET(request: NextRequest) {
     const personalities: Personality[] = data.personalities.map((p: any) => ({
       id: p.id,
       name: p.name,
-      description: p.description || '', // Brief description from prompt engine
-      promptUrl: `https://prompt.cmgfinancial.ai${p.url}`, // Full URL to the personality
+      description: p.description || '', // Brief description from persona engine
+      promptUrl: `https://persona.cmgfinancial.ai${p.url}`, // Full URL to the personality
       icon: p.emoji,
       createdAt: p.createdAt,
     }));
